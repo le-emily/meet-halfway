@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 
 import secrets
-# from model import connect_to_db, db, User
+from model import connect_to_db, db, User, Invitations, Status, Address, UserAddress
 
 
 app = Flask(__name__)
@@ -16,11 +16,13 @@ def index():
     
     return render_template("welcome.html")
 
+
 @app.route("/register", methods=["GET"])
 def register_form():
     """Show form for user signup."""
 
     return render_template("register.html")
+
 
 @app.route("/register", methods=["POST"])
 def process_registration():
@@ -32,11 +34,13 @@ def process_registration():
 
     return render_template("register.html", email=email, password=password)
 
+
 @app.route("/login", methods=["GET"])
 def login_form():
     """Show form for user login"""
     
     return render_template("login.html")
+
 
 @app.route("/login", methods=["POST"])
 def login_process():
@@ -52,16 +56,16 @@ def login_process():
         flash("This user does not exist in the databse.")
         return redirect("/login")
 
-    if user.password != password
-        flash("Incorrect password.")
-        return redirect("/login")
+    # if user.password != password
+    #     flash("Incorrect password.")
+    #     return redirect("/login")
 
     session["user_id"] = user.user_id
 
     flash("Log in successful!")
 
     # change redirect?
-    return redirect("/login"))
+    return redirect("/login")
 #     
 
 
@@ -70,8 +74,8 @@ if __name__ == "__main__":
     # that we invoke the DebugToolbarExtension
     app.debug = False
 
-    # connect_to_db(app)
-
+    connect_to_db(app)
+ 
     # Use the DebugToolbar
     DebugToolbarExtension(app)
 

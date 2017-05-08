@@ -1,2 +1,4 @@
 secrets.sh
-*.pyc
+*.pyc*.pyc
+secrets.py
+.DS_Store
