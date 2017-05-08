@@ -9,6 +9,8 @@ from model import connect_to_db, db, User, Invitations, Status, Address, UserAdd
 
 app = Flask(__name__)
 
+app.secret_key = "t)6r)3s5^w)i9kahs(=^u$0-djb*6!@gs93qlfnjxh_^!gi@&_"
+
 app.jinja_env.undefined = StrictUndefined
 
 @app.route("/", methods=["GET"])
