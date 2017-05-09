@@ -1,6 +1,6 @@
 """Models and database functions for MeetHalfway project."""
 
-from flask_sqlalchemy import SQLAlchemy, ForeignKey
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 ##############################################################################
@@ -12,11 +12,11 @@ class User(db.Model):
     __tablename__ = "user"
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(50), nullable=False)
-    password = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    address = db.Column(db.String(100), nullable=False)
 
-    invitations = relationship("Invitations", backref="user")
 
 class Invitations(db.Model):
     """Invitations details."""
@@ -24,8 +24,13 @@ class Invitations(db.Model):
     __tablename__ = "invitations"
 
     invitation_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
-    receiver_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
+
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    
+    sender = db.relationship("User", foreign_keys=[sender_id])
+    receiver = db.relationship("User", foreign_keys=[receiver_id])
+
     status_id = db.Column(db.Integer)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
@@ -48,7 +53,7 @@ class Address(db.Model):
     __tablename__ = "address"
 
     address_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    address_type = db.Column(db.String(50), autoincrement=True, primary_key=True)
+    address_type = db.Column(db.String(50))
     address = db.Column(db.String(100), nullable=False)
 
 
@@ -59,8 +64,12 @@ class UserAddress(db.Model):
     __tablename__ = "user_address_association"
  
     user_address_id =  db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id =  db.Column(db.Integer, ForeignKey("user.user_id"))
-    address_id = db.Column(db.Integer, ForeignKey("address.address_id"))
+
+    user_id =  db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    address_id = db.Column(db.Integer, db.ForeignKey('address.address_id'))
+
+    user = db.relationship("User", foreign_keys=[user_id])
+    address = db.relationship("Address", foreign_keys=[address_id])
 
     
 ##############################################################################
@@ -70,7 +79,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our PstgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/MeetHalfway'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///meethalfway'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)
