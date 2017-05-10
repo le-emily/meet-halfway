@@ -1,4 +1,7 @@
 secrets.sh
-*.pyc*.pyc
+*.pyc
 secrets.py
 .DS_Store
+env/
+lookatlater/
+database.sql

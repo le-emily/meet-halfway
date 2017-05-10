@@ -4,11 +4,51 @@
 
 {% block content %}
 
-<p>Some map here...</p>
+<p>Meet Me Halfway</p>
 
-<script async defer
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYeo7CsOXZpbOjy3_kGZOvYwZaeE_sglE&callback=initMap">
-    </script>
-<script src="static/javascript.js"></script>
+<!-- <div id="map"></div>
+<div id="floating-panel">
+  Origin: <input type="text" readonly id="origin">
+  Destination: <input type="text" readonly id="destination"><br>
+  Heading: <input type="text" readonly id="heading"> degrees
+</div> -->
+
+<div class="container">
+    <!-- control div -->
+    <div class="row">
+        <div class="col-sm-3">
+            <form action="/search_midpoint" method="GET">
+                <div class="form-group">
+                    <div>
+                        <label>Location A
+                            <input type="text" id="latitude" name="latitude">
+                        </label>
+                    </div>
+                    <div>
+                        <label>Location B
+                            <input type="text" id="longitude" name="longitude">
+                        </label>
+                    </div>
+                    <div>
+                        <button type="submit" id="find-midpoint" class="btn btn-default">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- beginning of map column -->
+        <div class="row-sm-6">
+            some map stuff here
+        </div>
+
+    <!-- close control div -->
+    </div>
+
+<!-- close container -->
+</div>
+{{ blah }}
+
+<script>
+// computeDistanceBetween()
+</script>
 
 {% endblock %}

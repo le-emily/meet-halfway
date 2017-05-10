@@ -6,12 +6,17 @@ from flask_debugtoolbar import DebugToolbarExtension
 # import secrets
 from model import connect_to_db, db, User, Status, Invitations, Address, UserAddress
 
+import requests
+
+import pdb
+
+import pprint
 
 app = Flask(__name__)
+app.jinja_env.undefined = StrictUndefined
+app.jinja_env.auto_reload = True
 
 app.secret_key = "t)6r)3s5^w)i9kahs(=^u$0-djb*6!@gs93qlfnjxh_^!gi@&_"
-
-app.jinja_env.undefined = StrictUndefined
 
 @app.route("/", methods=["GET"])
 def index():
@@ -35,10 +40,13 @@ def process_registration():
     name = request.form.get("name")
     email = request.form.get("email")
     password = request.form.get("password")
-    address = request.form.get("address")
+    street_address = request.form.get("street_address")
+    zipcode = request.form.get("zipcode")
+    city = request.form.get("city")
+    country = request.form.get("country")
 
     # instantiate User
-    new_user = User(name=name, email=email, password=password, address=address)
+    new_user = User(name=name, email=email, password=password, street_address=street_address, zipcode=zipcode, city=city, country=country)
     check_existence = User.query.filter_by(email=new_user.email).all()
 
     if check_existence:
@@ -83,7 +91,7 @@ def login_process():
     session["user_id"] = user.user_id
 
     flash("Logged in")
-    return redirect("/")
+    return redirect("/search_midpoint")
 
 
 @app.route("/logout")
@@ -102,11 +110,51 @@ def search_midpoint():
     return render_template("search_midpoint.html")
 
 
-# @app.route("/search_midpoint", methods=["POST"])
-# def search_midpoint():
-#     """Search midpoint location."""
+@app.route("/search_midpoint", methods=["GET"])
+def yelp_get_request():
+    # need to get longitude lattitude from google maps api mid location that user selects
 
-#     return redirect("/search_midpoint")
+    """Use extracted location data to render businesses (latitude/longitude coordinates)."""
+
+    access_token = 'AAPEv204eMRHn-7LRWL-HNO90iZrKf3F9HXdbSgLRMdmeKV2oAxDmWOa8RrVTv063jhO1ckEIeUGslnnN6w4AYNVp_PWFdEOM189VZf_XBt-hnMPDhpSS2YamjMSWXYx'
+
+    url = 'https://api.yelp.com/v3/businesses/search'
+
+    headers = {'Authorization': 'bearer %s' % access_token}
+
+    latitude = request.args.get("latitude")
+    longitude = request.args.get("longitude")
+
+    parameters = {'latitude': latitude,
+                    'longitude': longitude}
+
+    response = requests.get(url=url, parameters=parameters, headers=headers)
+
+    business_response = response.json()
+    
+    business_results = business_response['businesses']
+    businesses = []
+    for business in business_results:
+        businesses.append(business.name)
+
+    blah = "blah blah blah"
+
+    return redirect("/search_midpoint", blah=blah)
+
+
+# @app.route("/search_midpoint", methods=["POST"])
+# def google_geometrics_request():
+#     """Extract data from location to feed into yelp api"""
+    # this must be in javascript!!!
+
+# list of connected friends
+# @app.route("/friends")
+# def friends_list():
+#     """Show list of friends."""
+
+#     friends = Friends.query.all()
+#     return render_template("friends_list.html", friends=friends)
+
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point

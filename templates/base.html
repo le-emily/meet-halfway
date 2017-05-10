@@ -4,10 +4,15 @@
     <title> {% block title %} Title {% endblock %}</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/
           3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/style.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="static/style.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
 </head>
 <body>
+    <a href="http://jquery.com/"></a>
+    <script src="static/jquery.js"></script>
+
     <div>
 
         {% if "user_id" in session %}
@@ -34,3 +39,4 @@
     </div>
 </body>
 </html>
+
