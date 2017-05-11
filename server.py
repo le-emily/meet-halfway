@@ -100,12 +100,13 @@ def logout():
 
     del session["user_id"]
     flash("Logged Out.")
+
     return redirect("/")
 
      
 @app.route("/search_midpoint", methods=["GET"])
 def search_midpoint():
-    """Search midpoint location."""
+    """Show form for midpoint search."""
 
     return render_template("search_midpoint.html")
 
@@ -122,38 +123,28 @@ def yelp_get_request():
 
     headers = {'Authorization': 'bearer %s' % access_token}
 
-    latitude = request.args.get("latitude")
-    longitude = request.args.get("longitude")
+    location_a = request.args.get("location_a")
+    location_b = request.args.get("location_b")
 
-    parameters = {'latitude': latitude,
-                    'longitude': longitude}
+    parameters = {'location_a': location_a,
+                    'location_b': location_b}
 
     response = requests.get(url=url, parameters=parameters, headers=headers)
 
     business_response = response.json()
     
     business_results = business_response['businesses']
+
     businesses = []
     for business in business_results:
         businesses.append(business.name)
 
-    blah = "blah blah blah"
-
-    return redirect("/search_midpoint", blah=blah)
+    return redirect("/search_midpoint")
 
 
-# @app.route("/search_midpoint", methods=["POST"])
-# def google_geometrics_request():
-#     """Extract data from location to feed into yelp api"""
-    # this must be in javascript!!!
-
-# list of connected friends
-# @app.route("/friends")
-# def friends_list():
-#     """Show list of friends."""
-
-#     friends = Friends.query.all()
-#     return render_template("friends_list.html", friends=friends)
+# @app.route("/search_midpoint", method=["GET"])
+# def google_maps_midpoint():
+#     """Get google maps midpoint from two given locations."""
 
 
 if __name__ == "__main__":

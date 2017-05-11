@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %} Friends List {% endblock %}
+
+{% block content %}
+
+<!-- add friends -->
+<form action="/friends" method="GET">
+  <div class="form-group">
+    <label for="usr">Search Friend by Email:</label>
+    <input type="text" class="form-control" id="friend" placeholder="friend" name="friend">
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </div>
+</form>
+
+<!-- loop through list of users-->
+    {% for u in user %}
+        {{ u.name }}
+    {% endfor %}
+
+
+{% endblock %}

@@ -96,7 +96,7 @@ class UserAddress(db.Model):
 
     def __repr__(self):
         return "<User address %d>" % (self.user_address_id)
-    
+
     
 ##############################################################################
 # Helper functions

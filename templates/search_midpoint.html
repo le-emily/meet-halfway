@@ -6,13 +6,6 @@
 
 <p>Meet Me Halfway</p>
 
-<!-- <div id="map"></div>
-<div id="floating-panel">
-  Origin: <input type="text" readonly id="origin">
-  Destination: <input type="text" readonly id="destination"><br>
-  Heading: <input type="text" readonly id="heading"> degrees
-</div> -->
-
 <div class="container">
     <!-- control div -->
     <div class="row">
@@ -21,12 +14,12 @@
                 <div class="form-group">
                     <div>
                         <label>Location A
-                            <input type="text" id="latitude" name="latitude">
+                            <input type="text" id="location_a" name="location_a">
                         </label>
                     </div>
                     <div>
                         <label>Location B
-                            <input type="text" id="longitude" name="longitude">
+                            <input type="text" id="location_b" name="location_b">
                         </label>
                     </div>
                     <div>
@@ -36,19 +29,29 @@
             </form>
         </div>
         <!-- beginning of map column -->
-        <div class="row-sm-6">
-            some map stuff here
-        </div>
 
-    <!-- close control div -->
+         <!-- start google maps -->
+    
+        <div id="map"></div>
+        <script>
+          function initMap() {
+            var uluru = {lat: -25.363, lng: 131.044};
+            var map = new google.maps.Map(document.getElementById('map'), {
+              zoom: 4,
+              center: uluru
+            });
+            var marker = new google.maps.Marker({
+              position: uluru,
+              map: map
+            });
+          }
+        </script>
+        <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXbmqoGjh-BtVtOjfl8bKkOVY6sSyilUU&callback=initMap">
+        </script>
+
+
     </div>
-
-<!-- close container -->
 </div>
-{{ blah }}
-
-<script>
-// computeDistanceBetween()
-</script>
 
 {% endblock %}
