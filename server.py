@@ -123,6 +123,7 @@ def yelp_get_request():
 
     headers = {'Authorization': 'bearer %s' % access_token}
 
+    # need lat/long to get midpoint
     location_a = request.args.get("location_a")
     location_b = request.args.get("location_b")
 

@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col-sm-3">
             <form action="/search_midpoint" method="GET">
-                <div class="form-group">
+                <div class="form-group" id="midpoint-form">
                     <div>
                         <label>Location A
                             <input type="text" id="location_a" name="location_a">
@@ -28,30 +28,12 @@
                 </div>
             </form>
         </div>
-        <!-- beginning of map column -->
 
-         <!-- start google maps -->
-    
-        <div id="map"></div>
-        <script>
-          function initMap() {
-            var uluru = {lat: -25.363, lng: 131.044};
-            var map = new google.maps.Map(document.getElementById('map'), {
-              zoom: 4,
-              center: uluru
-            });
-            var marker = new google.maps.Marker({
-              position: uluru,
-              map: map
-            });
-          }
-        </script>
-        <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXbmqoGjh-BtVtOjfl8bKkOVY6sSyilUU&callback=initMap">
-        </script>
-
+        <div id="map" style="height: 500px;"></div>
 
     </div>
 </div>
+
+
 
 {% endblock %}
