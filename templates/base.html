@@ -4,9 +4,9 @@
     <title> {% block title %} Title {% endblock %}</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/static/js/epoly.js">
 </head>
 <body>
-
     {% if "user_id" in session %}
         <a href="/logout">Logout</a>
     {% else %}
@@ -30,6 +30,7 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXbmqoGjh-BtVtOjfl8bKkOVY6sSyilUU&libraries=geometry,places" async defer></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="/static/js/script.js"></script>
+
 
 </body>
 </html>

@@ -16,7 +16,6 @@ function initialize() {
 }
 
 
-
 function codeAddress_a(evt) {
       // marker will not show without preventDefault
       evt.preventDefault();
@@ -65,21 +64,24 @@ function codeAddress_b(evt) {
       locations.push(location_b);
 }
 
+function drawPolyline(locations) {
+  // draw polyline
+  var lin = new google.maps.Polyline({
+    path: [
+      new google.maps.LatLng(locations[0][0], locations[0][1]),
+      new google.maps.LatLng(locations[1][0], locations[1][1])
+    ],
+    strokeColor: "#000000",
+    strokeOpacity: 1.0,
+    strokeWeight: 10,
+    geodesic: true, //shortest path, account for fact that earth is curved, draw a geodesic line
+    map: map
+  });
+}
+
 initialize();
 
 $("#find-midpoint").on("click", codeAddress_a);
 $("#find-midpoint").on("click", codeAddress_b);
-
-function calcDistance (fromLat, fromLng, toLat, toLng) {
-      return google.maps.geometry.spherical.computeDistanceBetween(
-        new google.maps.LatLng(fromLat, fromLng), new google.maps.LatLng(toLat, toLng));
-}
-
-// var fromLat = locations[0][0];
-// var fromLng = locations[0][1];
-// var toLat = locations[1][0];
-// var toLng = locations[1][1];
-
-calcDistance(100, 100, 101, 101);
-
+$("#find-midpoint").on("click", drawPolyline(locations));
 
