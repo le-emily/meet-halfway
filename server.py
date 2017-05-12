@@ -119,7 +119,8 @@ def yelp_get_request():
 
     access_token = 'AAPEv204eMRHn-7LRWL-HNO90iZrKf3F9HXdbSgLRMdmeKV2oAxDmWOa8RrVTv063jhO1ckEIeUGslnnN6w4AYNVp_PWFdEOM189VZf_XBt-hnMPDhpSS2YamjMSWXYx'
 
-    url = 'https://api.yelp.com/v3/businesses/search'
+    # need to get latitude and longitude cooridnates from script.js
+    url = 'https://api.yelp.com/v3/businesses/search?latitude=' + latitude + '&longitude=' + longitude
 
     headers = {'Authorization': 'bearer %s' % access_token}
 

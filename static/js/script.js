@@ -67,23 +67,19 @@ function codeAddress_b(evt) {
 
 initialize();
 
-// check for user entries -- need location a AND b
-// $("#find-midpoint").on("click", function(evt) {
-//   if(($("#location_a").val() == "") || ($("#location_b").val() == "")) {
-//     evt.preventDefault();
-//   }
-// });
-
 $("#find-midpoint").on("click", codeAddress_a);
 $("#find-midpoint").on("click", codeAddress_b);
 
-// function findMidpoint() {
-//   var _coordinates = place.geometry.location; //a google.maps.LatLng object
-//   var _kCord = new google.maps.LatLng(location_a[0], location_a[1]);
-//   var _pCord = new google.maps.LatLng(location_b[0], location_a[1]);
+function calcDistance (fromLat, fromLng, toLat, toLng) {
+      return google.maps.geometry.spherical.computeDistanceBetween(
+        new google.maps.LatLng(fromLat, fromLng), new google.maps.LatLng(toLat, toLng));
+}
 
-//   console.log(google.maps.geometry.spherical.computeDistanceBetween(_pCord, _coordinates));
-//   console.log(google.maps.geometry.spherical.computeDistanceBetween(_kCord, _coordinates));
-// }
+// var fromLat = locations[0][0];
+// var fromLng = locations[0][1];
+// var toLat = locations[1][0];
+// var toLng = locations[1][1];
+
+calcDistance(100, 100, 101, 101);
 
 
