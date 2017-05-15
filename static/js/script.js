@@ -2,6 +2,7 @@
 var locations = [];
 var geocoder;
 var map;
+var midLocation = [];
 
 function initialize() {
   var directionsService = new google.maps.DirectionsService;
@@ -12,13 +13,16 @@ function initialize() {
         zoom: 8,
         center: latlng
   }
+
   map = new google.maps.Map(document.getElementById('map'), mapOptions);
   directionsDisplay.setMap(map);
+
   function onSubmit(evt) {
     evt.preventDefault();
     // codeAddress_a(evt);
     // codeAddress_b(evt);
     calculateAndDisplayRoute(directionsService, directionsDisplay);
+    // markMidpoint();
   }
 
   document.getElementById("find-midpoint").addEventListener("click", onSubmit);
@@ -26,11 +30,11 @@ function initialize() {
 
 // Directions Services
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-  var location_a = document.getElementById('location_a').value;
-  var location_b = document.getElementById('location_b').value;
+  var start = document.getElementById('location_a').value;
+  var end = document.getElementById('location_b').value;
   directionsService.route({
-    origin: location_a,
-    destination: location_b,
+    origin: start,
+    destination: end,
     travelMode: 'DRIVING'
   }, function(response, status) {
     if (status === 'OK') {
@@ -41,25 +45,33 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
   });
 }
 
-function codeAddress_a(evt) {
-  var address = document.getElementById('location_a').value;
-  var location_a = [];
-  geocoder.geocode( { 'address': address}, function(results, status) {
-  if (status == 'OK') {
 
-    location_a[0] = results[0].geometry.location.lat();
-    location_a[1] = results[0].geometry.location.lng();
+function markMidpoint(evt) {
+  evt.preventDefault();
+  // get all locations with name, locations
+  var arrs = document.querySelectorAll('[name="location_a"], [name="location_b"]');
+  console.log(arrs[0]);
+  console.log(arrs[1]);
+  // loop through all locations and get latlng
+  location = [];
+  for(var i=0; i<arrs.length; i++) {
+    var address = arrs[i];
+    console.log(address);
 
-    map.setCenter(results[0].geometry.location);
-    var marker = new google.maps.Marker({
-        map: map,
-        position: results[0].geometry.location
-    });
-  } else {
-    alert('Geocode was not successful for the following reason: ' + status);
+    // geocoder.geocode( { 'address': address}, function(results, status) {
+    //   if (status == 'OK') {
+    //     location[0] = results[0].geometry.location.lat();
+    //     location[1] = results[0].geometry.location.lng();
+
+    //     map.setCenter(results[0].geometry.location);
+    //     var marker = new google.maps.Marker({
+    //         map: map,
+    //         position: results[0].geometry.location
+    //     });
+    //   }
+    // })
   }
-  });
-  locations.push(location_a);
+  console.log(location);
 }
 
 
@@ -87,8 +99,3 @@ function codeAddress_b(evt) {
 }
 
 initialize();
-
-
-
-// document.getElementById('find-midpoint').on('click', onChangeHandler);
-
