@@ -1,10 +1,11 @@
 // holds lat/long of both locations
 var locations = [];
-
 var geocoder;
 var map;
 
 function initialize() {
+  var directionsService = new google.maps.DirectionsService;
+  var directionsDisplay = new google.maps.DirectionsRenderer;
   geocoder = new google.maps.Geocoder();
   var latlng = new google.maps.LatLng(37.78, -122.41);
   var mapOptions = {
@@ -12,33 +13,35 @@ function initialize() {
         center: latlng
   }
   map = new google.maps.Map(document.getElementById('map'), mapOptions);
+  directionsDisplay.setMap(map);
+  function onSubmit(evt) {
+    evt.preventDefault();
+    // codeAddress_a(evt);
+    // codeAddress_b(evt);
+    calculateAndDisplayRoute(directionsService, directionsDisplay);
+  }
+
+  document.getElementById("find-midpoint").addEventListener("click", onSubmit);
 }
 
-
-// function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-//   console.log("calculateAndDisplayRoute");
-//   directionsService.route({
-//     origin: [locations[0][0],locations[0][1]],
-//     destination: [locations[1][0],locations[1][1]],
-//     travelMode: 'DRIVING'
-//   }, function(response, status) {
-//     if (status === 'OK') {
-//       directionsDisplay.setDirections(response);
-//     } else {
-//       window.alert('Directions request failed due to ' + status);
-//     }
-//   });
-// }
-
-
-// $("#find-midpoint").click(function() {
-//     calculateAndDisplayRoute(directionsService, directionsDisplay);
-//   });
+// Directions Services
+function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+  var location_a = document.getElementById('location_a').value;
+  var location_b = document.getElementById('location_b').value;
+  directionsService.route({
+    origin: location_a,
+    destination: location_b,
+    travelMode: 'DRIVING'
+  }, function(response, status) {
+    if (status === 'OK') {
+      directionsDisplay.setDirections(response);
+    } else {
+      window.alert('Directions request failed due to ' + status);
+    }
+  });
+}
 
 function codeAddress_a(evt) {
-  console.log("codeAddress_a");
-  // marker will not show without preventDefault
-  evt.preventDefault();
   var address = document.getElementById('location_a').value;
   var location_a = [];
   geocoder.geocode( { 'address': address}, function(results, status) {
@@ -61,7 +64,6 @@ function codeAddress_a(evt) {
 
 
 function codeAddress_b(evt) {
-  console.log("codeAddress_b");
   // marker will not show without preventDefault
   evt.preventDefault();
   var address = document.getElementById('location_b').value;
@@ -84,11 +86,9 @@ function codeAddress_b(evt) {
   locations.push(location_b);
 }
 
-  // disable search button when location b is submitted
-//   $("#find-midpoint").prop("disabled", true);
-// }
-
 initialize();
 
-$("#find-midpoint").on("click", codeAddress_a);
-$("#find-midpoint").on("click", codeAddress_b);
+
+
+// document.getElementById('find-midpoint').on('click', onChangeHandler);
+
