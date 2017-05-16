@@ -8,6 +8,11 @@ from model import connect_to_db, db, User, Status, Invitations, Address, UserAdd
 
 import requests
 
+# to get js into python
+import sys 
+
+import json
+
 import pdb
 
 import pprint
@@ -35,8 +40,6 @@ def register_form():
 def process_registration():
     """Process registration."""
 
-    #Get form variables
-    # pull user submission from "name" attribute
     name = request.form.get("name")
     email = request.form.get("email")
     password = request.form.get("password")
@@ -45,11 +48,10 @@ def process_registration():
     city = request.form.get("city")
     address_type = request.form.get("address_type")
 
-    # instantiate User
     # 1. 
     new_user = User(name=name, email=email, password=password)
 
-    # 2. new address, make a new address object with its address fields--address_type, street, extracted
+    # 2. new address, make a new address object with its address fields--address_type, street, etc.
     # check if address exists, make new one or get from database
 
     # Check if address already exists, case sensitive
@@ -57,14 +59,13 @@ def process_registration():
 
     # If address does not exist, add.
     if not existing_address:
-        address_type = Address(address_type=address_type, street_address=street_address, city=city, zipcode=zipcode)
+        new_address = Address(address_type=address_type, street_address=street_address, city=city, zipcode=zipcode)
 
-    # 3. make user address association object with user id and address id
-    # new user.address.add
     user_address = UserAddress(user_id=user_id, address_id=address_id)
 
     # add and commit to session
     db.session.add(new_user)
+    db.session.add(user_address)
     db.session.commit()
 
     flash("Added.")
@@ -129,44 +130,74 @@ def friends_list():
     return render_template("friends_list.html", users=users)
 
 
+@app.route("/friends/<int:user_id>")
+def friend_detail(user_id):
+    """Show info about user."""
+
+    users = User.query.get(user_id)
+    print users
+
+    # UndefinedError: 'users' is undefined
+    return render_template("friends_list.html", users=users)
 
 
-# @app.route("/search_midpoint", methods=["GET"])
-# def yelp_get_request():
-#     # need to get longitude lattitude from google maps api mid location that user selects
 
-#     """Use extracted location data to render businesses (latitude/longitude coordinates)."""
 
-#     access_token = 'AAPEv204eMRHn-7LRWL-HNO90iZrKf3F9HXdbSgLRMdmeKV2oAxDmWOa8RrVTv063jhO1ckEIeUGslnnN6w4AYNVp_PWFdEOM189VZf_XBt-hnMPDhpSS2YamjMSWXYx'
+@app.route("/search_midpoint", methods=["POST"])
+def get_search_parameter():
+    # need to get longitude lattitude from google maps api mid location that user selects
 
-#     # need to get latitude and longitude cooridnates from script.js
-#     url = 'https://api.yelp.com/v3/businesses/search?latitude=' + latitude + '&longitude=' + longitude
+    """Use extracted location data to render businesses (latitude/longitude coordinates)."""
 
-#     headers = {'Authorization': 'bearer %s' % access_token}
+    # access_token = 'AAPEv204eMRHn-7LRWL-HNO90iZrKf3F9HXdbSgLRMdmeKV2oAxDmWOa8RrVTv063jhO1ckEIeUGslnnN6w4AYNVp_PWFdEOM189VZf_XBt-hnMPDhpSS2YamjMSWXYx'
 
-#     # need lat/long to get midpoint
-#     location_a = request.args.get("location_a")
-#     location_b = request.args.get("location_b")
+    # # need to get latitude and longitude cooridnates from script.js
+    # url = 'https://api.yelp.com/v3/businesses/search?'
 
-#     parameters = {'location_a': location_a,
-#                     'location_b': location_b}
+    # headers = {'Authorization': 'bearer %s' % access_token}
 
-#     response = requests.get(url=url, parameters=parameters, headers=headers)
+    # # read json and reply
+    # data = request.get_json()
+    # result = ''
 
-#     business_response = response.json()
+    # for item in data:
+    #     result += str(item['l']) + '\n'
+
+    # print result
+
+    # latitude = float(result[0])
+    # longitude = float(result[1])
+
+    # print latitude 
+    # print longitude 
+
+    # parameters = {'term': "restaurant", 'latitude': latitude, 'longitude': longitude, 'radius_filter': '10'}
+
+    # response = requests.get(url=url, parameters=parameters, headers=headers)
+
+    # business_response = response.json()
+
+    # print business_response
+
+    # print business_response
     
-#     business_results = business_response['businesses']
+    # business_results = business_response['businesses']
 
-#     businesses = []
-#     for business in business_results:
-#         businesses.append(business.name)
+    # businesses = []
 
-#     return redirect("/search_midpoint")
+    # for business in business_results:
+    #     businesses.append(business.name)
 
+    # second attempt
+    r = requests.get("/search_midpoint")
+    coordinates_json = r.json()
+    lat = coordinates_json['_lat']
+    lng = coordinates_json['_lng']
 
-# @app.route("/search_midpoint", method=["GET"])
-# def google_maps_midpoint():
-#     """Get google maps midpoint from two given locations."""
+    print lat 
+    print lng
+
+    return redirect("/search_midpoint")
 
 
 if __name__ == "__main__":

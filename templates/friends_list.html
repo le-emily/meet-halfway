@@ -15,5 +15,11 @@
       {% endfor %}
     </ul>
 
+    <form action="/friends" method="POST">
+      <div class="form-group">
+        <label for="usr">Add:</label>
+        <input type="text" class="form-control" id="friend_email" placeholder="friend email" name="friend">
+      </div>
+    </form>
 
 {% endblock %}

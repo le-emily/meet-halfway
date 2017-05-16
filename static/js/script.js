@@ -40,34 +40,6 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
   });
 }
 
-
-// function markMidpoint(evt) {
-//   evt.preventDefault();
-//   // get all coordinates with name, coordinates
-//   var arrs = document.querySelectorAll('[name="location_a"], [name="location_b"]');
-//   console.log(arrs[0]);
-//   // loop through all coordinates and get latlng
-//   location = [];
-//   for(var i=0; i<arrs.length; i++) {
-//     var address = arrs[i];
-//     console.log(address);
-
-//     // geocoder.geocode( { 'address': address}, function(results, status) {
-//     //   if (status == 'OK') {
-//     //     location[0] = results[0].geometry.location.lat();
-//     //     location[1] = results[0].geometry.location.lng();
-
-//     //     map.setCenter(results[0].geometry.location);
-//     //     var marker = new google.maps.Marker({
-//     //         map: map,
-//     //         position: results[0].geometry.location
-//     //     });
-//     //   }
-//     // })
-//   }
-//   console.log(location);
-// }
-
 function codeAddress_a() {
   var address = document.getElementById('location_a').value;
   var coord_a = [];
@@ -126,10 +98,21 @@ function calculateMidpoint() {
   var _lat = (coordinates[0] + coordinates[2])/2.0;
   var _lng = (coordinates[1] + coordinates[3])/2.0;
 
+  console.log(_lat);
+  console.log(_lng);
+
+  var coords = [
+    {"l": _lat},
+    {"l": _lng}
+  ];
+
   var marker = new google.maps.Marker({
     position: {lat: _lat, lng: _lng},
     map: map
   });
+
+  // ajax the JSON to the server
+  $.post("search_midpoint", coords);
 }
 
 
