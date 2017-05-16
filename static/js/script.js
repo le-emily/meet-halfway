@@ -27,7 +27,7 @@ function initialize() {
     // console.log(myLatLng);
   }
 
-  document.getElementById("find-midpoint").addEventListener("click", onSubmit);
+  document.getElementById("search").addEventListener("click", onSubmit);
 }
 
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
@@ -140,5 +140,3 @@ function calculateMidpoint() {
 
 
 initialize();
-
-// GOOGLE DIRECTIONS MIDPOINT

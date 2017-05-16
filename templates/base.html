@@ -7,25 +7,32 @@
     <!-- <link rel="stylesheet" type="text/css" href="/static/js/epoly.js"> -->
 </head>
 <body>
-    {% if "user_id" in session %}
-        <a href="/logout">Logout</a>
-    {% else %}
-        <a href="/login">Login</a>
-    {% endif %}
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+    
 
-    {% block content %}
-        Add content here!
-    {% endblock %}
+    <div class="messages">
+        {% if "user_id" in session %}
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/login">Login</a>
+        {% endif %}
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="content">
+        {% block content %}
+            Add content here!
+        {% endblock %}
+    </div>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXbmqoGjh-BtVtOjfl8bKkOVY6sSyilUU&libraries=geometry,places" async defer></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
