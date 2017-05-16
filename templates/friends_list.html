@@ -4,19 +4,16 @@
 
 {% block content %}
 
-<!-- add friends -->
-<form action="/friends" method="GET">
-  <div class="form-group">
-    <label for="usr">Search Friend by Email:</label>
-    <input type="text" class="form-control" id="friend" placeholder="friend" name="friend">
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </div>
-</form>
-
-<!-- loop through list of users-->
-    {% for u in user %}
-        {{ u.name }}
-    {% endfor %}
+    <h1>Friends</h1>
+    <ul>
+      {% for user in users %}
+          <li>
+              <a href="/friends/{{ user.user_id }}">
+                {{ user.email }} ({{ user.user_id }})
+              </a>
+          </li>
+      {% endfor %}
+    </ul>
 
 
 {% endblock %}

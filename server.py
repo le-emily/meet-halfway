@@ -43,16 +43,25 @@ def process_registration():
     street_address = request.form.get("street_address")
     zipcode = request.form.get("zipcode")
     city = request.form.get("city")
-    country = request.form.get("country")
+    address_type = request.form.get("address_type")
 
     # instantiate User
-    new_user = User(name=name, email=email, password=password, street_address=street_address, zipcode=zipcode, city=city, country=country)
-    check_existence = User.query.filter_by(email=new_user.email).all()
+    # 1. 
+    new_user = User(name=name, email=email, password=password)
 
-    if check_existence:
-        flash("User already exists.")
-        return redirect("/register")
+    # 2. new address, make a new address object with its address fields--address_type, street, extracted
+    # check if address exists, make new one or get from database
 
+    # Check if address already exists, case sensitive
+    existing_address = Address.query.filter_by(street_address=street_address).first()
+
+    # If address does not exist, add.
+    if not existing_address:
+        address_type = Address(address_type=address_type, street_address=street_address, city=city, zipcode=zipcode)
+
+    # 3. make user address association object with user id and address id
+    # new user.address.add
+    user_address = UserAddress(user_id=user_id, address_id=address_id)
 
     # add and commit to session
     db.session.add(new_user)
@@ -111,37 +120,48 @@ def search_midpoint():
     return render_template("search_midpoint.html")
 
 
-@app.route("/search_midpoint", methods=["GET"])
-def yelp_get_request():
-    # need to get longitude lattitude from google maps api mid location that user selects
+@app.route("/friends", methods=["GET"])
+def friends_list():
+    """Show list of friends."""
 
-    """Use extracted location data to render businesses (latitude/longitude coordinates)."""
+    users = User.query.all()
 
-    access_token = 'AAPEv204eMRHn-7LRWL-HNO90iZrKf3F9HXdbSgLRMdmeKV2oAxDmWOa8RrVTv063jhO1ckEIeUGslnnN6w4AYNVp_PWFdEOM189VZf_XBt-hnMPDhpSS2YamjMSWXYx'
+    return render_template("friends_list.html", users=users)
 
-    # need to get latitude and longitude cooridnates from script.js
-    url = 'https://api.yelp.com/v3/businesses/search?latitude=' + latitude + '&longitude=' + longitude
 
-    headers = {'Authorization': 'bearer %s' % access_token}
 
-    # need lat/long to get midpoint
-    location_a = request.args.get("location_a")
-    location_b = request.args.get("location_b")
 
-    parameters = {'location_a': location_a,
-                    'location_b': location_b}
+# @app.route("/search_midpoint", methods=["GET"])
+# def yelp_get_request():
+#     # need to get longitude lattitude from google maps api mid location that user selects
 
-    response = requests.get(url=url, parameters=parameters, headers=headers)
+#     """Use extracted location data to render businesses (latitude/longitude coordinates)."""
 
-    business_response = response.json()
+#     access_token = 'AAPEv204eMRHn-7LRWL-HNO90iZrKf3F9HXdbSgLRMdmeKV2oAxDmWOa8RrVTv063jhO1ckEIeUGslnnN6w4AYNVp_PWFdEOM189VZf_XBt-hnMPDhpSS2YamjMSWXYx'
+
+#     # need to get latitude and longitude cooridnates from script.js
+#     url = 'https://api.yelp.com/v3/businesses/search?latitude=' + latitude + '&longitude=' + longitude
+
+#     headers = {'Authorization': 'bearer %s' % access_token}
+
+#     # need lat/long to get midpoint
+#     location_a = request.args.get("location_a")
+#     location_b = request.args.get("location_b")
+
+#     parameters = {'location_a': location_a,
+#                     'location_b': location_b}
+
+#     response = requests.get(url=url, parameters=parameters, headers=headers)
+
+#     business_response = response.json()
     
-    business_results = business_response['businesses']
+#     business_results = business_response['businesses']
 
-    businesses = []
-    for business in business_results:
-        businesses.append(business.name)
+#     businesses = []
+#     for business in business_results:
+#         businesses.append(business.name)
 
-    return redirect("/search_midpoint")
+#     return redirect("/search_midpoint")
 
 
 # @app.route("/search_midpoint", method=["GET"])

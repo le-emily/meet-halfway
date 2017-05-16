@@ -17,7 +17,7 @@ class User(db.Model):
     password = db.Column(db.String(100), nullable=False)
 
     # Connect User and Address through WalkerDogs using secondary
-    address = db.relationship("Address",
+    addresses = db.relationship("Address",
                            secondary="user_address_association")
 
     def __repr__(self):
@@ -70,15 +70,15 @@ class Address(db.Model):
     street_address = db.Column(db.String(100), nullable=False)
     zipcode = db.Column(db.String(25), nullable=False)
     city = db.Column(db.String(50), nullable=False)
-    country = db.Column(db.String(50), nullable=False) 
+    # country = db.Column(db.String(50), nullable=False) 
 
     # Connect User and Address through WalkerDogs using secondary
-    user = db.relationship("User",
+    users = db.relationship("User",
                            secondary="user_address_association")
 
     def __repr__(self):
         # removed self.city, fix error before putting it back in
-        return "<Address: %s, %s, %s %s>" % (self.street_address, self.zipcode, self.country, self.city)
+        return "<Address: %s, %s, %s %s>" % (self.address_type, self.street_address, self.zipcode, self.city)
 
 
 class UserAddress(db.Model):
@@ -91,11 +91,11 @@ class UserAddress(db.Model):
     user_id =  db.Column(db.Integer, db.ForeignKey('user.user_id'))
     address_id = db.Column(db.Integer, db.ForeignKey('address.address_id'))
 
-    # user = db.relationship("User", foreign_keys=[user_id])
-    # address = db.relationship("Address", foreign_keys=[address_id])
+    user = db.relationship("User", foreign_keys=[user_id])
+    address = db.relationship("Address", foreign_keys=[address_id])
 
     def __repr__(self):
-        return "<User address %d>" % (self.user_address_id)
+        return "<User address %d>" % (self.user, self.address)
 
     
 ##############################################################################

@@ -19,12 +19,6 @@ function initialize() {
     evt.preventDefault();
     calculateAndDisplayRoute(directionsService, directionsDisplay);
     codeAddress_a();
-    // console.log(coordinates.length);
-    // console.log(coordinates[0]);
-    // console.log(coordinates);
-    
-    // alert(coordinates);
-    // console.log(myLatLng);
   }
 
   document.getElementById("search").addEventListener("click", onSubmit);
