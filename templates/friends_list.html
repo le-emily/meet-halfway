@@ -4,22 +4,21 @@
 
 {% block content %}
 
-    <h1>Friends</h1>
-    <ul>
-      {% for email in user_emails %}
-          <li>
-              <a href="/friends/{{ user.user_id }}">
-                {{ email }}
-              </a>
-          </li>
-      {% endfor %}
-    </ul>
+  <h1>Friends</h1>
+  <ul>
+    {% for email in user_emails %}
+      <li>
+        {{ email }}
+      </li>
+    {% endfor %}
+  </ul>
 
-    <form action="/friends" method="POST">
-      <div class="form-group">
-        <label for="usr">Add:</label>
-        <input type="text" class="form-control" id="friend_email" placeholder="friend email" name="friend">
-      </div>
-    </form>
+<!-- in progress...every user is currently a friend -->
+  <form action="/friends" method="POST">
+    <div class="form-group">
+      <label for="usr">Add:</label>
+      <input type="text" class="form-control" id="friend_email" placeholder="friend email" name="friend">
+    </div>
+  </form>
 
 {% endblock %}
