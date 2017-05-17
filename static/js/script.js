@@ -30,7 +30,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
   directionsService.route({
     origin: start,
     destination: end,
-    travelMode: 'DRIVING'
+    travelMode: 'WALKING'
   }, function(response, status) {
     if (status === 'OK') {
       directionsDisplay.setDirections(response);
@@ -109,7 +109,7 @@ function calculateMidpoint() {
   });
 
   // ajax the JSON to the server
-  $.get("/search_midpoint", coords);
+  // $.get("/search_midpoint", coords);
 }
 
 

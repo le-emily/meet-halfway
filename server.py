@@ -1,20 +1,11 @@
 from jinja2 import StrictUndefined
-
 from flask import Flask, render_template, request, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
-
-# import secrets
 from model import connect_to_db, db, User, Status, Invitations, Address, UserAddress
-
 import requests
-
-# to get js into python
 import sys 
-
 import json
-
 import pdb
-
 import pprint
 
 app = Flask(__name__)
@@ -48,8 +39,13 @@ def process_registration():
     city = request.form.get("city")
     address_type = request.form.get("address_type")
 
-    new_user = User(name=name, email=email, password=password)
+    existing_user = User.query.filter_by(email=email).first()
 
+    if not existing_user:
+        new_user = User(name=name, email=email, password=password)
+        db.session.add(new_user)
+
+    # .first() will pull into memory, look into this
     existing_address = Address.query.filter_by(street_address=street_address).first()
 
     if not existing_address:
@@ -58,11 +54,8 @@ def process_registration():
 
     user_address = UserAddress(user_id=new_user.user_id, address_id=new_address.address_id)
     
-    db.session.add(new_user)
     db.session.add(user_address)
-
     db.session.commit()
-
     flash("Added.")
 
     return redirect("/")

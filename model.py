@@ -13,10 +13,9 @@ class User(db.Model):
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String(100), nullable=False)
 
-    # Connect User and Address through WalkerDogs using secondary
     addresses = db.relationship("Address",
                            secondary="user_address_association")
 
