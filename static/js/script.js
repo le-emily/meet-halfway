@@ -101,10 +101,7 @@ function calculateMidpoint() {
   console.log(_lat);
   console.log(_lng);
 
-  var coords = [
-    {"l": _lat},
-    {"l": _lng}
-  ];
+  var coords = {"lat": _lat, "lng": _lng};
 
   var marker = new google.maps.Marker({
     position: {lat: _lat, lng: _lng},
@@ -112,7 +109,7 @@ function calculateMidpoint() {
   });
 
   // ajax the JSON to the server
-  $.post("search_midpoint", coords);
+  $.get("/search_midpoint", coords);
 }
 
 

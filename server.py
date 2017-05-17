@@ -51,7 +51,8 @@ def process_registration():
     # 1. 
     new_user = User(name=name, email=email, password=password)
 
-    # 2. new address, make a new address object with its address fields--address_type, street, etc.
+    # 2. 
+    # new address, make a new address object with its address fields--address_type, street, etc.
     # check if address exists, make new one or get from database
 
     # Check if address already exists, case sensitive
@@ -143,56 +144,14 @@ def friend_detail(user_id):
 
 
 
-@app.route("/search_midpoint", methods=["POST"])
+@app.route("/search_midpoint", methods=["GET"])
 def get_search_parameter():
     # need to get longitude lattitude from google maps api mid location that user selects
 
-    """Use extracted location data to render businesses (latitude/longitude coordinates)."""
+    """Get lat/lng coordinates from script."""
 
-    # access_token = 'AAPEv204eMRHn-7LRWL-HNO90iZrKf3F9HXdbSgLRMdmeKV2oAxDmWOa8RrVTv063jhO1ckEIeUGslnnN6w4AYNVp_PWFdEOM189VZf_XBt-hnMPDhpSS2YamjMSWXYx'
-
-    # # need to get latitude and longitude cooridnates from script.js
-    # url = 'https://api.yelp.com/v3/businesses/search?'
-
-    # headers = {'Authorization': 'bearer %s' % access_token}
-
-    # # read json and reply
-    # data = request.get_json()
-    # result = ''
-
-    # for item in data:
-    #     result += str(item['l']) + '\n'
-
-    # print result
-
-    # latitude = float(result[0])
-    # longitude = float(result[1])
-
-    # print latitude 
-    # print longitude 
-
-    # parameters = {'term': "restaurant", 'latitude': latitude, 'longitude': longitude, 'radius_filter': '10'}
-
-    # response = requests.get(url=url, parameters=parameters, headers=headers)
-
-    # business_response = response.json()
-
-    # print business_response
-
-    # print business_response
-    
-    # business_results = business_response['businesses']
-
-    # businesses = []
-
-    # for business in business_results:
-    #     businesses.append(business.name)
-
-    # second attempt
-    r = requests.get("/search_midpoint")
-    coordinates_json = r.json()
-    lat = coordinates_json['_lat']
-    lng = coordinates_json['_lng']
+    lat = request.args.get("lat")
+    lng = request.args.get("lng")
 
     print lat 
     print lng
