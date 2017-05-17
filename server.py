@@ -48,25 +48,19 @@ def process_registration():
     city = request.form.get("city")
     address_type = request.form.get("address_type")
 
-    # 1. 
     new_user = User(name=name, email=email, password=password)
 
-    # 2. 
-    # new address, make a new address object with its address fields--address_type, street, etc.
-    # check if address exists, make new one or get from database
-
-    # Check if address already exists, case sensitive
     existing_address = Address.query.filter_by(street_address=street_address).first()
 
-    # If address does not exist, add.
     if not existing_address:
         new_address = Address(address_type=address_type, street_address=street_address, city=city, zipcode=zipcode)
+        db.session.add(new_address)
 
-    user_address = UserAddress(user_id=user_id, address_id=address_id)
-
-    # add and commit to session
+    user_address = UserAddress(user_id=new_user.user_id, address_id=new_address.address_id)
+    
     db.session.add(new_user)
     db.session.add(user_address)
+
     db.session.commit()
 
     flash("Added.")
@@ -117,7 +111,7 @@ def logout():
      
 @app.route("/search_midpoint", methods=["GET"])
 def search_midpoint():
-    """Show form for midpoint search."""
+    """Render for map search."""
 
     return render_template("search_midpoint.html")
 
@@ -126,37 +120,38 @@ def search_midpoint():
 def friends_list():
     """Show list of friends."""
 
+    user_emails = []
+
     users = User.query.all()
 
-    return render_template("friends_list.html", users=users)
+    for user in users:
+        user_emails.append(user.email)
+
+    return render_template("friends_list.html", user_emails=user_emails)
 
 
-@app.route("/friends/<int:user_id>")
-def friend_detail(user_id):
-    """Show info about user."""
+# @app.route("/invitations")
+# def invitations_list():
 
-    users = User.query.get(user_id)
-    print users
+#     invitation = Invitations.query.all()
 
-    # UndefinedError: 'users' is undefined
-    return render_template("friends_list.html", users=users)
+#     # check each invitation, if accept, make green, if decline make grey.
 
-
+#     return render_template("invitations.html")
 
 
 @app.route("/search_midpoint", methods=["GET"])
-def get_search_parameter():
-    # need to get longitude lattitude from google maps api mid location that user selects
-
+def get_search_coordinates():
     """Get lat/lng coordinates from script."""
 
     lat = request.args.get("lat")
     lng = request.args.get("lng")
 
-    print lat 
-    print lng
+    coordinates = json.dumps({'lat': lat, 'lng': lng})
 
-    return redirect("/search_midpoint")
+    print coordinates
+
+    return redirect("search_midpoint", coordinates = coordinates)
 
 
 if __name__ == "__main__":
