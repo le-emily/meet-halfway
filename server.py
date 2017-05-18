@@ -142,10 +142,49 @@ def get_midpoint_coordinates():
 
     coords = json.dumps({'lat': lat, 'lng': lng})
 
-    print coords
-
     return coords
-    # return redirect("search_midpoint", coords = coords)
+
+
+@app.route("/search_midpoint/yelp_businesses", methods=["GET"])
+def get_yelp_businesses():
+    """Get yelp businesses and populate around midpoint."""
+
+    coords = get_midpoint_coordinates()
+    print int(coords.lat)
+    print int(coords.lng)
+
+    params = {
+        'term': 'restaurants'
+    }
+
+    url = 'https://api.yelp.com/v2/search?'
+
+    client.search_by_coordinates(coords.lng, coords.lat, **params)
+
+    return redirect("search_midpoint")
+
+
+#####################################
+import yelp
+@app.route('/yelp/v3/oauth2/token' , methods=['POST'] )
+def yelp_token():
+    return yelp.obtain_bearer_token()
+
+@app.route('/yelp/v3businesses/search', methods=['GET' ]) 
+def yelp_biz_search():
+    bearer = request.headers['Authorization']
+    bearer = bearer.replace('Bearer ','')
+    coords = get_midpoint_coordinates()
+    term = 'restaurants'
+    limit = 10
+    cll = coords.lng, coords.lat
+    res =  yelp.search(bearer, term, limit, cll)
+
+    return flask.jsonify(**res)
+
+@app.route('/yelp/')
+def yelp2():
+    return render_template('yelp.html')
 
 
 if __name__ == "__main__":
