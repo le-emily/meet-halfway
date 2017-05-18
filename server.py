@@ -133,18 +133,19 @@ def friends_list():
 #     return render_template("invitations.html")
 
 
-@app.route("/search_midpoint", methods=["GET"])
-def get_search_coordinates():
+@app.route("/search_midpoint.json", methods=["GET"])
+def get_midpoint_coordinates():
     """Get lat/lng coordinates from script."""
 
     lat = request.args.get("lat")
     lng = request.args.get("lng")
 
-    coordinates = json.dumps({'lat': lat, 'lng': lng})
+    coords = json.dumps({'lat': lat, 'lng': lng})
 
-    print coordinates
+    print coords
 
-    return redirect("search_midpoint", coordinates = coordinates)
+    return coords
+    # return redirect("search_midpoint", coords = coords)
 
 
 if __name__ == "__main__":

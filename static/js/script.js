@@ -14,6 +14,7 @@ function initialize() {
   map = new google.maps.Map(document.getElementById('map'), mapOptions);
   directionsDisplay.setMap(map);
 
+
   function onSubmit(evt) {
     evt.preventDefault();
     calculateAndDisplayRoute(directionsService, directionsDisplay);
@@ -46,17 +47,22 @@ function codeAddress() {
   for(var x=0; x < location.length; x++) {
     var address = location[x].value;
     geocoder.geocode( { 'address': address}, function(results, status) {
+      debugger
+
+      var two_lats = results[0].geometry.bounds.b;
+      var two_lngs = results[0].geometry.bounds.f;
       if (status == 'OK') {
 
+        results = results[0].address_components
         coord.push(results[0].geometry.location.lat());
-        coord.push(results[0].geometry.location.lng());
+        coord.push(results[1].geometry.location.lng());
+        coord.push(results[2].geometry.location.lat());
+        coord.push(results[3].geometry.location.lng());        
 
         map.setCenter(results[0].geometry.location);
-        // coordinates.push.apply(coordinates, coord);
         if (coord.length == 4) {
-          // console.log("coord variable has:");
-          // console.log(coord);
           return calculateMidpoint(coord);
+          coord.length = 0;
         }
       } else {
         alert('Geocode was not successful for the following reason: ' + status);
@@ -67,19 +73,33 @@ function codeAddress() {
   }
 }
 
-function calculateMidpoint(evt) {
-  var _lat = (evt[0] + evt[2])/2.0;
-  var _lng = (evt[1] + evt[3])/2.0;
+
+function showResults(data){
+  debugger
+  console.log(data);
+}
+
+function calculateMidpoint(coord) {
+  // evt.preventDefault();
+  var _lat = (coord[0] + coord[2])/2.0;
+  var _lng = (coord[1] + coord[3])/2.0;
+
+  console.log("lat:");
+  console.log(_lat);
+  console.log("lng:");
+  console.log(_lng);
 
   var coords = {"lat": _lat, "lng": _lng};
 
-  var marker = new google.maps.Marker({
+  var midpointMarker = new google.maps.Marker({
     position: {lat: _lat, lng: _lng},
     map: map
   });
 
+  $.get("/search_midpoint", coords, showResults);
+
   // ajax the JSON to the server
-  // $.get("/search_midpoint", coords);
+  
 }
 
 
