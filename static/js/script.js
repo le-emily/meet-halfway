@@ -43,10 +43,10 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
 function codeAddress() {
   var location = document.getElementsByName('location');
   var coord = [];
+  // go through each location and geocode;?
   for(var i=0; i < location.length; i++) {
     var address = location[i].value;
     geocoder.geocode( { 'address': address}, function(results, status) {
-
 
     // var two_lats = results[0].geometry.bounds.b;
     var two_lats = results[0].geometry.viewport.b
@@ -54,24 +54,21 @@ function codeAddress() {
     var two_lngs = results[0].geometry.viewport.f
 
       if (status == 'OK') {
-        
-        // results = results[0].address_components
+        // why push 4 times when i'm iterating i each time?
         coord.push(Object.values(two_lats)[0]);
         coord.push(Object.values(two_lngs)[0]);
         coord.push(Object.values(two_lats)[1]);
         coord.push(Object.values(two_lngs)[1]); 
-        
-        // console.log(two_lats[0])       
 
         map.setCenter(results[0].geometry.location);
-        if (coord.length == 4) {
+        // if (coord.length == 4) {
           calculateMidpoint(coord);
-          coord.length = 0;
-        }
+          // coord.length = 0;
+        // }
+        debugger
       } else {
         alert('Geocode was not successful for the following reason: ' + status);
-      }
-      
+      }    
     });
     console.log("The end");
   }
@@ -83,21 +80,23 @@ function showResults(data){
 }
 
 function calculateMidpoint(coord) {
-  // evt.preventDefault();
+
   var _lat = (coord[0] + coord[2])/2.0;
   var _lng = (coord[1] + coord[3])/2.0;
-
-
 
   var coords = {"lat": _lat, "lng": _lng};
 
   var midpointMarker = new google.maps.Marker({
     position: {lat: _lat, lng: _lng},
     map: map
+
+
   });
 
+  // $("#midpoint-form").append('<span><button type="submit" value="invite" id="send_invite">Invite</button>');
+
   // $.get("/search_midpoint", coords, showResults);
-  $.get("/search_midpoint", coords);
+  // $.get("/search_midpoint", coords);
 
 }
 

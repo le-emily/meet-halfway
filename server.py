@@ -123,68 +123,54 @@ def friends_list():
     return render_template("friends_list.html", user_emails=user_emails)
 
 
-# @app.route("/invitations")
-# def invitations_list():
+@app.route("/invitations")
+def invitations_list():
+    # invitation = Invitations.query.all()
+    # check each invitation, if accept, make green, if decline make grey.
 
-#     invitation = Invitations.query.all()
-
-#     # check each invitation, if accept, make green, if decline make grey.
-
-#     return render_template("invitations.html")
+    return render_template("invitations.html")
 
 
-@app.route("/search_midpoint.json", methods=["GET"])
-def get_midpoint_coordinates():
-    """Get lat/lng coordinates from script."""
+# @app.route("/search_midpoint.json", methods=["GET"])
+# def get_midpoint_coordinates():
+#     """Get lat/lng coordinates from script."""
 
-    lat = request.args.get("lat")
-    lng = request.args.get("lng")
+#     lat = request.args.get("lat")
+#     lng = request.args.get("lng")
 
-    coords = json.dumps({'lat': lat, 'lng': lng})
+#     coords = json.dumps({'lat': lat, 'lng': lng})
 
-    return coords
-
-
-@app.route("/search_midpoint/yelp_businesses", methods=["GET"])
-def get_yelp_businesses():
-    """Get yelp businesses and populate around midpoint."""
-
-    coords = get_midpoint_coordinates()
-    print int(coords.lat)
-    print int(coords.lng)
-
-    params = {
-        'term': 'restaurants'
-    }
-
-    url = 'https://api.yelp.com/v2/search?'
-
-    client.search_by_coordinates(coords.lng, coords.lat, **params)
-
-    return redirect("search_midpoint")
+#     return coords
 
 
-#####################################
-import yelp
-@app.route('/yelp/v3/oauth2/token' , methods=['POST'] )
-def yelp_token():
-    return yelp.obtain_bearer_token()
+# @app.route("/search_midpoint", methods=["GET"])
+# def get_yelp_businesses():
+#     """Get yelp businesses and populate around midpoint."""
 
-@app.route('/yelp/v3businesses/search', methods=['GET' ]) 
-def yelp_biz_search():
-    bearer = request.headers['Authorization']
-    bearer = bearer.replace('Bearer ','')
-    coords = get_midpoint_coordinates()
-    term = 'restaurants'
-    limit = 10
-    cll = coords.lng, coords.lat
-    res =  yelp.search(bearer, term, limit, cll)
+#     coord = json.loads(get_midpoint_coordinates())
 
-    return flask.jsonify(**res)
+#     _lat = coord['lat']
+#     _lng = coord['lng']
 
-@app.route('/yelp/')
-def yelp2():
-    return render_template('yelp.html')
+#     # put access token in config file and import it here
+#     access_token = token.json()
+
+#     url = 'https://api.yelp.com/v2/search?'
+
+#     params = {
+#         'term': 'restaurants'
+#         'll': _lat, _lng
+#     }
+
+#     # yelp_businesses = client.search_by_coordinates(_lat, _lng, **params)
+
+#     response = requests.get(url=url, params=params, headers=headers)
+
+#     pprint.pprint(response.json())
+
+#     result = response.json()
+
+#     return render_template("search_midpoint.html", result=result)
 
 
 if __name__ == "__main__":
