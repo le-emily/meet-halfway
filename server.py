@@ -140,22 +140,37 @@ def get_midpoint_coordinates():
 
     coords = json.dumps({'lat': lat, 'lng': lng})
 
-    # coord = json.loads(get_midpoint_coordinates())
-
-    # _lat = coord['lat']
-    # _lng = coord['lng']
-
     return coords
 
-@app.route("route to get request")
-def yelp():
-    """Get yelp businesses."""
-    coord = json.loads(get_midpoint_coordinates())
+@app.route("/yelp_test.json", methods=["GET"])
+def yelp_business_search(): 
+    """Get yelp businesses around midpoint coordinates."""
 
-    _lat = coord['lat']
-    _lng = coord['lng']
+    app_id = 'CCbMJ0qYlYAB3GJ8DA-pFg'
+    app_secret = 'pgbsg6iN7p8Sg767MFJjmmW0cia3Cad9X8IGJjZLCNIMUFbKzgb45MCvGdAapxlM'
+    coords = get_midpoint_coordinates()
+    data = {'grant_type': 'client_credentials',
+            'client_id': app_id,
+            'client_secret': app_secret}
+    token = requests.post('https://api.yelp.com/oauth2/token', data=data)
+    access_token = token.json()['access_token']
+    url = 'https://api.yelp.com/v3/businesses/search'
+    headers = {'Authorization': 'bearer %s' % access_token}
+    params = {'limit': 10, 'term': 'Restaurant', 'sort_by': 'rating', 'latitude': coords['lat'], 'longitude': coords['lng']}
 
-    resposne = search(bearer_token, term, _lat, _lng)
+    resp = requests.get(url=url, params=params, headers=headers)
+
+    result = resp.json()['businesses']
+
+    result_list = []
+
+    for r in result:
+        result_list.append(r.get("name"))
+
+    print result_list
+    return result_list
+
+
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point

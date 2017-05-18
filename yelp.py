@@ -43,8 +43,10 @@ except ImportError:
 
 import yelp_secrets
 
-CLIENT_ID =  yelp_secrets.CLIENT_ID
-CLIENT_SECRET =  yelp_secrets.CLIENT_SECRET
+# CLIENT_ID =  yelp_secrets.CLIENT_ID
+# CLIENT_SECRET =  yelp_secrets.CLIENT_SECRET
+CLIENT_ID = 'CCbMJ0qYlYAB3GJ8DA-pFg'
+CLIENT_SECRET = 'pgbsg6iN7p8Sg767MFJjmmW0cia3Cad9X8IGJjZLCNIMUFbKzgb45MCvGdAapxlM'
 
 # API constants, you shouldn't have to change these.
 API_HOST = 'https://api.yelp.com'
