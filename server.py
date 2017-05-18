@@ -131,47 +131,31 @@ def invitations_list():
     return render_template("invitations.html")
 
 
-# @app.route("/search_midpoint.json", methods=["GET"])
-# def get_midpoint_coordinates():
-#     """Get lat/lng coordinates from script."""
+@app.route("/search_midpoint.json", methods=["GET"])
+def get_midpoint_coordinates():
+    """Get lat/lng coordinates from script."""
 
-#     lat = request.args.get("lat")
-#     lng = request.args.get("lng")
+    lat = request.args.get("lat")
+    lng = request.args.get("lng")
 
-#     coords = json.dumps({'lat': lat, 'lng': lng})
+    coords = json.dumps({'lat': lat, 'lng': lng})
 
-#     return coords
+    # coord = json.loads(get_midpoint_coordinates())
 
+    # _lat = coord['lat']
+    # _lng = coord['lng']
 
-# @app.route("/search_midpoint", methods=["GET"])
-# def get_yelp_businesses():
-#     """Get yelp businesses and populate around midpoint."""
+    return coords
 
-#     coord = json.loads(get_midpoint_coordinates())
+@app.route("route to get request")
+def yelp():
+    """Get yelp businesses."""
+    coord = json.loads(get_midpoint_coordinates())
 
-#     _lat = coord['lat']
-#     _lng = coord['lng']
+    _lat = coord['lat']
+    _lng = coord['lng']
 
-#     # put access token in config file and import it here
-#     access_token = token.json()
-
-#     url = 'https://api.yelp.com/v2/search?'
-
-#     params = {
-#         'term': 'restaurants'
-#         'll': _lat, _lng
-#     }
-
-#     # yelp_businesses = client.search_by_coordinates(_lat, _lng, **params)
-
-#     response = requests.get(url=url, params=params, headers=headers)
-
-#     pprint.pprint(response.json())
-
-#     result = response.json()
-
-#     return render_template("search_midpoint.html", result=result)
-
+    resposne = search(bearer_token, term, _lat, _lng)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point

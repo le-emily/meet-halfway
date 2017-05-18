@@ -1,5 +1,6 @@
 var geocoder;
 var map;
+var midpointMarker;
 
 function initialize() {
   var directionsService = new google.maps.DirectionsService;
@@ -47,25 +48,17 @@ function codeAddress() {
   for(var i=0; i < location.length; i++) {
     var address = location[i].value;
     geocoder.geocode( { 'address': address}, function(results, status) {
-
-    // var two_lats = results[0].geometry.bounds.b;
-    var two_lats = results[0].geometry.viewport.b
-    // var two_lngs = results[0].geometry.bounds.f;
-    var two_lngs = results[0].geometry.viewport.f
-
+    var _lat = results[0].geometry.location.lat()
+    var _lng = results[0].geometry.location.lng()
       if (status == 'OK') {
         // why push 4 times when i'm iterating i each time?
-        coord.push(Object.values(two_lats)[0]);
-        coord.push(Object.values(two_lngs)[0]);
-        coord.push(Object.values(two_lats)[1]);
-        coord.push(Object.values(two_lngs)[1]); 
-
-        map.setCenter(results[0].geometry.location);
-        // if (coord.length == 4) {
+        coord.push(_lat);
+        coord.push(_lng);
+        // checked for length of coord array because marker wouldn't update, held all coords
+        if (coord.length == 4) {
           calculateMidpoint(coord);
-          // coord.length = 0;
-        // }
-        debugger
+        }
+        
       } else {
         alert('Geocode was not successful for the following reason: ' + status);
       }    
@@ -80,24 +73,29 @@ function showResults(data){
 }
 
 function calculateMidpoint(coord) {
-
   var _lat = (coord[0] + coord[2])/2.0;
   var _lng = (coord[1] + coord[3])/2.0;
 
   var coords = {"lat": _lat, "lng": _lng};
 
-  var midpointMarker = new google.maps.Marker({
-    position: {lat: _lat, lng: _lng},
-    map: map
-
-
-  });
-
+  placeMarker(coords);
+  map.setCenter(coords); 
   // $("#midpoint-form").append('<span><button type="submit" value="invite" id="send_invite">Invite</button>');
 
   // $.get("/search_midpoint", coords, showResults);
   // $.get("/search_midpoint", coords);
 
+}
+
+function placeMarker(coords) {
+  if (midpointMarker) {
+    midpointMarker.setPosition(coords);
+  } else {
+    midpointMarker = new google.maps.Marker({
+      position: coords,
+      map: map
+    });
+  }
 }
 
 
