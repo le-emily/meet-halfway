@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% for business in result %}
+        <div>
+            <h4><a href="{{ business['url'] }}">{{ business['name'] }}</a></h4>
+        </div>
+    {% endfor %}
+
+
+{% endblock %}

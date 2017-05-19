@@ -1,5 +1,5 @@
 from jinja2 import StrictUndefined
-from flask import Flask, render_template, request, flash, redirect, session
+from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, User, Status, Invitations, Address, UserAddress
 import requests
@@ -118,7 +118,7 @@ def friends_list():
     users = User.query.all()
 
     for user in users:
-        user_emails.append(user.email)
+        user_emails.append(user)
 
     return render_template("friends_list.html", user_emails=user_emails)
 
@@ -127,55 +127,68 @@ def friends_list():
 def invitations_list():
     # invitation = Invitations.query.all()
     # check each invitation, if accept, make green, if decline make grey.
+    user_emails = []
+    users = User.query.all()
 
-    return render_template("invitations.html")
+    for user in users:
+        user_emails.append(user.email)
+
+    return render_template("invitations.html", user_emails=user_emails)
 
 
-@app.route("/search_midpoint.json", methods=["GET"])
+# @app.route("/search_midpoint.json", methods=["GET"])
 def get_midpoint_coordinates():
     """Get lat/lng coordinates from script."""
 
     lat = request.args.get("lat")
     lng = request.args.get("lng")
 
-    coords = json.dumps({'lat': lat, 'lng': lng})
+    coord = {'lat': lat, 'lng': lng}
+    
+    return coord
 
-    return coords
 
-@app.route("/yelp_test.json", methods=["GET"])
-def yelp_business_search(): 
+@app.route("/yelp_search", methods=["POST"])
+def get_yelp_access_token(): 
     """Get yelp businesses around midpoint coordinates."""
 
     app_id = 'CCbMJ0qYlYAB3GJ8DA-pFg'
     app_secret = 'pgbsg6iN7p8Sg767MFJjmmW0cia3Cad9X8IGJjZLCNIMUFbKzgb45MCvGdAapxlM'
-    coords = get_midpoint_coordinates()
+
     data = {'grant_type': 'client_credentials',
             'client_id': app_id,
             'client_secret': app_secret}
     token = requests.post('https://api.yelp.com/oauth2/token', data=data)
     access_token = token.json()['access_token']
+
+    return access_token
+
+
+@app.route("/yelp_search.json", methods=["GET"])
+def yelp_business_search():
+    lat = request.args.get("lat")
+    lng = request.args.get("lng")
+ 
+    access_token = get_yelp_access_token()
+    
     url = 'https://api.yelp.com/v3/businesses/search'
     headers = {'Authorization': 'bearer %s' % access_token}
-    params = {'limit': 10, 'term': 'Restaurant', 'sort_by': 'rating', 'latitude': coords['lat'], 'longitude': coords['lng']}
+    params = {'limit': 10, 'term': 'Restaurant', 'sort_by': 'rating', 'latitude': lat, 'longitude': lng}
 
     resp = requests.get(url=url, params=params, headers=headers)
 
+    # result = resp.json()['businesses']
     result = resp.json()['businesses']
 
-    result_list = []
-
-    for r in result:
-        result_list.append(r.get("name"))
-
-    print result_list
-    return result_list
-
+    # for r in result:
+    #     result_list.append(r.get("name"))
+    return jsonify(result)
 
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
     # that we invoke the DebugToolbarExtension
-    app.debug = False
+    app.debug = True
 
     connect_to_db(app)
  

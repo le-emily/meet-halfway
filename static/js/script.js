@@ -63,14 +63,9 @@ function codeAddress() {
         alert('Geocode was not successful for the following reason: ' + status);
       }    
     });
-    console.log("The end");
   }
 }
 
-
-function showResults(data){
-  console.log(data);
-}
 
 function calculateMidpoint(coord) {
   var _lat = (coord[0] + coord[2])/2.0;
@@ -78,16 +73,41 @@ function calculateMidpoint(coord) {
 
   var coords = {"lat": _lat, "lng": _lng};
 
-  placeMarker(coords);
+  placeMidpointMarker(coords);
   map.setCenter(coords); 
-  // $("#midpoint-form").append('<span><button type="submit" value="invite" id="send_invite">Invite</button>');
 
-  // $.get("/search_midpoint", coords, showResults);
-  // $.get("/search_midpoint", coords);
+  $.get("/yelp_search.json", coords, function(results) {
+    // create marker for each yelp business and place on map
+    console.log(results);
+    
+    // make a separate marker function
+    for(var i=0; i < results.length; i++) {
+      // not accessing the address correctly
+      address = results[i]['location']['address1']
+      geocoder.geocode( { 'address': address}, function(results, status) {
+      var _lat = results[0].geometry.location.lat()
+      var _lng = results[0].geometry.location.lng()
+        if (status == 'OK') {
+          // why push 4 times when i'm iterating i each time?
+          // make marker with lat/long
+          var yelp_marker = new google.maps.Marker({
+            position: {lat: _lat, lng: _lng},
+            map: map
+          });
+        } else {
+          alert('Geocode was not successful for the following reason: ' + status);
+        }    
+    });
+}
+  
+
+    
+
+  });
 
 }
 
-function placeMarker(coords) {
+function placeMidpointMarker(coords) {
   if (midpointMarker) {
     midpointMarker.setPosition(coords);
   } else {
@@ -96,6 +116,11 @@ function placeMarker(coords) {
       map: map
     });
   }
+}
+
+
+function placeYelpBusinessMarkers() {
+  // code to place and clear yelp business markers after every search
 }
 
 
