@@ -170,7 +170,7 @@ def yelp_business_search():
     lng = request.args.get("lng")
  
     access_token = get_yelp_access_token()
-    
+
     url = 'https://api.yelp.com/v3/businesses/search'
     headers = {'Authorization': 'bearer %s' % access_token}
     params = {'limit': 10, 'term': 'Restaurant', 'sort_by': 'rating', 'latitude': lat, 'longitude': lng}

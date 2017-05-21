@@ -77,35 +77,73 @@ function calculateMidpoint(coord) {
   map.setCenter(coords); 
 
   $.get("/yelp_search.json", coords, function(results) {
-    // create marker for each yelp business and place on map
     console.log(results);
-    
+    debugger
     // make a separate marker function
     for(var i=0; i < results.length; i++) {
       // not accessing the address correctly
-      address = results[i]['location']['address1']
+      address = results[i]['location']['address1'];
       geocoder.geocode( { 'address': address}, function(results, status) {
-      var _lat = results[0].geometry.location.lat()
-      var _lng = results[0].geometry.location.lng()
+      var _lat = results[0].geometry.location.lat();
+      var _lng = results[0].geometry.location.lng();
         if (status == 'OK') {
-          // why push 4 times when i'm iterating i each time?
-          // make marker with lat/long
+          // creating marker for each yelp business around midpoint
           var yelp_marker = new google.maps.Marker({
             position: {lat: _lat, lng: _lng},
             map: map
           });
+          
+          // create and populate info window
+          // showing error message --- script.js:96 Uncaught TypeError: Cannot read property 'display_phone' of undefined
+          var business_phone = results[i]['display_phone'];
+          var business_street_address = results[i]['location']['display_address'][0];
+          var business_city_zip = results[i]['location']['display_address'][1];
+          var business_complete_address = business_street_address + ", " + business_city_zip;
+
+          var rating = results[i]['rating'];
+          var review_count = results[i]['review_count'];
+          var url = results[i]['url']
+
+          var price = results[i]['price'];
+          var name = results[i]['name'];
+          // populate business marker with details
+          var contentString = '<div id="content">'+
+                      '<div id="siteNotice">'+
+                      '</div>'+
+                      '<h1 id="firstHeading" class="firstHeading">Uluru</h1>'+
+                      '<div id="bodyContent">'+
+                      '<p><b>' + name + '</b>' + 
+                      business_phone + 
+                      business_complete_address + 
+                      price + 
+                      rating +
+                      review_count +
+                      '</p>' +
+                      '<p><a href=' + url + '>'+
+                      url + '</a> '+
+                      '</p>'+
+                      '</div>'+
+                      '</div>';
+
+          var infowindow = new google.maps.InfoWindow({
+            content: contentString
+          });
+
+          marker.addListener('click', function() {
+            infowindow.open(map, yelp_marker);
+          });
+          // end info window
+
         } else {
           alert('Geocode was not successful for the following reason: ' + status);
         }    
     });
 }
-  
+});
 
-    
-
-  });
 
 }
+
 
 function placeMidpointMarker(coords) {
   if (midpointMarker) {
@@ -119,9 +157,15 @@ function placeMidpointMarker(coords) {
 }
 
 
-function placeYelpBusinessMarkers() {
-  // code to place and clear yelp business markers after every search
+function placeYelpBusinessMarkers(coords) {
+// refactor code in calculate midpoint to 2 separate functions
 }
 
 
 initialize();
+
+
+
+
+
+
