@@ -76,23 +76,23 @@ function calculateMidpoint(coord) {
   placeMidpointMarker(coords);
   map.setCenter(coords); 
 
+  // this is gross. try to make into a separate function?
   $.get("/yelp_search.json", coords, function(results) {
     console.log(results);
     debugger
-    // make a separate marker function
     for(var i=0; i < results.length; i++) {
-      // not accessing the address correctly
       address = results[i]['location']['address1'];
       geocoder.geocode( { 'address': address}, function(results, status) {
       var _lat = results[0].geometry.location.lat();
       var _lng = results[0].geometry.location.lng();
         if (status == 'OK') {
-          // creating marker for each yelp business around midpoint
+          
+          // all yelp_markers are staying on the page again! need to clear these on new searches
           var yelp_marker = new google.maps.Marker({
             position: {lat: _lat, lng: _lng},
             map: map
           });
-          
+
           // create and populate info window
           // showing error message --- script.js:96 Uncaught TypeError: Cannot read property 'display_phone' of undefined
           var business_phone = results[i]['display_phone'];
