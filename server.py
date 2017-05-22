@@ -152,13 +152,16 @@ def get_midpoint_coordinates():
 def get_yelp_access_token(): 
     """Get yelp businesses around midpoint coordinates."""
 
+    # UNSAFE! need to put app_id and app_secret in config file
     app_id = 'CCbMJ0qYlYAB3GJ8DA-pFg'
     app_secret = 'pgbsg6iN7p8Sg767MFJjmmW0cia3Cad9X8IGJjZLCNIMUFbKzgb45MCvGdAapxlM'
 
     data = {'grant_type': 'client_credentials',
             'client_id': app_id,
             'client_secret': app_secret}
+
     token = requests.post('https://api.yelp.com/oauth2/token', data=data)
+
     access_token = token.json()['access_token']
 
     return access_token
@@ -177,9 +180,8 @@ def yelp_business_search():
 
     resp = requests.get(url=url, params=params, headers=headers)
 
-    # result = resp.json()['businesses']
     result = resp.json()['businesses']
-    # print result
+
     # for r in result:
     #     result_list.append(r.get("name"))
     return jsonify(result)
