@@ -77,14 +77,15 @@ function calculateMidpoint(coord) {
   map.setCenter(coords); 
 
   // this is gross. try to make into a separate function?
-  $.get("/yelp_search.json", coords, function(results) {
-    console.log(results);
-    debugger
-    for(var i=0; i < results.length; i++) {
-      address = results[i]['location']['address1'];
-      geocoder.geocode( { 'address': address}, function(results, status) {
-      var _lat = results[0].geometry.location.lat();
-      var _lng = results[0].geometry.location.lng();
+  $.get("/yelp_search.json", coords, function(yelpResults) {
+    console.log(yelpResults);
+    for(let i=0; i < yelpResults.length; i++) {
+      // give state, city, zipcode to address
+      address = yelpResults[i]['location']['address1'];
+      geocoder.geocode( { 'address': address}, function(businessResults, status) {
+        
+        var _lat = businessResults[0].geometry.location.lat();
+        var _lng = businessResults[0].geometry.location.lng();
         if (status == 'OK') {
           
           // all yelp_markers are staying on the page again! need to clear these on new searches
@@ -92,25 +93,25 @@ function calculateMidpoint(coord) {
             position: {lat: _lat, lng: _lng},
             map: map
           });
-
+          
           // create and populate info window
           // showing error message --- script.js:96 Uncaught TypeError: Cannot read property 'display_phone' of undefined
-          var business_phone = results[i]['display_phone'];
-          var business_street_address = results[i]['location']['display_address'][0];
-          var business_city_zip = results[i]['location']['display_address'][1];
+          var business_phone = yelpResults[i]['display_phone'];
+          var business_street_address = yelpResults[i]['location']['display_address'][0];
+          var business_city_zip = yelpResults[i]['location']['display_address'][1];
           var business_complete_address = business_street_address + ", " + business_city_zip;
 
-          var rating = results[i]['rating'];
-          var review_count = results[i]['review_count'];
-          var url = results[i]['url']
+          var rating = yelpResults[i]['rating'];
+          var review_count = yelpResults[i]['review_count'];
+          var url = yelpResults[i]['url']
 
-          var price = results[i]['price'];
-          var name = results[i]['name'];
+          var price = yelpResults[i]['price'];
+          var name = yelpResults[i]['name'];
           // populate business marker with details
           var contentString = '<div id="content">'+
                       '<div id="siteNotice">'+
                       '</div>'+
-                      '<h1 id="firstHeading" class="firstHeading">Uluru</h1>'+
+                      '<h1 id="firstHeading" class="firstHeading">' + name + '</h1>'+
                       '<div id="bodyContent">'+
                       '<p><b>' + name + '</b>' + 
                       business_phone + 
@@ -129,7 +130,7 @@ function calculateMidpoint(coord) {
             content: contentString
           });
 
-          marker.addListener('click', function() {
+          yelp_marker.addListener('click', function() {
             infowindow.open(map, yelp_marker);
           });
           // end info window
@@ -149,6 +150,8 @@ function placeMidpointMarker(coords) {
   if (midpointMarker) {
     midpointMarker.setPosition(coords);
   } else {
+
+    // change midpointMarker color
     midpointMarker = new google.maps.Marker({
       position: coords,
       map: map

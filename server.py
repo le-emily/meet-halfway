@@ -147,7 +147,7 @@ def get_midpoint_coordinates():
     
     return coord
 
-
+# javascript doesn't need access token, route not necessary; security issue
 @app.route("/yelp_search", methods=["POST"])
 def get_yelp_access_token(): 
     """Get yelp businesses around midpoint coordinates."""
@@ -179,7 +179,7 @@ def yelp_business_search():
 
     # result = resp.json()['businesses']
     result = resp.json()['businesses']
-
+    # print result
     # for r in result:
     #     result_list.append(r.get("name"))
     return jsonify(result)
