@@ -6,9 +6,14 @@
 
 <h3>Invitation Summary</h3>
 
-{% for user in user_emails %}
+{% for business_address in list_of_business_addresses %}
 
-    {{ user }}
+    <label> {{ business_address }}</label>
+    <form action="invitations_history" method="get">
+        <input type="radio" name="accept" value="accept" /> Accept
+        <input type="radio" name="decline" value="decline" /> Decline
+        <input type="submit" id="invitation_response" name="invitation_response" value="Submit">
+    </form>
 
 {% endfor %}
 

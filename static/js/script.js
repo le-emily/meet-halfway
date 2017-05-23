@@ -104,7 +104,11 @@ function calculateMidpoint(startAndEndLocationCoords) {
   placeMidpointMarker(midpointCoords);
   map.setCenter(midpointCoords); 
 
-  // this is gross. try to make into a separate function?
+  markYelpBusinessesOnMap(midpointCoords);
+}
+
+
+function markYelpBusinessesOnMap(midpointCoords) {
   $.get("/yelp_search.json", midpointCoords, function(yelpResults) {
     // console.log(yelpResults);
     for(let i=0; i < yelpResults.length; i++) {
@@ -183,11 +187,17 @@ function calculateMidpoint(startAndEndLocationCoords) {
               var emailOfPersonInvited = document.getElementById("inviteEmail").value;
 
               console.log(emailOfPersonInvited);
+              console.log(business_complete_address);
 
               $.get(
-                  url="/invitation_receipient_email", 
-                  data= {"email": emailOfPersonInvited}
+                url="/invitation_receipient_email", 
+                data= {"email": emailOfPersonInvited, "businessAddress": business_complete_address}
               );
+
+              // var senderEmail = JSON.parse('{{ logged_in_user }}');
+              // console.log("sender: ");
+              // console.log(senderEmail);
+
             });
           });
           // end info window
@@ -196,10 +206,8 @@ function calculateMidpoint(startAndEndLocationCoords) {
           alert('Geocode was not successful for the following reason: ' + status);
         }    
     });
-}
-});
-
-
+  }
+  });
 }
 
 // TO DO: midpoint marker should NOT be global. you can pass midpointmarker here as a parameter

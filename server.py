@@ -92,8 +92,10 @@ def login_process():
 
     session["user_id"] = user.user_id
 
+    logged_in_user = [{"email": email}]
+
     flash("Logged in")
-    return redirect("/search_midpoint")
+    return redirect("/search_midpoint", logged_in_user=json.dumps(logged_in_user))
 
 
 @app.route("/logout")
@@ -126,100 +128,45 @@ def friends_list():
 
     return render_template("friends_list.html", user_emails=user_emails)
 
-
-# def coords_for_invitation():
-#     """Send friend an invitation to meet."""
-
-#     latOfSelectedBusiness = request.args.get("lat")
-#     lngOfSelectedBusiness = request.args.get("lng")
-
-#     coordsOfOneBusinessToInvite = {"lat": latOfSelectedBusiness, "lng": lngOfSelectedBusiness}
-
-#     results = coordsOfOneBusinessToInvite.json()
-
-#     return results
-
-#     # return jsonify(results)
-
-
+# IN PROGRESS
 @app.route("/invitation_receipient_email", methods=["GET"])
-def check_invitation_email_validity():
+def check_invitation_email():
     """Get email of invitation recipient."""
     invitation_recipient_email = request.args.get("email")
     print invitation_recipient_email
-    # return email
 
     check_valid_email = User.query.filter_by(email=invitation_recipient_email).first()
+    print check_valid_email
 
     print 'BLAH BLAH BLAH THIS IS check_recipient_is_valid'
 
     # if statement is not checking for validity
     if not check_valid_email:
-        flash("No such user")
         return redirect("/search_midpoint")
-
-    flash("Invitation sent!")
-
-    return redirect("/search_midpoint")
-
-
-# @app.route("/check_validity", methods=["GET"])
-# def check_recipient_is_valid():
-
-#     invitation_recipient_email = get_email_of_invitation_recipient()
-
-#     print invitation_recipient_email
-
-#     check_valid_email = User.query.filter_by(email=invitation_recipient_email).first()
-
-#     print 'BLAH BLAH BLAH THIS IS check_recipient_is_valid'
-
-#     if not check_valid_email:
-#         flash("No such user")
-#         return redirect("/search_midpoint")
-
-#     flash("Invitation sent!")
-
-#     return redirect("/search_midpoint")
-
-
-# @app.route("/invitation_details", methods=["GET"])
-# def invitation_details():
-
-#     coordsOfBusinessInvite = coords_for_invitation()
-
-#     print "this is the invitations page"
-#     print coordsOfBusinessInvite
-
-#     # Get form variables
-#     inviteEmail = request.args.get("inviteEmail")
-#     print inviteEmail
-
-#     userEmailToInvite = User.query.filter_by(email=email).first()
-
-#     print userEmailToInvite
-
-#     if not user:
-#         flash("No such user")
-#         return redirect("/search_midpoint")
-
-#     flash("Invitation sent!")
-
-#     return redirect("/search_midpoint")
-
-
-# def get_midpoint_coordinates():
-#     """Get lat/lng coordinates from script.js."""
-
-#     lat = request.args.get("lat")
-#     lng = request.args.get("lng")
-
-#     coord = {'lat': lat, 'lng': lng}
     
-#     return coord
+    # sender = request.args.get()???login
+    recipient = invitation_recipient_email
 
-# javascript doesn't need access token, route not necessary; security issue
-# @app.route("/yelp_search", methods=["POST"])
+    # invitation = Invitation()
+    return invitation_recipient_email
+
+
+@app.route("/invitations_history")
+def invitations_history():
+    invitation_recipient = check_invitation_email()
+
+    list_of_business_addresses = []
+    business_address = request.args.get("businessAddress")
+    list_of_business_addresses.append(business_address)
+
+    status = request.args.get("invitation_response")
+
+    response_to_invitation = Invitation(sender=NEED TO FIGURE THIS PART OUT, receiver=invitation_recipient, status=status)
+
+    return render_template("invitations.html", list_of_business_addresses=list_of_business_addresses)
+# END IN PROGRESS
+
+
 def get_yelp_access_token(): 
     """Get yelp businesses around midpoint coordinates."""
 
