@@ -10,7 +10,7 @@ import pdb
 import pprint
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'my super secret key blah blah'
+# app.config['SECRET_KEY'] = 'my super secret key blah blah'
 app.jinja_env.undefined = StrictUndefined
 app.jinja_env.auto_reload = True
 
@@ -127,28 +127,59 @@ def friends_list():
     return render_template("friends_list.html", user_emails=user_emails)
 
 
-@app.route("/search_midpoint")
-def invite_friend():
+def coords_for_invitation():
     """Send friend an invitation to meet."""
 
-    return redirect("/invitations")
+    latOfSelectedBusiness = request.args.get("lat")
+    lngOfSelectedBusiness = request.args.get("lng")
 
-@app.route("/invitations")
-def invitations_list():
-    # invitation = Invitations.query.all()
-    # check each invitation, if accept, make green, if decline make grey.
-    user_emails = []
-    users = User.query.all()
+    coordsOfOneBusinessToInvite = {"lat": latOfSelectedBusiness, "lng": lngOfSelectedBusiness}
 
-    for user in users:
-        user_emails.append(user.email)
+    results = coordsOfOneBusinessToInvite.json()
 
-    return render_template("invitations.html", user_emails=user_emails)
+    return results
+
+    # return jsonify(results)
 
 
-# @app.route("/search_midpoint.json", methods=["GET"])
+@app.route("/email_for_invitation.json")
+def invitation_email():
+    """Get email of invitation recipient."""
+    email = request.args.get("emailOfPersonInvited")
+    # print "email from script file"
+    # print email
+
+    return email.json()
+
+
+
+# @app.route("/invitation_details", methods=["GET"])
+# def invitation_details():
+
+#     coordsOfBusinessInvite = coords_for_invitation()
+
+#     print "this is the invitations page"
+#     print coordsOfBusinessInvite
+
+#     # Get form variables
+#     inviteEmail = request.args.get("inviteEmail")
+#     print inviteEmail
+
+#     userEmailToInvite = User.query.filter_by(email=email).first()
+
+#     print userEmailToInvite
+
+#     if not user:
+#         flash("No such user")
+#         return redirect("/search_midpoint")
+
+#     flash("Invitation sent!")
+
+#     return redirect("/search_midpoint")
+
+
 def get_midpoint_coordinates():
-    """Get lat/lng coordinates from script."""
+    """Get lat/lng coordinates from script.js."""
 
     lat = request.args.get("lat")
     lng = request.args.get("lng")

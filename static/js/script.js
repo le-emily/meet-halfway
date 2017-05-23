@@ -8,7 +8,7 @@ var midpointMarker;
 
 function initialize() {
   // TO DO: make sure everything defined in intialize never changes (if it changes, move it out of initialize)
-  console.log('initializing')
+  // console.log('initializing')
   var directionsService = new google.maps.DirectionsService;
   var directionsDisplay = new google.maps.DirectionsRenderer;
   // TO DO: do i change?
@@ -50,6 +50,7 @@ function getNewMap(directionsDisplay, mapOptions) {
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
   var start = document.getElementById('location_a').value;
   var end = document.getElementById('location_b').value;
+
   directionsService.route({
     origin: start,
     destination: end,
@@ -67,7 +68,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
 function getStartAndEndLocationCoords() {
   var location = document.getElementsByName('location');
   // TODO: change my name to be more specific! which coords are we talking about here?
-  var coord = [];
+  var startAndEndLocationCoords = [];
   // go through each location and geocode;?
   for(var i=0; i < location.length; i++) {
     var address = location[i].value;
@@ -76,12 +77,13 @@ function getStartAndEndLocationCoords() {
     var _lng = results[0].geometry.location.lng()
       if (status == 'OK') {
         // why push 4 times when i'm iterating i each time?
-        coord.push(_lat);
-        coord.push(_lng);
+        startAndEndLocationCoords.push(_lat);
+        startAndEndLocationCoords.push(_lng);
         // checked for length of coord array because marker wouldn't update, held all coords
-        if (coord.length == 4) {
-          console.log('calculating midpoint')
-          calculateMidpoint(coord);
+        if (startAndEndLocationCoords.length == 4) {
+          // console.log('calculating midpoint')
+          calculateMidpoint(startAndEndLocationCoords);
+
         }
         
       } else {
@@ -92,24 +94,24 @@ function getStartAndEndLocationCoords() {
 }
 
 
-function calculateMidpoint(coord) {
-  var _lat = (coord[0] + coord[2])/2.0;
-  var _lng = (coord[1] + coord[3])/2.0;
+function calculateMidpoint(startAndEndLocationCoords) {
+  var _lat = (startAndEndLocationCoords[0] + startAndEndLocationCoords[2])/2.0;
+  var _lng = (startAndEndLocationCoords[1] + startAndEndLocationCoords[3])/2.0;
 
   // TODO: rename me! which coords am i?
-  var coords = {"lat": _lat, "lng": _lng};
+  var midpointCoords = {"lat": _lat, "lng": _lng};
 
-  placeMidpointMarker(coords);
-  map.setCenter(coords); 
+  placeMidpointMarker(midpointCoords);
+  map.setCenter(midpointCoords); 
 
   // this is gross. try to make into a separate function?
-  $.get("/yelp_search.json", coords, function(yelpResults) {
-    console.log(yelpResults);
+  $.get("/yelp_search.json", midpointCoords, function(yelpResults) {
+    // console.log(yelpResults);
     for(let i=0; i < yelpResults.length; i++) {
       // give state, city, zipcode to address
       address = yelpResults[i]['location']['address1'];
       geocoder.geocode( { 'address': address}, function(businessResults, status) {
-        console.log(businessResults) // TO DO: this is null when you do a subsequent search -- why?
+        // console.log(businessResults) // TO DO: this is null when you do a subsequent search -- why?
         var _lat = businessResults[0].geometry.location.lat();
         var _lng = businessResults[0].geometry.location.lng();
         if (status == 'OK') {
@@ -119,7 +121,7 @@ function calculateMidpoint(coord) {
             position: {lat: _lat, lng: _lng},
             map: map
           });
-          // debugger
+          
           
           var business_phone = yelpResults[i]['display_phone'];
           var business_street_address = yelpResults[i]['location']['display_address'][0];
@@ -133,8 +135,10 @@ function calculateMidpoint(coord) {
           var price = yelpResults[i]['price'];
           var name = yelpResults[i]['name'];
 
-          var _latOfYelpBusiness = yelpResults[i]['coordinates']['latitude'];
-          var _lngOfYelpBusiness = yelpResults[i]['coordinates']['longitude'];
+          var latOfBusiness = yelpResults[i]['coordinates']['latitude'];
+          var lngOfBusiness = yelpResults[i]['coordinates']['longitude'];
+
+          var coordsOfOneBusiness = {"lat": latOfBusiness, "lng": lngOfBusiness};
 
           // populate business marker with details
           
@@ -152,8 +156,13 @@ function calculateMidpoint(coord) {
                 '</p>' +
                 'Click ' + '<span><a href=' + url + '>' +
                 'here' + '</a> '+ 'to view this business on Yelp!' +
-                '</span>'+ '<br>' +
-                '<button type="submit" id="inviteFriendButton" value="submit">invite</button>' +
+                '</span>'+ '<br><br>' +
+                '<form id="inviteForm" action="/search_midpoint" method="GET">' + 
+                  'E-mail: ' + '<br>' + 
+                  '<input type="text" id="inviteEmail" name="inviteEmail" value="emily@gmail.com">' + 
+                  '<span>' + '<button type="submit" class="inviteFriendButton" value="submit">invite</button>' +
+                  '</span>' +
+                '</form>' +
               '</div>'+
             '</div>';
 
@@ -163,12 +172,21 @@ function calculateMidpoint(coord) {
 
           yelp_marker.addListener('click', function() {
             infowindow.open(map, yelp_marker);
-            $("#inviteFriendButton").click(function(evt){ 
+            $(".inviteFriendButton").click(function(evt){ 
               evt.preventDefault(); 
-              
-              console.log('hi');
-            });
+              var coordsOfSelectedBusiness = {"lat": latOfBusiness, "lng": lngOfBusiness};
+              // send coordsOfSelectedBusiness to python
+              console.log(latOfBusiness);
+              console.log(lngOfBusiness);
 
+              // get user email, check if valid in python
+              var emailOfPersonInvited = document.getElementById("inviteEmail").value;
+              console.log(emailOfPersonInvited);
+              $.get(
+                  url="/email_for_invitation.json", 
+                  data=emailOfPersonInvited
+              );
+            });
           });
           // end info window
 
@@ -186,13 +204,14 @@ function calculateMidpoint(coord) {
 // and call setPosition on it.
 // if midpoint marker doesnt exist, you can call something like createMidpointMarker
 function placeMidpointMarker(coords) {
-  console.log(midpointMarker)
+
+  // console.log(midpointMarker)
   if (midpointMarker) {
     // clear the map
     // create a new map with new midpoint
     midpointMarker.setPosition(coords);
   } else {
-    console.log('new google maps')
+    // console.log('new google maps')
     // change midpointMarker color
     midpointMarker = new google.maps.Marker({
       position: coords,
@@ -200,15 +219,6 @@ function placeMidpointMarker(coords) {
     });
   }
 }
-
-
-
-// $("#inviteFriendButton").click(function(evt){ 
-//   evt.preventDefault(); 
-  
-//   console.log('hi');
-// });
-
 
 initialize();
 
