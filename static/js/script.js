@@ -1,28 +1,50 @@
+// none of these need to be global -- pass these as parameters to each function
+// instead of defining them globally
 var geocoder;
 var map;
 var midpointMarker;
 
+
+
 function initialize() {
+  // TO DO: make sure everything defined in intialize never changes (if it changes, move it out of initialize)
+  console.log('initializing')
   var directionsService = new google.maps.DirectionsService;
   var directionsDisplay = new google.maps.DirectionsRenderer;
+  // TO DO: do i change?
   geocoder = new google.maps.Geocoder();
+  // TO DO: do i change? --> No
   var latlng = new google.maps.LatLng(37.78, -122.41);
   var mapOptions = {
         zoom: 8,
         center: latlng
   }
 
+  // TODO: initialize instance of map, but re-draw the map on click
+  // (if that's what is necessary for adding points to the map)
   map = new google.maps.Map(document.getElementById('map'), mapOptions);
+  // TODO: do i need this for an initial map rendering? what does this do?
   directionsDisplay.setMap(map);
 
-
+  // move this out of initialize
   function onSubmit(evt) {
     evt.preventDefault();
+    // TO DO: this is still being assigned as a global map parameter; this is bad
+    map = getNewMap(directionsDisplay, mapOptions);
     calculateAndDisplayRoute(directionsService, directionsDisplay);
-    codeAddress();
+    getStartAndEndLocationCoords();
   }
 
+  // this is a good use of initialize
   document.getElementById("search").addEventListener("click", onSubmit);
+}
+
+function getNewMap(directionsDisplay, mapOptions) {
+  // TO DO: notice how this is NOT using a global map parameter 
+  // this is good!
+  var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+  directionsDisplay.setMap(map);
+  return map;
 }
 
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
@@ -41,8 +63,10 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
   });
 }
 
-function codeAddress() {
+// TO DO: change my name! too vague
+function getStartAndEndLocationCoords() {
   var location = document.getElementsByName('location');
+  // TODO: change my name to be more specific! which coords are we talking about here?
   var coord = [];
   // go through each location and geocode;?
   for(var i=0; i < location.length; i++) {
@@ -56,6 +80,7 @@ function codeAddress() {
         coord.push(_lng);
         // checked for length of coord array because marker wouldn't update, held all coords
         if (coord.length == 4) {
+          console.log('calculating midpoint')
           calculateMidpoint(coord);
         }
         
@@ -71,6 +96,7 @@ function calculateMidpoint(coord) {
   var _lat = (coord[0] + coord[2])/2.0;
   var _lng = (coord[1] + coord[3])/2.0;
 
+  // TODO: rename me! which coords am i?
   var coords = {"lat": _lat, "lng": _lng};
 
   placeMidpointMarker(coords);
@@ -83,7 +109,7 @@ function calculateMidpoint(coord) {
       // give state, city, zipcode to address
       address = yelpResults[i]['location']['address1'];
       geocoder.geocode( { 'address': address}, function(businessResults, status) {
-        
+        console.log(businessResults) // TO DO: this is null when you do a subsequent search -- why?
         var _lat = businessResults[0].geometry.location.lat();
         var _lng = businessResults[0].geometry.location.lng();
         if (status == 'OK') {
@@ -93,9 +119,8 @@ function calculateMidpoint(coord) {
             position: {lat: _lat, lng: _lng},
             map: map
           });
+          // debugger
           
-          // create and populate info window
-          // showing error message --- script.js:96 Uncaught TypeError: Cannot read property 'display_phone' of undefined
           var business_phone = yelpResults[i]['display_phone'];
           var business_street_address = yelpResults[i]['location']['display_address'][0];
           var business_city_zip = yelpResults[i]['location']['display_address'][1];
@@ -107,31 +132,43 @@ function calculateMidpoint(coord) {
 
           var price = yelpResults[i]['price'];
           var name = yelpResults[i]['name'];
+
+          var _latOfYelpBusiness = yelpResults[i]['coordinates']['latitude'];
+          var _lngOfYelpBusiness = yelpResults[i]['coordinates']['longitude'];
+
           // populate business marker with details
-          var contentString = '<div id="content">'+
-                      '<div id="siteNotice">'+
-                      '</div>'+
-                      '<h1 id="firstHeading" class="firstHeading">' + name + '</h1>'+
-                      '<div id="bodyContent">'+
-                      '<p><b>' + name + '</b>' + 
-                      business_phone + 
-                      business_complete_address + 
-                      price + 
-                      rating +
-                      review_count +
-                      '</p>' +
-                      '<p><a href=' + url + '>'+
-                      url + '</a> '+
-                      '</p>'+
-                      '</div>'+
-                      '</div>';
+          
+          var yelpBusinessInfowindowDetails = 
+            '<div id="content">'+
+            '<div id="siteNotice">'+'</div>'+
+              '<h2 id="firstHeading" class="firstHeading">' + name + '</h2>' +
+              '<div id="bodyContent">'+
+                '<p><b>' + name + '</b>' + '<br>' +
+                  + business_phone + '<br>' +
+                  business_complete_address + '<br>' +
+                  'Price: ' + price + '<br>' +
+                  'Rating: ' + rating + '<br>' +
+                  'Review Count: ' + review_count +
+                '</p>' +
+                'Click ' + '<span><a href=' + url + '>' +
+                'here' + '</a> '+ 'to view this business on Yelp!' +
+                '</span>'+ '<br>' +
+                '<button type="submit" id="inviteFriendButton" value="submit">invite</button>' +
+              '</div>'+
+            '</div>';
 
           var infowindow = new google.maps.InfoWindow({
-            content: contentString
+            content: yelpBusinessInfowindowDetails
           });
 
           yelp_marker.addListener('click', function() {
             infowindow.open(map, yelp_marker);
+            $("#inviteFriendButton").click(function(evt){ 
+              evt.preventDefault(); 
+              
+              console.log('hi');
+            });
+
           });
           // end info window
 
@@ -145,12 +182,17 @@ function calculateMidpoint(coord) {
 
 }
 
-
+// TO DO: midpoint marker should NOT be global. you can pass midpointmarker here as a parameter
+// and call setPosition on it.
+// if midpoint marker doesnt exist, you can call something like createMidpointMarker
 function placeMidpointMarker(coords) {
+  console.log(midpointMarker)
   if (midpointMarker) {
+    // clear the map
+    // create a new map with new midpoint
     midpointMarker.setPosition(coords);
   } else {
-
+    console.log('new google maps')
     // change midpointMarker color
     midpointMarker = new google.maps.Marker({
       position: coords,
@@ -160,9 +202,12 @@ function placeMidpointMarker(coords) {
 }
 
 
-function placeYelpBusinessMarkers(coords) {
-// refactor code in calculate midpoint to 2 separate functions
-}
+
+// $("#inviteFriendButton").click(function(evt){ 
+//   evt.preventDefault(); 
+  
+//   console.log('hi');
+// });
 
 
 initialize();

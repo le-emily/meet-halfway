@@ -4,13 +4,17 @@ from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, User, Status, Invitations, Address, UserAddress
 import requests
 import sys 
+import os
 import json
 import pdb
 import pprint
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'my super secret key blah blah'
 app.jinja_env.undefined = StrictUndefined
 app.jinja_env.auto_reload = True
+
+os.urandom(24)
 
 app.secret_key = "t)6r)3s5^w)i9kahs(=^u$0-djb*6!@gs93qlfnjxh_^!gi@&_"
 
@@ -123,6 +127,12 @@ def friends_list():
     return render_template("friends_list.html", user_emails=user_emails)
 
 
+@app.route("/search_midpoint")
+def invite_friend():
+    """Send friend an invitation to meet."""
+
+    return redirect("/invitations")
+
 @app.route("/invitations")
 def invitations_list():
     # invitation = Invitations.query.all()
@@ -148,7 +158,7 @@ def get_midpoint_coordinates():
     return coord
 
 # javascript doesn't need access token, route not necessary; security issue
-@app.route("/yelp_search", methods=["POST"])
+# @app.route("/yelp_search", methods=["POST"])
 def get_yelp_access_token(): 
     """Get yelp businesses around midpoint coordinates."""
 
