@@ -181,10 +181,12 @@ function calculateMidpoint(startAndEndLocationCoords) {
 
               // get user email, check if valid in python
               var emailOfPersonInvited = document.getElementById("inviteEmail").value;
+
               console.log(emailOfPersonInvited);
+
               $.get(
-                  url="/email_for_invitation.json", 
-                  data=emailOfPersonInvited
+                  url="/invitation_receipient_email", 
+                  data= {"email": emailOfPersonInvited}
               );
             });
           });
