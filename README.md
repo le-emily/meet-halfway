@@ -2,34 +2,34 @@
 
 Setup
 
-    Launch and activate a virtual environment
+   Launch and activate a virtual environment
 
         $ virtualenv env
         $ source env/bin/activate
 
-    Install Python 2.7
+   Install Python 2.7
 
-    pip install requirements
+   pip install requirements
         
         $ pip install -r requirements.txt
 
-    Create the database
+   Create the database
 
         $ createdb meethalfway
         $ python -i model.py
           >>> db.create_all()
 
-    Launch server
+   Launch server
 
         $ python server.py
 
-    View app at:
+   View app at:
     
         http://localhost:5000/
 
 Test it out!
 
-    Register as a new user to:
+   Register as a new user to:
         - search a midpoint between two locations 
         - add friends
         - send an invite to meet at a restaurant of your choosing
