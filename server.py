@@ -80,7 +80,14 @@ def login_process():
     email = request.form["email"]
     password = request.form["password"]
 
+    # using this user to send current logged in user as sender
     user = User.query.filter_by(email=email).first()
+
+    sender = user.email
+    # create a session to hold onto current user for invitations
+    session['sender'] = sender
+    print "working!!"
+    print sender
 
     if not user:
         flash("No such user")
@@ -92,10 +99,8 @@ def login_process():
 
     session["user_id"] = user.user_id
 
-    logged_in_user = [{"email": email}]
-
     flash("Logged in")
-    return redirect("/search_midpoint", logged_in_user=json.dumps(logged_in_user))
+    return redirect("/search_midpoint")
 
 
 @app.route("/logout")
@@ -130,40 +135,68 @@ def friends_list():
 
 # IN PROGRESS
 @app.route("/invitation_receipient_email", methods=["GET"])
-def check_invitation_email():
-    """Get email of invitation recipient."""
-    invitation_recipient_email = request.args.get("email")
-    print invitation_recipient_email
+def check_invitation_email(invitation_recipient_email):
+    """Check validity and get email of invite recipient."""
 
-    check_valid_email = User.query.filter_by(email=invitation_recipient_email).first()
-    print check_valid_email
+    check_valid_recipient_email = User.query.filter_by(email=invitation_recipient_email).first()
+    print check_valid_recipient_email
 
-    print 'BLAH BLAH BLAH THIS IS check_recipient_is_valid'
+    if not check_valid_recipient_email:
+        return None
 
-    # if statement is not checking for validity
-    if not check_valid_email:
-        return redirect("/search_midpoint")
+    recipient = check_valid_recipient_email
+
+    return recipient
+
+
+@app.route("/invitations", methods=["GET"])
+def invitations_form():
+    """Show form for user signup."""
+    # query database for current logged in user
+    return render_template("invitations.html")
+
+
+@app.route("/invitations", methods=["POST"])
+def make_invitations():
+    """Make Invitations."""
+    invitation_recipient_email = request.form.get("email")
+    # User should only see invitations in which they're on the receiving end. Currently, sender 
+    # can accept and reject invitation
+    receiver = check_invitation_email(invitation_recipient_email)
+
+    if receiver:
+        sender = session.get('sender')
+        s = User.query.filter_by(email=sender).first()
+        # status = request.form.get("invitation_response")
+        response_to_invitation = Invitations(sender=s, receiver=receiver)
+        db.session.add(response_to_invitation)
+        db.session.commit()
+        response = {'recipient_name' : receiver.name, 'status': "Ok"}
+        return jsonify(response)
+    else:
+        response = {'status' : "bad user!!"}
+        return jsonify(response)
+
+    # if status=="decline":
+        # disable/gray out the invitation
+
+@app.route("/invitations", methods=["POST"])
+def respond_to_invitations():
+    """Respond to Invitations."""
+
+    invitation_response = request.form.get("selection")
+
+    response_to_invitation
     
-    # sender = request.args.get()???login
-    recipient = invitation_recipient_email
-
-    # invitation = Invitation()
-    return invitation_recipient_email
 
 
-@app.route("/invitations_history")
-def invitations_history():
-    invitation_recipient = check_invitation_email()
+@app.route("/invitations")
+def invitations_list():
+    invitations = Invitations.query.all()
+    print invitations
+    invitation_location = request.args.get("businessAddress")
 
-    list_of_business_addresses = []
-    business_address = request.args.get("businessAddress")
-    list_of_business_addresses.append(business_address)
-
-    status = request.args.get("invitation_response")
-
-    response_to_invitation = Invitation(sender=NEED TO FIGURE THIS PART OUT, receiver=invitation_recipient, status=status)
-
-    return render_template("invitations.html", list_of_business_addresses=list_of_business_addresses)
+    return redirect("/invitations", invitations=invitations, invitation_location=invitation_location)
 # END IN PROGRESS
 
 

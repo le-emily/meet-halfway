@@ -4,17 +4,14 @@
 
 {% block content %}
 
-<h3>Invitation Summary</h3>
-
-{% for business_address in list_of_business_addresses %}
-
-    <label> {{ business_address }}</label>
-    <form action="invitations_history" method="get">
-        <input type="radio" name="accept" value="accept" /> Accept
-        <input type="radio" name="decline" value="decline" /> Decline
+<h3>Pending Invitations</h3>
+    {% for invitation in invitations %}
+    <label>Please respond to {{ invitation.sender }}'s invitation to {{ invitation_location }}</label>
+    <form action="invitations" method="post">
+        <input type="radio" name="selection" value="accept" /> Accept
+        <input type="radio" name="selection" value="decline" /> Decline
         <input type="submit" id="invitation_response" name="invitation_response" value="Submit">
     </form>
-
-{% endfor %}
+    {% endfor %}
 
 {% endblock %}

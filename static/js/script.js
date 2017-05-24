@@ -64,10 +64,8 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
   });
 }
 
-// TO DO: change my name! too vague
 function getStartAndEndLocationCoords() {
   var location = document.getElementsByName('location');
-  // TODO: change my name to be more specific! which coords are we talking about here?
   var startAndEndLocationCoords = [];
   // go through each location and geocode;?
   for(var i=0; i < location.length; i++) {
@@ -98,7 +96,6 @@ function calculateMidpoint(startAndEndLocationCoords) {
   var _lat = (startAndEndLocationCoords[0] + startAndEndLocationCoords[2])/2.0;
   var _lng = (startAndEndLocationCoords[1] + startAndEndLocationCoords[3])/2.0;
 
-  // TODO: rename me! which coords am i?
   var midpointCoords = {"lat": _lat, "lng": _lng};
 
   placeMidpointMarker(midpointCoords);
@@ -112,20 +109,16 @@ function markYelpBusinessesOnMap(midpointCoords) {
   $.get("/yelp_search.json", midpointCoords, function(yelpResults) {
     // console.log(yelpResults);
     for(let i=0; i < yelpResults.length; i++) {
-      // give state, city, zipcode to address
       address = yelpResults[i]['location']['address1'];
       geocoder.geocode( { 'address': address}, function(businessResults, status) {
         // console.log(businessResults) // TO DO: this is null when you do a subsequent search -- why?
         var _lat = businessResults[0].geometry.location.lat();
         var _lng = businessResults[0].geometry.location.lng();
         if (status == 'OK') {
-          
-          // all yelp_markers are staying on the page again! need to clear these on new searches
           var yelp_marker = new google.maps.Marker({
             position: {lat: _lat, lng: _lng},
             map: map
           });
-          
           
           var business_phone = yelpResults[i]['display_phone'];
           var business_street_address = yelpResults[i]['location']['display_address'][0];
@@ -143,8 +136,6 @@ function markYelpBusinessesOnMap(midpointCoords) {
           var lngOfBusiness = yelpResults[i]['coordinates']['longitude'];
 
           var coordsOfOneBusiness = {"lat": latOfBusiness, "lng": lngOfBusiness};
-
-          // populate business marker with details
           
           var yelpBusinessInfowindowDetails = 
             '<div id="content">'+
@@ -161,7 +152,7 @@ function markYelpBusinessesOnMap(midpointCoords) {
                 'Click ' + '<span><a href=' + url + '>' +
                 'here' + '</a> '+ 'to view this business on Yelp!' +
                 '</span>'+ '<br><br>' +
-                '<form id="inviteForm" action="/search_midpoint" method="GET">' + 
+                '<form id="inviteForm" action="/invitations" method="POST">' + 
                   'E-mail: ' + '<br>' + 
                   '<input type="text" id="inviteEmail" name="inviteEmail" value="emily@gmail.com">' + 
                   '<span>' + '<button type="submit" class="inviteFriendButton" value="submit">invite</button>' +
@@ -183,21 +174,36 @@ function markYelpBusinessesOnMap(midpointCoords) {
               console.log(latOfBusiness);
               console.log(lngOfBusiness);
 
-              // get user email, check if valid in python
               var emailOfPersonInvited = document.getElementById("inviteEmail").value;
 
               console.log(emailOfPersonInvited);
               console.log(business_complete_address);
 
-              $.get(
-                url="/invitation_receipient_email", 
-                data= {"email": emailOfPersonInvited, "businessAddress": business_complete_address}
+              $.post(
+                url="/invitations", 
+                data= {"email": emailOfPersonInvited, "businessAddress": business_complete_address}, 
+                function(result){
+                  if(result["status"] !== "Ok") {
+                    console.log("invalid email!!! :(");
+                    var invitation_status_details = '<div>' + 
+                      data["email"] + " is an invalid email!" + " Please try again."
+                      '</div>';
+                    invitation_status_details
+                  } else {
+                    
+                    // '<div id="invitation_status_content">'+
+                    var invitation_status_details = '<div>' + 
+                      result["recipient_name"] +  " has been invited to " + yelpResults[0]['name'] + "." +
+                      '</div>';
+                    invitation_status_details
+                    
+                    // looping through user's invitations here would make a div on the search page
+                    // find invitations, inline html
+                    // let user know they're invitation has been sent
+                    // console.log(result["recipient_name"]);
+                  }
+                }
               );
-
-              // var senderEmail = JSON.parse('{{ logged_in_user }}');
-              // console.log("sender: ");
-              // console.log(senderEmail);
-
             });
           });
           // end info window
