@@ -30,6 +30,9 @@ Setup
 Test it out!
 
    -Register as a new user to:
+   
       - search a midpoint between two locations 
+      
       - add friends
+      
       - send an invite to meet at a restaurant of your choosing
