@@ -153,36 +153,11 @@ def check_invitation_email(invitation_recipient_email):
     return recipient
 
 
-@app.route("/invitations", methods=["GET"])
-def invitations_form():
-    """Show form for user signup."""
-    # check logged in user
-    logged_in_user = session.get('logged_in_user')
-    # print "This is the logged_in_user variable!!! WORKS!!!"
-    print logged_in_user
-
-    # import pdb;pdb.set_trace()
-
-    l = User.query.filter_by(email=logged_in_user).first().email
-    print "THIS IS l.email!!!!!!"
-    print l.email
-    # check all invitations that match logged in user's email
-    invitations = Invitations.query.filter_by(receiver=l).all()
-
-    # AttributeError: 'Invitations' object has no attribute 'status_type'
-    # NEED TO ADD IN STATUS TYPE, IN FUNCTION BELOW
-    if invitations:
-        return render_template("invitations.html", invitations=invitations)
-    # query database for current logged in user
-    
-
-
 @app.route("/invitations", methods=["POST"])
 def make_invitations():
     """Make Invitations."""
     invitation_recipient_email = request.form.get("email")
-    # User should only see invitations in which they're on the receiving end. Currently, sender 
-    # can accept and reject invitation
+
     receiver = check_invitation_email(invitation_recipient_email)
 
     if receiver:
@@ -204,7 +179,7 @@ def make_invitations():
 @app.route("/invitations", methods=["POST"])
 def respond_to_invitations():
     """Respond to Invitations."""
-    # how do i know which one i'm responding to?
+    # how do i know which one i'm responding to? 
     invitation_response = request.form.get("selection")
 
     print "response_to_invitation"
@@ -214,15 +189,31 @@ def respond_to_invitations():
     response_to_invitation.status = invitation_response
 
     db.session.commit()
+    return redirect("/invitations")
 
 
-# @app.route("/invitations")
-# def invitations_list():
-#     invitations = Invitations.query.all()
-#     print invitations
-#     invitation_location = request.args.get("businessAddress")
+@app.route("/invitations", methods=["GET"])
+def invitations_form():
+    """Show form for user signup."""
+    # check logged in user
+    logged_in_user = session.get('logged_in_user')
+    # print "This is the logged_in_user variable!!! WORKS!!!"
+    print logged_in_user
 
-#     return redirect("/invitations", invitations=invitations, invitation_location=invitation_location)
+    # import pdb;pdb.set_trace()
+
+    l = User.query.filter_by(email=logged_in_user).first()
+    print "THIS IS l.email!!!!!!"
+    # check all invitations that match logged in user's email
+    invitations = Invitations.query.filter_by(receiver=l).all()
+
+    # AttributeError: 'Invitations' object has no attribute 'status_type'
+    # NEED TO ADD IN STATUS TYPE, IN FUNCTION BELOW
+    # if invitations:
+    return render_template("invitations.html", invitations=invitations)
+    # query database for current logged in user
+    
+    # return "Nothing!"
 # END IN PROGRESS
 
 
