@@ -216,13 +216,13 @@ def respond_to_invitations():
     db.session.commit()
 
 
-@app.route("/invitations")
-def invitations_list():
-    invitations = Invitations.query.all()
-    print invitations
-    invitation_location = request.args.get("businessAddress")
+# @app.route("/invitations")
+# def invitations_list():
+#     invitations = Invitations.query.all()
+#     print invitations
+#     invitation_location = request.args.get("businessAddress")
 
-    return redirect("/invitations", invitations=invitations, invitation_location=invitation_location)
+#     return redirect("/invitations", invitations=invitations, invitation_location=invitation_location)
 # END IN PROGRESS
 
 
