@@ -75,7 +75,7 @@ def login_form():
 @app.route("/login", methods=["POST"])
 def login_process():
     """Process login."""
-
+    
     # Get form variables
     email = request.form["email"]
     password = request.form["password"]
@@ -86,8 +86,12 @@ def login_process():
     sender = user.email
     # create a session to hold onto current user for invitations
     session['sender'] = sender
-    print "working!!"
-    print sender
+    
+    logged_in_user = user.email 
+
+    session['logged_in_user'] = logged_in_user
+
+    print logged_in_user
 
     if not user:
         flash("No such user")
@@ -152,8 +156,25 @@ def check_invitation_email(invitation_recipient_email):
 @app.route("/invitations", methods=["GET"])
 def invitations_form():
     """Show form for user signup."""
+    # check logged in user
+    logged_in_user = session.get('logged_in_user')
+    # print "This is the logged_in_user variable!!! WORKS!!!"
+    print logged_in_user
+
+    # import pdb;pdb.set_trace()
+
+    l = User.query.filter_by(email=logged_in_user).first().email
+    print "THIS IS l.email!!!!!!"
+    print l.email
+    # check all invitations that match logged in user's email
+    invitations = Invitations.query.filter_by(receiver=l).all()
+
+    # AttributeError: 'Invitations' object has no attribute 'status_type'
+    # NEED TO ADD IN STATUS TYPE, IN FUNCTION BELOW
+    if invitations:
+        return render_template("invitations.html", invitations=invitations)
     # query database for current logged in user
-    return render_template("invitations.html")
+    
 
 
 @app.route("/invitations", methods=["POST"])
@@ -183,11 +204,16 @@ def make_invitations():
 @app.route("/invitations", methods=["POST"])
 def respond_to_invitations():
     """Respond to Invitations."""
-
+    # how do i know which one i'm responding to?
     invitation_response = request.form.get("selection")
 
-    response_to_invitation
-    
+    print "response_to_invitation"
+    print response_to_invitation
+
+    # HOW DO I ADD STATUS BACK INTO THE INSTANCE????
+    response_to_invitation.status = invitation_response
+
+    db.session.commit()
 
 
 @app.route("/invitations")

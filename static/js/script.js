@@ -185,13 +185,13 @@ function markYelpBusinessesOnMap(midpointCoords) {
                 function(result){
                   if(result["status"] !== "Ok") {
                     console.log("invalid email!!! :(");
+                    // need to figure out how to make this htmlcontent to show up in a certain area of my page
                     var invitation_status_details = '<div>' + 
                       data["email"] + " is an invalid email!" + " Please try again."
                       '</div>';
                     invitation_status_details
                   } else {
-                    
-                    // '<div id="invitation_status_content">'+
+                    // need to figure out how to make this htmlcontent to show up in a certain area of my page
                     var invitation_status_details = '<div>' + 
                       result["recipient_name"] +  " has been invited to " + yelpResults[0]['name'] + "." +
                       '</div>';
