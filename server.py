@@ -185,35 +185,43 @@ def respond_to_invitations():
     print "response_to_invitation"
     print response_to_invitation
 
-    # HOW DO I ADD STATUS BACK INTO THE INSTANCE????
-    response_to_invitation.status = invitation_response
+    # Create an instance of Status with invitation_response
+    response_to_invitation = Status(status_type=invitation_response)
 
+    # query invitations with status and check for matched status_id
+    find_invitation = Invitations.query.filter_by(status_id=response_to_invitation.status_id).first()
+
+    if find_invitation:
+        find_invitation.status_type = respond_to_invitations
+
+    print "THIS IS FIND_INVITATIONS. NEED TO MATCH THE STATUS_ID IN STATUS WITH THE ONE IN INVITATIONS"
+    print find_invitation
+
+    response_to_invitation.add(response_to_invitation)
     db.session.commit()
+
     return redirect("/invitations")
 
 
 @app.route("/invitations", methods=["GET"])
 def invitations_form():
     """Show form for user signup."""
-    # check logged in user
+    import pdb; pdb.set_trace()
+        # check logged in user
     logged_in_user = session.get('logged_in_user')
     # print "This is the logged_in_user variable!!! WORKS!!!"
     print logged_in_user
 
-    # import pdb;pdb.set_trace()
-
-    l = User.query.filter_by(email=logged_in_user).first()
+    find_users_invitations = User.query.filter_by(email=logged_in_user).first().email
     print "THIS IS l.email!!!!!!"
     # check all invitations that match logged in user's email
     invitations = Invitations.query.filter_by(receiver=l).all()
+    print "THESE ARE THE INVITATIONS"
+    print invitations
 
-    # AttributeError: 'Invitations' object has no attribute 'status_type'
-    # NEED TO ADD IN STATUS TYPE, IN FUNCTION BELOW
-    # if invitations:
+
     return render_template("invitations.html", invitations=invitations)
-    # query database for current logged in user
-    
-    # return "Nothing!"
+
 # END IN PROGRESS
 
 

@@ -186,16 +186,19 @@ function markYelpBusinessesOnMap(midpointCoords) {
                   if(result["status"] !== "Ok") {
                     console.log("invalid email!!! :(");
                     // need to figure out how to make this htmlcontent to show up in a certain area of my page
-                    var invitation_status_details = '<div>' + 
+                    var invitation_failed_message = '<div>' + 
                       data["email"] + " is an invalid email!" + " Please try again."
                       '</div>';
-                    invitation_status_details
+                    $(".col-sm-3").append(invitation_failed_message);
                   } else {
                     // need to figure out how to make this htmlcontent to show up in a certain area of my page
-                    var invitation_status_details = '<div>' + 
-                      result["recipient_name"] +  " has been invited to " + yelpResults[0]['name'] + "." +
+              
+                    var invitation_success_message = '<div>' + 
+                      result["recipient_name"] +  " has been invited to " + yelpResults[i]['name'] + "." +
                       '</div>';
-                    invitation_status_details
+
+                    $(".col-sm-3").append(invitation_success_message);
+                    // invitation_status_details
                     
                     // looping through user's invitations here would make a div on the search page
                     // find invitations, inline html
