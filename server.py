@@ -206,16 +206,19 @@ def respond_to_invitations():
 @app.route("/invitations", methods=["GET"])
 def invitations_form():
     """Show form for user signup."""
-    import pdb; pdb.set_trace()
         # check logged in user
     logged_in_user = session.get('logged_in_user')
     # print "This is the logged_in_user variable!!! WORKS!!!"
     print logged_in_user
 
-    find_users_invitations = User.query.filter_by(email=logged_in_user).first().email
-    print "THIS IS l.email!!!!!!"
+    import pdb; pdb.set_trace()
+
+    get_logged_in_user = User.query.filter_by(email=logged_in_user).first()
+    print "THIS IS get_logged_in_user"
+
     # check all invitations that match logged in user's email
-    invitations = Invitations.query.filter_by(receiver=l).all()
+    # getting error: *** AttributeError: 'Invitations' object has no attribute 'status_type'
+    invitations = Invitations.query.filter_by(receiver=get_logged_in_user).all()
     print "THESE ARE THE INVITATIONS"
     print invitations
 
