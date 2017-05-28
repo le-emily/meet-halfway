@@ -163,13 +163,14 @@ def make_invitations():
 
     if receiver:
         sender = session.get("sender")
-        s = User.query.filter_by(email=sender).first()
-        # invitation instance, status is null until receiver responds
-        response_to_invitation = Invitations(sender=s, receiver=receiver)
-        db.session.add(response_to_invitation)
-        db.session.commit()
-        response = {"recipient_name" : receiver.name, "status": "Ok"}
-        return jsonify(response)
+        if receiver != sender:
+            s = User.query.filter_by(email=sender).first()
+            # invitation instance, status is null until receiver responds
+            response_to_invitation = Invitations(sender=s, receiver=receiver)
+            db.session.add(response_to_invitation)
+            db.session.commit()
+            response = {"recipient_name" : receiver.name, "status": "Ok"}
+            return jsonify(response)
     else:
         response = {"status" : "bad user!!"}
         return jsonify(response)
@@ -199,7 +200,7 @@ def invitations_form():
 
     return render_template("invitations.html", invitations=invitations, business_address=business_address, business_name=business_name)
 
-
+# after user responds to an invitation, status_type is updated in database, and invitation is grayed out
 @app.route("/invitations", methods=["POST"])
 def respond_to_invitation():
     """Respond to Invitations."""
@@ -211,11 +212,9 @@ def respond_to_invitation():
     response_to_invitation = Status(status_type=invitation_response)
     print response_to_invitation.status_type
 
-    # query invitations with status and check for matched status_id
-    # i don't think this is actually matching the correct status_id in the status instances....
     find_invitation = Invitations.query.filter_by(status_id=response_to_invitation.status_id).first()
     print "YAYYYYYYYY find_invitations"
-    print find_invitations
+    # print find_invitations
 
     if find_invitation:
         find_invitation.status_type = response_to_invitation
@@ -229,6 +228,7 @@ def respond_to_invitation():
     response = {"response": invitation_response}
 
     return jsonify(response)
+
 
 # END IN PROGRESS
 

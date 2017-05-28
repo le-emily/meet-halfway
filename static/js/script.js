@@ -186,7 +186,6 @@ function markYelpBusinessesOnMap(midpointCoords) {
                         "businessName": name}, 
                 // check for valid email, need to be a registered user to be Ok
                 function(result){
-                  debugger
                   console.log(result)
                   if(result["status"] !== "Ok") {
                     console.log("invalid email!!! :(");
@@ -208,7 +207,6 @@ function markYelpBusinessesOnMap(midpointCoords) {
             });
           });
           // end info window
-
         } else {
           alert('Geocode was not successful for the following reason: ' + status);
         }    
@@ -238,10 +236,20 @@ function placeMidpointMarker(coords) {
   midpointMarker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
 }
 
-
-// $(".respond_to_invitation").click(function(evt) {
-//   evt.preventDefault();
-// })
+// how to keep button disabled forever?
+$("#invitation_response").click(function(evt) {
+  evt.preventDefault();
+  $.post(
+    url="/invitations", 
+    function(invitationResponse) {
+      console.log(invitationResponse);
+      if(invitationResponse) {
+        $("#invitation_response").prop("disabled", true);
+      }
+    }
+  );
+  // $("#invitation_need_response").setTimeout(function() { $("#invitation_need_response").val(''); }, 3000);
+});
 
 initialize();
 
