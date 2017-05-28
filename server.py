@@ -10,7 +10,7 @@ import pdb
 import pprint
 
 app = Flask(__name__)
-# app.config['SECRET_KEY'] = 'my super secret key blah blah'
+# app.config["SECRET_KEY"] = "my super secret key blah blah"
 app.jinja_env.undefined = StrictUndefined
 app.jinja_env.auto_reload = True
 
@@ -85,11 +85,11 @@ def login_process():
 
     sender = user.email
     # create a session to hold onto current user for invitations
-    session['sender'] = sender
+    session["sender"] = sender
     
     logged_in_user = user.email 
 
-    session['logged_in_user'] = logged_in_user
+    session["logged_in_user"] = logged_in_user
 
     print logged_in_user
 
@@ -153,7 +153,7 @@ def check_invitation_email(invitation_recipient_email):
     return recipient
 
 
-@app.route("/invitations", methods=["POST"])
+@app.route("/add_invitation", methods=["POST"])
 def make_invitations():
     """Make Invitations."""
     invitation_recipient_email = request.form.get("email")
@@ -161,69 +161,69 @@ def make_invitations():
     receiver = check_invitation_email(invitation_recipient_email)
 
     if receiver:
-        sender = session.get('sender')
+        sender = session.get("sender")
         s = User.query.filter_by(email=sender).first()
         # status = request.form.get("invitation_response")
         response_to_invitation = Invitations(sender=s, receiver=receiver)
         db.session.add(response_to_invitation)
         db.session.commit()
-        response = {'recipient_name' : receiver.name, 'status': "Ok"}
+        response = {"recipient_name" : receiver.name, "status": "Ok"}
         return jsonify(response)
     else:
-        response = {'status' : "bad user!!"}
+        response = {"status" : "bad user!!"}
         return jsonify(response)
 
     # if status=="decline":
         # disable/gray out the invitation
 
 @app.route("/invitations", methods=["POST"])
-def respond_to_invitations():
+def respond_to_invitation():
     """Respond to Invitations."""
-    # how do i know which one i'm responding to? 
+    # how do i know which one i"m responding to? 
     invitation_response = request.form.get("selection")
 
     print "response_to_invitation"
-    print response_to_invitation
-
     # Create an instance of Status with invitation_response
     response_to_invitation = Status(status_type=invitation_response)
+    print response_to_invitation
 
     # query invitations with status and check for matched status_id
     find_invitation = Invitations.query.filter_by(status_id=response_to_invitation.status_id).first()
 
     if find_invitation:
-        find_invitation.status_type = respond_to_invitations
+        find_invitation.status_type = response_to_invitation
 
     print "THIS IS FIND_INVITATIONS. NEED TO MATCH THE STATUS_ID IN STATUS WITH THE ONE IN INVITATIONS"
     print find_invitation
 
-    response_to_invitation.add(response_to_invitation)
+    db.session.add(response_to_invitation)
     db.session.commit()
 
-    return redirect("/invitations")
+    response = {"response": invitation_response}
+
+    return jsonify(response)
 
 
 @app.route("/invitations", methods=["GET"])
 def invitations_form():
-    """Show form for user signup."""
-        # check logged in user
-    logged_in_user = session.get('logged_in_user')
+    """Show list of invitations received."""
+    # get logged in user
+    logged_in_user = session.get("logged_in_user")
+
+    business_address = request.form.get("businessAddress")
+    print "BUSINESS ADDRESS!!"
+    print business_address
     # print "This is the logged_in_user variable!!! WORKS!!!"
     print logged_in_user
-
-    import pdb; pdb.set_trace()
 
     get_logged_in_user = User.query.filter_by(email=logged_in_user).first()
     print "THIS IS get_logged_in_user"
 
-    # check all invitations that match logged in user's email
-    # getting error: *** AttributeError: 'Invitations' object has no attribute 'status_type'
+    # check all invitations that match logged in user"s email
+    # getting error: *** AttributeError: "Invitations" object has no attribute "status_type"
     invitations = Invitations.query.filter_by(receiver=get_logged_in_user).all()
-    print "THESE ARE THE INVITATIONS"
-    print invitations
 
-
-    return render_template("invitations.html", invitations=invitations)
+    return render_template("invitations.html", invitations=invitations, business_address=business_address)
 
 # END IN PROGRESS
 
@@ -232,16 +232,16 @@ def get_yelp_access_token():
     """Get yelp businesses around midpoint coordinates."""
 
     # UNSAFE! need to put app_id and app_secret in config file
-    app_id = 'CCbMJ0qYlYAB3GJ8DA-pFg'
-    app_secret = 'pgbsg6iN7p8Sg767MFJjmmW0cia3Cad9X8IGJjZLCNIMUFbKzgb45MCvGdAapxlM'
+    app_id = "CCbMJ0qYlYAB3GJ8DA-pFg"
+    app_secret = "pgbsg6iN7p8Sg767MFJjmmW0cia3Cad9X8IGJjZLCNIMUFbKzgb45MCvGdAapxlM"
 
-    data = {'grant_type': 'client_credentials',
-            'client_id': app_id,
-            'client_secret': app_secret}
+    data = {"grant_type": "client_credentials",
+            "client_id": app_id,
+            "client_secret": app_secret}
 
-    token = requests.post('https://api.yelp.com/oauth2/token', data=data)
+    token = requests.post("https://api.yelp.com/oauth2/token", data=data)
 
-    access_token = token.json()['access_token']
+    access_token = token.json()["access_token"]
 
     return access_token
 
@@ -253,13 +253,13 @@ def yelp_business_search():
  
     access_token = get_yelp_access_token()
 
-    url = 'https://api.yelp.com/v3/businesses/search'
-    headers = {'Authorization': 'bearer %s' % access_token}
-    params = {'limit': 10, 'term': 'Restaurant', 'sort_by': 'rating', 'latitude': lat, 'longitude': lng}
+    url = "https://api.yelp.com/v3/businesses/search"
+    headers = {"Authorization": "bearer %s" % access_token}
+    params = {"limit": 10, "term": "Restaurant", "sort_by": "rating", "latitude": lat, "longitude": lng}
 
     resp = requests.get(url=url, params=params, headers=headers)
 
-    result = resp.json()['businesses']
+    result = resp.json()["businesses"]
 
     # for r in result:
     #     result_list.append(r.get("name"))

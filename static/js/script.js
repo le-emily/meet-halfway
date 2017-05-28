@@ -106,6 +106,7 @@ function calculateMidpoint(startAndEndLocationCoords) {
 
 
 function markYelpBusinessesOnMap(midpointCoords) {
+  var yelp_marker_array = [];
   $.get("/yelp_search.json", midpointCoords, function(yelpResults) {
     // console.log(yelpResults);
     for(let i=0; i < yelpResults.length; i++) {
@@ -119,11 +120,15 @@ function markYelpBusinessesOnMap(midpointCoords) {
             position: {lat: _lat, lng: _lng},
             map: map
           });
+
+          yelp_marker_array.push(yelp_marker);
+
+          debugger
           
           var business_phone = yelpResults[i]['display_phone'];
           var business_street_address = yelpResults[i]['location']['display_address'][0];
           var business_city_zip = yelpResults[i]['location']['display_address'][1];
-          var business_complete_address = business_street_address + ", " + business_city_zip;
+          var complete_business_address = business_street_address + ", " + business_city_zip;
 
           var rating = yelpResults[i]['rating'];
           var review_count = yelpResults[i]['review_count'];
@@ -139,12 +144,10 @@ function markYelpBusinessesOnMap(midpointCoords) {
           
           var yelpBusinessInfowindowDetails = 
             '<div id="content">'+
-            '<div id="siteNotice">'+'</div>'+
-              '<h2 id="firstHeading" class="firstHeading">' + name + '</h2>' +
+              '<h3 id="firstHeading" class="firstHeading">' + name + '</h3>' +
               '<div id="bodyContent">'+
-                '<p><b>' + name + '</b>' + '<br>' +
-                  + business_phone + '<br>' +
-                  business_complete_address + '<br>' +
+                '<p>' + business_phone + '<br>' +
+                  complete_business_address + '<br>' +
                   'Price: ' + price + '<br>' +
                   'Rating: ' + rating + '<br>' +
                   'Review Count: ' + review_count +
@@ -152,7 +155,7 @@ function markYelpBusinessesOnMap(midpointCoords) {
                 'Click ' + '<span><a href=' + url + '>' +
                 'here' + '</a> '+ 'to view this business on Yelp!' +
                 '</span>'+ '<br><br>' +
-                '<form id="inviteForm" action="/invitations" method="POST">' + 
+                '<form id="inviteForm">' + 
                   'E-mail: ' + '<br>' + 
                   '<input type="text" id="inviteEmail" name="inviteEmail" value="emily@gmail.com">' + 
                   '<span>' + '<button type="submit" class="inviteFriendButton" value="submit">invite</button>' +
@@ -169,6 +172,7 @@ function markYelpBusinessesOnMap(midpointCoords) {
             infowindow.open(map, yelp_marker);
             $(".inviteFriendButton").click(function(evt){ 
               evt.preventDefault(); 
+              
               var coordsOfSelectedBusiness = {"lat": latOfBusiness, "lng": lngOfBusiness};
               // send coordsOfSelectedBusiness to python
               console.log(latOfBusiness);
@@ -177,36 +181,32 @@ function markYelpBusinessesOnMap(midpointCoords) {
               var emailOfPersonInvited = document.getElementById("inviteEmail").value;
 
               console.log(emailOfPersonInvited);
-              console.log(business_complete_address);
+              console.log("BUSINESS COMPLETE ADDRESS IS:");
+              console.log(complete_business_address);
 
               $.post(
-                url="/invitations", 
-                data= {"email": emailOfPersonInvited, "businessAddress": business_complete_address}, 
+                url="/add_invitation", 
+                data= {"email": emailOfPersonInvited, "businessAddress": complete_business_address}, 
+                // check for valid email, need to be a registered user to be Ok
                 function(result){
+                  console.log(result)
                   if(result["status"] !== "Ok") {
                     console.log("invalid email!!! :(");
                     // need to figure out how to make this htmlcontent to show up in a certain area of my page
                     var invitation_failed_message = '<div>' + 
                       data["email"] + " is an invalid email!" + " Please try again."
                       '</div>';
-                    $(".col-sm-3").append(invitation_failed_message);
+                    $("#successFailureMessage").html(invitation_failed_message).fadeIn().fadeOut(3000).setTimeout(function() { $("#successFailureMessage").val(''); }, 5000);
                   } else {
-                    // need to figure out how to make this htmlcontent to show up in a certain area of my page
-              
                     var invitation_success_message = '<div>' + 
                       result["recipient_name"] +  " has been invited to " + yelpResults[i]['name'] + "." +
                       '</div>';
 
-                    $(".col-sm-3").append(invitation_success_message);
-                    // invitation_status_details
-                    
-                    // looping through user's invitations here would make a div on the search page
-                    // find invitations, inline html
-                    // let user know they're invitation has been sent
-                    // console.log(result["recipient_name"]);
+                    $("#successFailureMessage").html(invitation_success_message).fadeIn().fadeOut(3000).setTimeout(function() { $("#successFailureMessage").val(''); }, 5000);
                   }
                 }
               );
+
             });
           });
           // end info window
@@ -237,7 +237,13 @@ function placeMidpointMarker(coords) {
       map: map
     });
   }
+  midpointMarker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
 }
+
+
+// $(".respond_to_invitation").click(function(evt) {
+//   evt.preventDefault();
+// })
 
 initialize();
 

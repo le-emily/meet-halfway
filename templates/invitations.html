@@ -6,13 +6,14 @@
 
 <h3>Pending Invitations</h3>
     {% for invitation in invitations %}
-    <label>Please respond to {{ invitation }}'s invitation to {{ invitation_location }}
+    <label>Please respond to {{ invitation.sender.name }}'s invitation (id {{ invitation.invitation_id }}).
     </label>
-    <form action="invitations" method="POST">
+    <form action="invitations" class="respond_to_invitation" method="POST">
         <input type="radio" name="selection" value="accept" /> Accept
         <input type="radio" name="selection" value="decline" /> Decline
         <input type="submit" id="invitation_response" name="invitation_response" value="Submit">
     </form>
+    <span>{{ business_address }}</span>
     {% endfor %}
 
 {% endblock %}
