@@ -106,7 +106,6 @@ function calculateMidpoint(startAndEndLocationCoords) {
 
 
 function markYelpBusinessesOnMap(midpointCoords) {
-  var yelp_marker_array = [];
   $.get("/yelp_search.json", midpointCoords, function(yelpResults) {
     // console.log(yelpResults);
     for(let i=0; i < yelpResults.length; i++) {
@@ -120,10 +119,6 @@ function markYelpBusinessesOnMap(midpointCoords) {
             position: {lat: _lat, lng: _lng},
             map: map
           });
-
-          yelp_marker_array.push(yelp_marker);
-
-          debugger
           
           var business_phone = yelpResults[i]['display_phone'];
           var business_street_address = yelpResults[i]['location']['display_address'][0];
@@ -186,9 +181,12 @@ function markYelpBusinessesOnMap(midpointCoords) {
 
               $.post(
                 url="/add_invitation", 
-                data= {"email": emailOfPersonInvited, "businessAddress": complete_business_address}, 
+                data= {"email": emailOfPersonInvited, 
+                        "businessAddress": complete_business_address,
+                        "businessName": name}, 
                 // check for valid email, need to be a registered user to be Ok
                 function(result){
+                  debugger
                   console.log(result)
                   if(result["status"] !== "Ok") {
                     console.log("invalid email!!! :(");

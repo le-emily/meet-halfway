@@ -137,13 +137,11 @@ def friends_list():
 
     return render_template("friends_list.html", user_emails=user_emails)
 
-# IN PROGRESS
 @app.route("/invitation_receipient_email", methods=["GET"])
 def check_invitation_email(invitation_recipient_email):
-    """Check validity and get email of invite recipient."""
+    """Check validity and get email of invited recipient. Will get passed into make_invitations."""
 
     check_valid_recipient_email = User.query.filter_by(email=invitation_recipient_email).first()
-    print check_valid_recipient_email
 
     if not check_valid_recipient_email:
         return None
@@ -155,15 +153,18 @@ def check_invitation_email(invitation_recipient_email):
 
 @app.route("/add_invitation", methods=["POST"])
 def make_invitations():
-    """Make Invitations."""
+    """Make Invitations instances with null status'."""
+
     invitation_recipient_email = request.form.get("email")
+    print "INVITATION_RECIPIENT_EMAIL: "
+    print invitation_recipient_email
 
     receiver = check_invitation_email(invitation_recipient_email)
 
     if receiver:
         sender = session.get("sender")
         s = User.query.filter_by(email=sender).first()
-        # status = request.form.get("invitation_response")
+        # invitation instance, status is null until receiver responds
         response_to_invitation = Invitations(sender=s, receiver=receiver)
         db.session.add(response_to_invitation)
         db.session.commit()
@@ -173,8 +174,31 @@ def make_invitations():
         response = {"status" : "bad user!!"}
         return jsonify(response)
 
-    # if status=="decline":
-        # disable/gray out the invitation
+
+@app.route("/invitations", methods=["GET"])
+def invitations_form():
+    """Show list of invitations received."""
+    # get logged in user
+    logged_in_user = session.get("logged_in_user")
+
+    invitation_recipient_email = request.form.get("email")
+    print "THIS IS THE BUSINESS NAME"
+    business_name = request.form.get("name")
+
+    business_address = request.form.get("businessAddress")
+    print "BUSINESS ADDRESS!!"
+    print business_address
+
+    get_logged_in_user = User.query.filter_by(email=logged_in_user).first()
+    print "THIS IS get_logged_in_user"
+    print get_logged_in_user
+
+    invitations = Invitations.query.filter_by(receiver=get_logged_in_user).all()
+    print "THIS IS INVITATIONS, it's filtering to whatever invitations are being sent to the logged in user"
+    print invitations
+
+    return render_template("invitations.html", invitations=invitations, business_address=business_address, business_name=business_name)
+
 
 @app.route("/invitations", methods=["POST"])
 def respond_to_invitation():
@@ -185,10 +209,13 @@ def respond_to_invitation():
     print "response_to_invitation"
     # Create an instance of Status with invitation_response
     response_to_invitation = Status(status_type=invitation_response)
-    print response_to_invitation
+    print response_to_invitation.status_type
 
     # query invitations with status and check for matched status_id
+    # i don't think this is actually matching the correct status_id in the status instances....
     find_invitation = Invitations.query.filter_by(status_id=response_to_invitation.status_id).first()
+    print "YAYYYYYYYY find_invitations"
+    print find_invitations
 
     if find_invitation:
         find_invitation.status_type = response_to_invitation
@@ -202,28 +229,6 @@ def respond_to_invitation():
     response = {"response": invitation_response}
 
     return jsonify(response)
-
-
-@app.route("/invitations", methods=["GET"])
-def invitations_form():
-    """Show list of invitations received."""
-    # get logged in user
-    logged_in_user = session.get("logged_in_user")
-
-    business_address = request.form.get("businessAddress")
-    print "BUSINESS ADDRESS!!"
-    print business_address
-    # print "This is the logged_in_user variable!!! WORKS!!!"
-    print logged_in_user
-
-    get_logged_in_user = User.query.filter_by(email=logged_in_user).first()
-    print "THIS IS get_logged_in_user"
-
-    # check all invitations that match logged in user"s email
-    # getting error: *** AttributeError: "Invitations" object has no attribute "status_type"
-    invitations = Invitations.query.filter_by(receiver=get_logged_in_user).all()
-
-    return render_template("invitations.html", invitations=invitations, business_address=business_address)
 
 # END IN PROGRESS
 
