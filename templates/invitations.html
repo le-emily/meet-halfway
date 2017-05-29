@@ -6,7 +6,7 @@
 
 <h3>Pending Invitations</h3>
     {% for invitation in invitations %}
-    <p id="invitation_need_response">Please respond to {{ invitation.sender.name }}'s invitation (id {{ invitation.invitation_id }}): 
+    <p class="invitation_need_response">Please respond to {{ invitation.sender.name }}'s invitation (id {{ invitation.invitation_id }}): 
         <div>Name: {{ business_name }}</div> 
         <div>Address: {{ business_address }}</div>
         <form action="/invitations" class="respond_to_invitation" method="POST">

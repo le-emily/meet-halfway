@@ -119,6 +119,8 @@ function markYelpBusinessesOnMap(midpointCoords) {
             position: {lat: _lat, lng: _lng},
             map: map
           });
+
+          yelp_marker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
           
           var business_phone = yelpResults[i]['display_phone'];
           var business_street_address = yelpResults[i]['location']['display_address'][0];
@@ -233,21 +235,21 @@ function placeMidpointMarker(coords) {
       map: map
     });
   }
-  midpointMarker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
 }
 
 // how to keep button disabled forever?
-$("#invitation_response").click(function(evt) {
+$("#invitation_response").on("click", function(evt) {
   evt.preventDefault();
-  $.post(
-    url="/invitations", 
-    function(invitationResponse) {
-      console.log(invitationResponse);
-      if(invitationResponse) {
-        $("#invitation_response").prop("disabled", true);
-      }
-    }
-  );
+  // $.post(
+    // url="/invitations", 
+    // function(invitationResponse) {
+  //     // if(invitationResponse) { 
+      // console.log(invitationResponse);
+      
+  $(".invitation_need_response").fadeOut();
+      // }
+    // }
+  // );
   // $("#invitation_need_response").setTimeout(function() { $("#invitation_need_response").val(''); }, 3000);
 });
 

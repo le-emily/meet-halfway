@@ -91,8 +91,6 @@ def login_process():
 
     session["logged_in_user"] = logged_in_user
 
-    print logged_in_user
-
     if not user:
         flash("No such user")
         return redirect("/login")
@@ -229,6 +227,7 @@ def respond_to_invitation():
 
     return jsonify(response)
 
+    # return redirect("/invitations")
 
 # END IN PROGRESS
 
@@ -274,7 +273,7 @@ def yelp_business_search():
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
     # that we invoke the DebugToolbarExtension
-    app.debug = True
+    app.debug = False
 
     connect_to_db(app)
  
