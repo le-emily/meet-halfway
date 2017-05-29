@@ -196,6 +196,7 @@ def invitations_form():
     print "THIS IS INVITATIONS, it's filtering to whatever invitations are being sent to the logged in user"
     print invitations
 
+
     return render_template("invitations.html", invitations=invitations, business_address=business_address, business_name=business_name)
 
 # after user responds to an invitation, status_type is updated in database, and invitation is grayed out
@@ -211,8 +212,6 @@ def respond_to_invitation():
     print response_to_invitation.status_type
 
     find_invitation = Invitations.query.filter_by(status_id=response_to_invitation.status_id).first()
-    print "YAYYYYYYYY find_invitations"
-    # print find_invitations
 
     if find_invitation:
         find_invitation.status_type = response_to_invitation
@@ -226,8 +225,6 @@ def respond_to_invitation():
     response = {"response": invitation_response}
 
     return jsonify(response)
-
-    # return redirect("/invitations")
 
 # END IN PROGRESS
 

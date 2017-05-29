@@ -4,8 +4,6 @@ var geocoder;
 // var map;
 // var midpointMarker;
 
-
-
 function initialize() {
   // TO DO: make sure everything defined in intialize never changes (if it changes, move it out of initialize)
   var directionsService = new google.maps.DirectionsService;
@@ -21,11 +19,13 @@ function initialize() {
 
   // TODO: initialize instance of map, but re-draw the map on click
   // (if that's what is necessary for adding points to the map)
-  // map = new google.maps.Map(document.getElementById('map'), mapOptions);
+  // this map is necessary to show map on load
+  map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
   // TODO: do i need this for an initial map rendering? what does this do?
   // directionsDisplay is a DirectionsRenderer object that controls how the map renders.
   // You can create markers and add them to a map at a later time e.g. after clicking some button using setMap()
+  // directionsDisplay.setMap(map);
 
   // move this out of initialize
   function onSubmit(evt) {
@@ -40,12 +40,13 @@ function initialize() {
   document.getElementById("search").addEventListener("click", onSubmit);
 }
 
+
 function getNewMap(directionsDisplay, mapOptions) {
   // TO DO: notice how this is NOT using a global map parameter 
   // this is good!
   var map = new google.maps.Map(document.getElementById('map'), mapOptions);
   directionsDisplay.setMap(map);
-  
+
   return map;
 }
 
@@ -89,7 +90,6 @@ function getStartAndEndLocationCoords() {
     });
   }
 }
-
 
 function calculateMidpoint(startAndEndLocationCoords) {
   var _lat = (startAndEndLocationCoords[0] + startAndEndLocationCoords[2])/2.0;
@@ -196,7 +196,12 @@ function markYelpBusinessesOnMap(midpointCoords) {
                     var invitation_failed_message = '<div>' + 
                       data["email"] + " is an invalid email!" + " Please try again."
                       '</div>';
-                    $("#successFailureMessage").html(invitation_failed_message).fadeIn().fadeOut(3000).setTimeout(function() { $("#successFailureMessage").val(''); }, 5000);
+                    $("#successFailureMessage").html(invitation_failed_message)
+                                                .fadeIn()
+                                                .fadeOut(3000)
+                                                .setTimeout(function() { 
+                                                  $("#successFailureMessage").val(''); 
+                                                }, 6000);
                   } else {
                     var invitation_success_message = '<div>' + 
                       result["recipient_name"] +  " has been invited to " + yelpResults[i]['name'] + "." +
@@ -207,11 +212,10 @@ function markYelpBusinessesOnMap(midpointCoords) {
                                                 .fadeOut(3000)
                                                 .setTimeout(function() { 
                                                   $("#successFailureMessage").val(''); 
-                                                }, 5000);
+                                                }, 6000);
                   }
                 }
               );
-
             });
           });
           // end info window
@@ -255,16 +259,17 @@ function createMidpointMarker(coords) {
 // how to keep button disabled forever?
 $("#invitation_response").on("click", function(evt) {
   evt.preventDefault();
-  // $.post(
-    // url="/invitations", 
-    // function(invitationResponse) {
-  //     // if(invitationResponse) { 
-      // console.log(invitationResponse);
-      
-  $(".invitation_need_response").fadeOut();
+  $.post(
+    url="/invitations", 
+    function(invitationResponse) {
+      // if(invitationResponse) { 
+      console.log(invitationResponse);
+      if(invitationResponse) {
+        $(".invitation_need_response").fadeOut();
+      }
       // }
-    // }
-  // );
+    }
+  );
   // $("#invitation_need_response").setTimeout(function() { $("#invitation_need_response").val(''); }, 3000);
 });
 
