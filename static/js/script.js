@@ -1,7 +1,7 @@
 // none of these need to be global -- pass these as parameters to each function
 // instead of defining them globally
 var geocoder;
-var map;
+// var map;
 // var midpointMarker;
 
 
@@ -21,12 +21,11 @@ function initialize() {
 
   // TODO: initialize instance of map, but re-draw the map on click
   // (if that's what is necessary for adding points to the map)
-  map = new google.maps.Map(document.getElementById('map'), mapOptions);
+  // map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
   // TODO: do i need this for an initial map rendering? what does this do?
   // directionsDisplay is a DirectionsRenderer object that controls how the map renders.
   // You can create markers and add them to a map at a later time e.g. after clicking some button using setMap()
-  directionsDisplay.setMap(map);
 
   // move this out of initialize
   function onSubmit(evt) {
@@ -46,6 +45,7 @@ function getNewMap(directionsDisplay, mapOptions) {
   // this is good!
   var map = new google.maps.Map(document.getElementById('map'), mapOptions);
   directionsDisplay.setMap(map);
+  
   return map;
 }
 
