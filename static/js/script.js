@@ -2,13 +2,12 @@
 // instead of defining them globally
 var geocoder;
 var map;
-var midpointMarker;
+// var midpointMarker;
 
 
 
 function initialize() {
   // TO DO: make sure everything defined in intialize never changes (if it changes, move it out of initialize)
-  // console.log('initializing')
   var directionsService = new google.maps.DirectionsService;
   var directionsDisplay = new google.maps.DirectionsRenderer;
   // TO DO: do i change?
@@ -23,7 +22,10 @@ function initialize() {
   // TODO: initialize instance of map, but re-draw the map on click
   // (if that's what is necessary for adding points to the map)
   map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
   // TODO: do i need this for an initial map rendering? what does this do?
+  // directionsDisplay is a DirectionsRenderer object that controls how the map renders.
+  // You can create markers and add them to a map at a later time e.g. after clicking some button using setMap()
   directionsDisplay.setMap(map);
 
   // move this out of initialize
@@ -68,22 +70,19 @@ function getStartAndEndLocationCoords() {
   var location = document.getElementsByName('location');
   var startAndEndLocationCoords = [];
   // go through each location and geocode;?
+  // goes through each location entered and get the geocode.
   for(var i=0; i < location.length; i++) {
     var address = location[i].value;
     geocoder.geocode( { 'address': address}, function(results, status) {
     var _lat = results[0].geometry.location.lat()
     var _lng = results[0].geometry.location.lng()
       if (status == 'OK') {
-        // why push 4 times when i'm iterating i each time?
         startAndEndLocationCoords.push(_lat);
         startAndEndLocationCoords.push(_lng);
-        // checked for length of coord array because marker wouldn't update, held all coords
         if (startAndEndLocationCoords.length == 4) {
           // console.log('calculating midpoint')
           calculateMidpoint(startAndEndLocationCoords);
-
         }
-        
       } else {
         alert('Geocode was not successful for the following reason: ' + status);
       }    
@@ -111,7 +110,10 @@ function markYelpBusinessesOnMap(midpointCoords) {
     for(let i=0; i < yelpResults.length; i++) {
       address = yelpResults[i]['location']['address1'];
       geocoder.geocode( { 'address': address}, function(businessResults, status) {
-        // console.log(businessResults) // TO DO: this is null when you do a subsequent search -- why?
+        // businessResults no longer null during subsequent search
+        // console.log("BUSINESS RESULTS: ");
+        // console.log(businessResults);
+        // console.log("end busiess results"); // TO DO: this is null when you do a subsequent search -- why?
         var _lat = businessResults[0].geometry.location.lat();
         var _lng = businessResults[0].geometry.location.lng();
         if (status == 'OK') {
@@ -171,15 +173,14 @@ function markYelpBusinessesOnMap(midpointCoords) {
               evt.preventDefault(); 
               
               var coordsOfSelectedBusiness = {"lat": latOfBusiness, "lng": lngOfBusiness};
-              // send coordsOfSelectedBusiness to python
-              console.log(latOfBusiness);
-              console.log(lngOfBusiness);
+              // console.log(latOfBusiness);
+              // console.log(lngOfBusiness);
 
               var emailOfPersonInvited = document.getElementById("inviteEmail").value;
 
-              console.log(emailOfPersonInvited);
-              console.log("BUSINESS COMPLETE ADDRESS IS:");
-              console.log(complete_business_address);
+              // console.log(emailOfPersonInvited);
+              // console.log("BUSINESS COMPLETE ADDRESS IS:");
+              // console.log(complete_business_address);
 
               $.post(
                 url="/add_invitation", 
@@ -188,7 +189,7 @@ function markYelpBusinessesOnMap(midpointCoords) {
                         "businessName": name}, 
                 // check for valid email, need to be a registered user to be Ok
                 function(result){
-                  console.log(result)
+                  // console.log(result)
                   if(result["status"] !== "Ok") {
                     console.log("invalid email!!! :(");
                     // need to figure out how to make this htmlcontent to show up in a certain area of my page
@@ -201,7 +202,12 @@ function markYelpBusinessesOnMap(midpointCoords) {
                       result["recipient_name"] +  " has been invited to " + yelpResults[i]['name'] + "." +
                       '</div>';
 
-                    $("#successFailureMessage").html(invitation_success_message).fadeIn().fadeOut(3000).setTimeout(function() { $("#successFailureMessage").val(''); }, 5000);
+                    $("#successFailureMessage").html(invitation_success_message)
+                                                .fadeIn()
+                                                .fadeOut(3000)
+                                                .setTimeout(function() { 
+                                                  $("#successFailureMessage").val(''); 
+                                                }, 5000);
                   }
                 }
               );
@@ -220,7 +226,7 @@ function markYelpBusinessesOnMap(midpointCoords) {
 // TO DO: midpoint marker should NOT be global. you can pass midpointmarker here as a parameter
 // and call setPosition on it.
 // if midpoint marker doesnt exist, you can call something like createMidpointMarker
-function placeMidpointMarker(coords) {
+function placeMidpointMarker(coords, midpointMarker) {
 
   // console.log(midpointMarker)
   if (midpointMarker) {
@@ -230,11 +236,20 @@ function placeMidpointMarker(coords) {
   } else {
     // console.log('new google maps')
     // change midpointMarker color
-    midpointMarker = new google.maps.Marker({
+    createMidpointMarker(coords);
+    // midpointMarker = new google.maps.Marker({
+    //   position: coords,
+    //   map: map
+    // });
+  }
+}
+
+
+function createMidpointMarker(coords) {
+  var midpointMarker = new google.maps.Marker({
       position: coords,
       map: map
-    });
-  }
+  });
 }
 
 // how to keep button disabled forever?
