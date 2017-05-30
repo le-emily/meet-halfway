@@ -1,26 +1,32 @@
 // none of these need to be global -- pass these as parameters to each function
 // instead of defining them globally
 var geocoder;
-// var map;
-// var midpointMarker;
+var map;
 
 function initialize() {
   // TO DO: make sure everything defined in intialize never changes (if it changes, move it out of initialize)
   var directionsService = new google.maps.DirectionsService;
   var directionsDisplay = new google.maps.DirectionsRenderer;
-  // TO DO: do i change?
+
   geocoder = new google.maps.Geocoder();
-  // TO DO: do i change? --> No
+
   var latlng = new google.maps.LatLng(37.78, -122.41);
+
   var mapOptions = {
         zoom: 8,
         center: latlng
   }
 
+  map = new google.maps.Map(document.getElementById('map'), mapOptions);
+  directionsDisplay.setMap(map);
+
   // TODO: initialize instance of map, but re-draw the map on click
   // (if that's what is necessary for adding points to the map)
   // this map is necessary to show map on load
-  map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+  var oldInfoWindow = {
+    oldWindow: null
+  };
 
   // TODO: do i need this for an initial map rendering? what does this do?
   // directionsDisplay is a DirectionsRenderer object that controls how the map renders.
@@ -31,24 +37,23 @@ function initialize() {
   function onSubmit(evt) {
     evt.preventDefault();
     // TO DO: this is still being assigned as a global map parameter; this is bad
-    map = getNewMap(directionsDisplay, mapOptions);
+    // map = getNewMap(directionsDisplay, mapOptions);
     calculateAndDisplayRoute(directionsService, directionsDisplay);
-    getStartAndEndLocationCoords();
+    getStartAndEndLocationCoords(oldInfoWindow);
   }
-
   // this is a good use of initialize
   document.getElementById("search").addEventListener("click", onSubmit);
 }
 
 
-function getNewMap(directionsDisplay, mapOptions) {
-  // TO DO: notice how this is NOT using a global map parameter 
-  // this is good!
-  var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-  directionsDisplay.setMap(map);
+// function getNewMap(directionsDisplay, mapOptions) {
+//   // TO DO: notice how this is NOT using a global map parameter 
+//   // this is good!
+//   var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+//   directionsDisplay.setMap(map);
 
-  return map;
-}
+//   return map;
+// }
 
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
   var start = document.getElementById('location_a').value;
@@ -62,15 +67,14 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
     if (status === 'OK') {
       directionsDisplay.setDirections(response);
     } else {
-      window.alert('Directions request failed due to ' + status);
+      console.log('Directions request failed due to ' + status);
     }
   });
 }
 
-function getStartAndEndLocationCoords() {
+function getStartAndEndLocationCoords(oldInfoWindow) {
   var location = document.getElementsByName('location');
   var startAndEndLocationCoords = [];
-  // go through each location and geocode;?
   // goes through each location entered and get the geocode.
   for(var i=0; i < location.length; i++) {
     var address = location[i].value;
@@ -81,17 +85,16 @@ function getStartAndEndLocationCoords() {
         startAndEndLocationCoords.push(_lat);
         startAndEndLocationCoords.push(_lng);
         if (startAndEndLocationCoords.length == 4) {
-          // console.log('calculating midpoint')
-          calculateMidpoint(startAndEndLocationCoords);
+          calculateMidpoint(startAndEndLocationCoords, oldInfoWindow);
         }
       } else {
-        alert('Geocode was not successful for the following reason: ' + status);
+        console.log('Geocode was not successful for the following reason: ' + status);
       }    
     });
   }
 }
 
-function calculateMidpoint(startAndEndLocationCoords) {
+function calculateMidpoint(startAndEndLocationCoords, oldInfoWindow) {
   var _lat = (startAndEndLocationCoords[0] + startAndEndLocationCoords[2])/2.0;
   var _lng = (startAndEndLocationCoords[1] + startAndEndLocationCoords[3])/2.0;
 
@@ -100,20 +103,15 @@ function calculateMidpoint(startAndEndLocationCoords) {
   placeMidpointMarker(midpointCoords);
   map.setCenter(midpointCoords); 
 
-  markYelpBusinessesOnMap(midpointCoords);
+  markYelpBusinessesOnMap(midpointCoords, oldInfoWindow);
 }
 
 
-function markYelpBusinessesOnMap(midpointCoords) {
+function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
   $.get("/yelp_search.json", midpointCoords, function(yelpResults) {
-    // console.log(yelpResults);
     for(let i=0; i < yelpResults.length; i++) {
       address = yelpResults[i]['location']['address1'];
       geocoder.geocode( { 'address': address}, function(businessResults, status) {
-        // businessResults no longer null during subsequent search
-        // console.log("BUSINESS RESULTS: ");
-        // console.log(businessResults);
-        // console.log("end busiess results"); // TO DO: this is null when you do a subsequent search -- why?
         var _lat = businessResults[0].geometry.location.lat();
         var _lng = businessResults[0].geometry.location.lng();
         if (status == 'OK') {
@@ -163,62 +161,14 @@ function markYelpBusinessesOnMap(midpointCoords) {
               '</div>'+
             '</div>';
 
-          var infowindow = new google.maps.InfoWindow({
+          var newInfoWindow = new google.maps.InfoWindow({
             content: yelpBusinessInfowindowDetails
           });
 
           yelp_marker.addListener('click', function() {
-            infowindow.open(map, yelp_marker);
-            $(".inviteFriendButton").click(function(evt){ 
-              evt.preventDefault(); 
-              
-              var coordsOfSelectedBusiness = {"lat": latOfBusiness, "lng": lngOfBusiness};
-              // console.log(latOfBusiness);
-              // console.log(lngOfBusiness);
-
-              var emailOfPersonInvited = document.getElementById("inviteEmail").value;
-
-              // console.log(emailOfPersonInvited);
-              // console.log("BUSINESS COMPLETE ADDRESS IS:");
-              // console.log(complete_business_address);
-
-              $.post(
-                url="/add_invitation", 
-                data= {"email": emailOfPersonInvited, 
-                        "businessAddress": complete_business_address,
-                        "businessName": name}, 
-                // check for valid email, need to be a registered user to be Ok
-                function(result){
-                  // console.log(result)
-                  if(result["status"] !== "Ok") {
-                    console.log("invalid email!!! :(");
-                    // need to figure out how to make this htmlcontent to show up in a certain area of my page
-                    var invitation_failed_message = '<div>' + 
-                      data["email"] + " is an invalid email!" + " Please try again."
-                      '</div>';
-                    $("#successFailureMessage").html(invitation_failed_message)
-                                                .fadeIn()
-                                                .fadeOut(3000)
-             
-                  } else {
-                    var invitation_success_message = '<div>' + 
-                      result["recipient_name"] +  " has been invited to " + yelpResults[i]['name'] + "." +
-                      '</div>';
-                    try {
-                    $("#successFailureMessage").html(invitation_success_message)
-                                                .fadeIn()
-                                                .fadeOut(3000)
-                    }
-                    catch(err) {
-                      console.log(err.message);
-                    }
-                  }
-                  setTimeout(function() { $("#successFailureMessage").val('');}, 6000);
-                }
-              );
-            });
+            openInfoWindowAndCallInvitationHandler(newInfoWindow, complete_business_address, name, yelp_marker, oldInfoWindow);
           });
-          // end info window
+
         } else {
           alert('Geocode was not successful for the following reason: ' + status);
         }    
@@ -227,24 +177,67 @@ function markYelpBusinessesOnMap(midpointCoords) {
   });
 }
 
+
+function openInfoWindowAndCallInvitationHandler(newInfoWindow, complete_business_address, name, yelp_marker, oldInfoWindow) {
+  if(oldInfoWindow.oldWindow == null) {
+    newInfoWindow.open(map, yelp_marker);
+    oldInfoWindow.oldWindow = newInfoWindow;
+  } else {
+    oldInfoWindow.oldWindow.close(map, yelp_marker);
+    newInfoWindow.open(map, yelp_marker);
+    oldInfoWindow.oldWindow = newInfoWindow;
+  }
+
+
+  $(".inviteFriendButton").click(function(evt){ 
+    evt.preventDefault(); 
+
+    var emailOfPersonInvited = document.getElementById("inviteEmail").value;
+
+    $.post(
+      url="/add_invitation", 
+      data= {"email": emailOfPersonInvited, 
+              "businessAddress": complete_business_address,
+              "businessName": name}, 
+      // check for valid email, need to be a registered user to be Ok
+      function(result){
+        if(result["status"] !== "Ok") {
+          console.log("invalid email!!! :(");
+          // need to figure out how to make this htmlcontent to show up in a certain area of my page
+          var invitation_failed_message = '<div>' + 
+            data["email"] + " is an invalid email!" + " Please try again."
+            '</div>';
+          $("#successFailureMessage").html(invitation_failed_message)
+                                      .fadeIn()
+                                      .fadeOut(3000)
+   
+        } else {
+          var invitation_success_message = '<div>' + 
+            result["recipient_name"] +  " has been invited to " + name + "." +
+            '</div>';
+          try {
+          $("#successFailureMessage").html(invitation_success_message)
+                                      .fadeIn()
+                                      .fadeOut(3000)
+          }
+          catch(err) {
+            console.log(err.message);
+          }
+        }
+        setTimeout(function() { $("#successFailureMessage").val('');}, 6000);
+      }
+    );
+  });
+}
+
 // TO DO: midpoint marker should NOT be global. you can pass midpointmarker here as a parameter
 // and call setPosition on it.
 // if midpoint marker doesnt exist, you can call something like createMidpointMarker
 function placeMidpointMarker(coords, midpointMarker) {
-
-  // console.log(midpointMarker)
   if (midpointMarker) {
-    // clear the map
-    // create a new map with new midpoint
     midpointMarker.setPosition(coords);
   } else {
-    // console.log('new google maps')
-    // change midpointMarker color
     createMidpointMarker(coords);
-    // midpointMarker = new google.maps.Marker({
-    //   position: coords,
-    //   map: map
-    // });
   }
 }
 
@@ -256,27 +249,22 @@ function createMidpointMarker(coords) {
   });
 }
 
-// how to keep button disabled forever?
-$("#invitation_response").on("click", function(evt) {
-  evt.preventDefault();
-  $.post(
-    url="/invitations", 
-    function(invitationResponse) {
-      // if(invitationResponse) { 
-      console.log(invitationResponse);
-      if(invitationResponse) {
-        $(".invitation_need_response").fadeOut();
-      }
-      // }
-    }
-  );
-  // $("#invitation_need_response").setTimeout(function() { $("#invitation_need_response").val(''); }, 3000);
+$body = $("body");
+
+$(document).on({
+    ajaxStart: function() {
+      $body.addClass("loading");    
+    },
+     ajaxStop: function() { 
+      $body.removeClass("loading"); 
+
+
+    }    
 });
 
+
+
+
 initialize();
-
-
-
-
 
 

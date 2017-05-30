@@ -12,13 +12,22 @@
       <form action="/search_midpoint" method="GET">
         <div class="form-group" id="midpoint-form">
           <div>
-            <label>
+            <label>Your address:
               <input type="text" id="location_a" placeholder="Your location(street, city or zipcode)" value="hackbright" name="location">
             </label>
           </div>
           <div>
-            <label>
+            <label>Their address:
               <input type="text" id="location_b" placeholder="Their location(street, city or zipcode)" value="dublin, ca" name="location">
+            </label>
+          </div>
+          <div>
+            <label>Venue type:
+              <select id="venue_type_selections" name="venue_type">
+                {% for o in data %}
+                <option value="{{ o.name }}">{{ o.name }}</option>
+                {% endfor %}
+              </select>
             </label>
           </div>
           <span>

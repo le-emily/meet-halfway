@@ -6,8 +6,7 @@ import requests
 import sys 
 import os
 import json
-import pdb
-import pprint
+import random
 
 app = Flask(__name__)
 # app.config["SECRET_KEY"] = "my super secret key blah blah"
@@ -118,8 +117,9 @@ def logout():
 @app.route("/search_midpoint", methods=["GET"])
 def search_midpoint():
     """Render for map search."""
+    data=[{'name':'restaurant'}, {'name':'shopping'}, {'name':'bar'}, {'name':'cafe'}]
 
-    return render_template("search_midpoint.html")
+    return render_template("search_midpoint.html", data=data)
 
 
 @app.route("/friends", methods=["GET"])
@@ -163,7 +163,6 @@ def make_invitations():
         sender = session.get("sender")
         if receiver != sender:
             s = User.query.filter_by(email=sender).first()
-            # invitation instance, status is null until receiver responds
             response_to_invitation = Invitations(sender=s, receiver=receiver)
             db.session.add(response_to_invitation)
             db.session.commit()
@@ -177,7 +176,6 @@ def make_invitations():
 @app.route("/invitations", methods=["GET"])
 def invitations_form():
     """Show list of invitations received."""
-    # get logged in user
     logged_in_user = session.get("logged_in_user")
 
     invitation_recipient_email = request.form.get("email")
@@ -188,13 +186,9 @@ def invitations_form():
     print "BUSINESS ADDRESS!!"
     print business_address
 
-    get_logged_in_user = User.query.filter_by(email=logged_in_user).first()
-    print "THIS IS get_logged_in_user"
-    print get_logged_in_user
+    verified_logged_in_user = User.query.filter_by(email=logged_in_user).first()
 
-    invitations = Invitations.query.filter_by(receiver=get_logged_in_user).all()
-    print "THIS IS INVITATIONS, it's filtering to whatever invitations are being sent to the logged in user"
-    print invitations
+    invitations = Invitations.query.filter_by(receiver=verified_logged_in_user).all()
 
     return render_template("invitations.html", invitations=invitations, business_address=business_address, business_name=business_name)
 
@@ -202,15 +196,7 @@ def invitations_form():
 @app.route("/invitations", methods=["POST"])
 def respond_to_invitation():
     """Respond to Invitations."""
-    # how do i know which one i"m responding to? 
     invitation_response = request.form.get("selection")
-
-    print "response_to_invitation"
-    # Create an instance of Status with invitation_response
-    # response_to_invitation = Status(status_type=invitation_response)
-
-    # db.session.add(response_to_invitation)
-    
 
     find_invitation = Invitations.query.filter_by(invitation_id=request.form.get("invitation_id")).first()
 
@@ -255,19 +241,19 @@ def get_yelp_access_token():
 def yelp_business_search():
     lat = request.args.get("lat")
     lng = request.args.get("lng")
- 
+
+    venue_type = request.form.get("venue_type")
+
     access_token = get_yelp_access_token()
 
     url = "https://api.yelp.com/v3/businesses/search"
     headers = {"Authorization": "bearer %s" % access_token}
-    params = {"radius": 50, "limit": 10, "term": "Restaurant", "sort_by": "rating", "latitude": lat, "longitude": lng}
+    params = {"radius": 100, "limit": 10, "term": venue_type, "sort_by": "rating", "latitude": lat, "longitude": lng}
 
     resp = requests.get(url=url, params=params, headers=headers)
 
     result = resp.json()["businesses"]
 
-    # for r in result:
-    #     result_list.append(r.get("name"))
     return jsonify(result)
 
 

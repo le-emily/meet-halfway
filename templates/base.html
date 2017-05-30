@@ -4,6 +4,7 @@
     <title> {% block title %} Title {% endblock %}</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <!-- <link rel="stylesheet" type="text/css" href="/static/css/poi.css"> -->
     <!-- <link rel="stylesheet" type="text/css" href="/static/js/epoly.js"> -->
 </head>
 <body>
@@ -35,7 +36,10 @@
         {% endblock %}
     </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXbmqoGjh-BtVtOjfl8bKkOVY6sSyilUU&libraries=geometry,places" async defer></script>
+<div class="modal"><!-- Place at bottom of page --></div>
+<!-- <div class='uil-poi-css' style='transform:scale(0.44);'><div></div></div> -->
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXbmqoGjh-BtVtOjfl8bKkOVY6sSyilUU&libraries=geometry,places"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="/static/js/script.js"></script>
 

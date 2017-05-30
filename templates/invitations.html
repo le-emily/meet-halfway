@@ -15,6 +15,7 @@
                 <input type="radio" name="selection" value="accept" {% if invitation.status_id == 1 %}checked="checked"{% endif %}> Accept </input><br>
                 <input type="radio" name="selection" value="decline" {% if invitation.status_id == 2 %}checked="checked"{% endif %}> Decline </input><br>
                 <!-- dangerous... -->
+                <!-- create authorization for invitation id -->
                 <input type="hidden" name="invitation_id" value={{ invitation.invitation_id }}> </input><br>
                 <button type="submit" id="invitation_response" name="invitation_response" value="Submit">Submit</button>
             </form>
