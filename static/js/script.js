@@ -100,6 +100,12 @@ function calculateMidpoint(startAndEndLocationCoords, oldInfoWindow) {
 
   var midpointCoords = {"lat": _lat, "lng": _lng};
 
+
+  // var midpointMarker = new google.maps.Marker({
+  //     position: midpointCoords,
+  //     map: map
+  // });
+
   placeMidpointMarker(midpointCoords);
   map.setCenter(midpointCoords); 
 
@@ -108,6 +114,7 @@ function calculateMidpoint(startAndEndLocationCoords, oldInfoWindow) {
 
 
 function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
+  listOfYelpBusinessMarkers = [];
   $.get("/yelp_search.json", midpointCoords, function(yelpResults) {
     for(let i=0; i < yelpResults.length; i++) {
       address = yelpResults[i]['location']['address1'];
@@ -119,6 +126,8 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
             position: {lat: _lat, lng: _lng},
             map: map
           });
+
+          listOfYelpBusinessMarkers.push(yelp_marker);
 
           yelp_marker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
           
@@ -164,6 +173,7 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
           var newInfoWindow = new google.maps.InfoWindow({
             content: yelpBusinessInfowindowDetails
           });
+
 
           yelp_marker.addListener('click', function() {
             openInfoWindowAndCallInvitationHandler(newInfoWindow, complete_business_address, name, yelp_marker, oldInfoWindow);
@@ -233,11 +243,11 @@ function openInfoWindowAndCallInvitationHandler(newInfoWindow, complete_business
 // TO DO: midpoint marker should NOT be global. you can pass midpointmarker here as a parameter
 // and call setPosition on it.
 // if midpoint marker doesnt exist, you can call something like createMidpointMarker
-function placeMidpointMarker(coords, midpointMarker) {
+function placeMidpointMarker(midpointCoords, midpointMarker) {
   if (midpointMarker) {
-    midpointMarker.setPosition(coords);
+    midpointMarker.setPosition(midpointCoords);
   } else {
-    createMidpointMarker(coords);
+    createMidpointMarker(midpointCoords);
   }
 }
 
@@ -249,18 +259,16 @@ function createMidpointMarker(coords) {
   });
 }
 
-$body = $("body");
+// $body = $("body");
 
-$(document).on({
-    ajaxStart: function() {
-      $body.addClass("loading");    
-    },
-     ajaxStop: function() { 
-      $body.removeClass("loading"); 
-
-
-    }    
-});
+// $(document).on({
+//     ajaxStart: function() {
+//       $body.addClass("loading");    
+//     },
+//      ajaxStop: function() { 
+//       $body.removeClass("loading"); 
+//     }    
+// });
 
 
 
