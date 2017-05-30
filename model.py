@@ -44,7 +44,10 @@ class Invitations(db.Model):
     time = db.Column(db.DateTime)
 
     def __repr__(self):
-        return "<Invitation Details: %s %s>" % (self.sender, self.receiver)
+        if not self.status:
+            return "<Invitation Details: %s %s>" % (self.sender, self.receiver)
+        else:
+            return "<Invitation Details: %s %s %s>" % (self.sender, self.receiver, self.status)
 
 
 class Status(db.Model):

@@ -199,21 +199,21 @@ function markYelpBusinessesOnMap(midpointCoords) {
                     $("#successFailureMessage").html(invitation_failed_message)
                                                 .fadeIn()
                                                 .fadeOut(3000)
-                                                .setTimeout(function() { 
-                                                  $("#successFailureMessage").val(''); 
-                                                }, 6000);
+             
                   } else {
                     var invitation_success_message = '<div>' + 
                       result["recipient_name"] +  " has been invited to " + yelpResults[i]['name'] + "." +
                       '</div>';
-
+                    try {
                     $("#successFailureMessage").html(invitation_success_message)
                                                 .fadeIn()
                                                 .fadeOut(3000)
-                                                .setTimeout(function() { 
-                                                  $("#successFailureMessage").val(''); 
-                                                }, 6000);
+                    }
+                    catch(err) {
+                      console.log(err.message);
+                    }
                   }
+                  setTimeout(function() { $("#successFailureMessage").val('');}, 6000);
                 }
               );
             });

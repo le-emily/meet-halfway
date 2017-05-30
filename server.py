@@ -196,7 +196,6 @@ def invitations_form():
     print "THIS IS INVITATIONS, it's filtering to whatever invitations are being sent to the logged in user"
     print invitations
 
-
     return render_template("invitations.html", invitations=invitations, business_address=business_address, business_name=business_name)
 
 # after user responds to an invitation, status_type is updated in database, and invitation is grayed out
@@ -208,19 +207,24 @@ def respond_to_invitation():
 
     print "response_to_invitation"
     # Create an instance of Status with invitation_response
-    response_to_invitation = Status(status_type=invitation_response)
-    print response_to_invitation.status_type
+    # response_to_invitation = Status(status_type=invitation_response)
 
-    find_invitation = Invitations.query.filter_by(status_id=response_to_invitation.status_id).first()
+    # db.session.add(response_to_invitation)
+    
+
+    find_invitation = Invitations.query.filter_by(invitation_id=request.form.get("invitation_id")).first()
 
     if find_invitation:
-        find_invitation.status_type = response_to_invitation
+        if invitation_response == "accept":
+            find_invitation.status_id = 1
+        elif invitation_response == "decline":
+            find_invitation.status_id = 2
+        else:
+            "hi"
 
-    print "THIS IS FIND_INVITATIONS. NEED TO MATCH THE STATUS_ID IN STATUS WITH THE ONE IN INVITATIONS"
-    print find_invitation
-
-    db.session.add(response_to_invitation)
     db.session.commit()
+
+    print find_invitation
 
     response = {"response": invitation_response}
 
@@ -256,7 +260,7 @@ def yelp_business_search():
 
     url = "https://api.yelp.com/v3/businesses/search"
     headers = {"Authorization": "bearer %s" % access_token}
-    params = {"limit": 10, "term": "Restaurant", "sort_by": "rating", "latitude": lat, "longitude": lng}
+    params = {"radius": 50, "limit": 10, "term": "Restaurant", "sort_by": "rating", "latitude": lat, "longitude": lng}
 
     resp = requests.get(url=url, params=params, headers=headers)
 
@@ -270,7 +274,7 @@ def yelp_business_search():
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
     # that we invoke the DebugToolbarExtension
-    app.debug = False
+    app.debug = True
 
     connect_to_db(app)
  
