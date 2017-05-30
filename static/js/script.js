@@ -114,7 +114,7 @@ function calculateMidpoint(startAndEndLocationCoords, oldInfoWindow) {
 
 
 function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
-  listOfYelpBusinessMarkers = [];
+  // listOfYelpBusinessMarkers = [];
   $.get("/yelp_search.json", midpointCoords, function(yelpResults) {
     for(let i=0; i < yelpResults.length; i++) {
       address = yelpResults[i]['location']['address1'];
@@ -127,7 +127,7 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
             map: map
           });
 
-          listOfYelpBusinessMarkers.push(yelp_marker);
+          // listOfYelpBusinessMarkers.push(yelp_marker);
 
           yelp_marker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
           
