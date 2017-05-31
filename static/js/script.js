@@ -1,61 +1,58 @@
 // none of these need to be global -- pass these as parameters to each function
 // instead of defining them globally
 var geocoder;
-var map;
-// var markers = [];
+// var map;
+// var midpointMarker;
 
 function initialize() {
   // TO DO: make sure everything defined in intialize never changes (if it changes, move it out of initialize)
   var directionsService = new google.maps.DirectionsService;
   var directionsDisplay = new google.maps.DirectionsRenderer;
-
+  // TO DO: do i change?
   geocoder = new google.maps.Geocoder();
-
+  // TO DO: do i change? --> No
   var latlng = new google.maps.LatLng(37.78, -122.41);
-
   var mapOptions = {
         zoom: 8,
         center: latlng
   }
 
-  map = new google.maps.Map(document.getElementById('map'), mapOptions);
-  directionsDisplay.setMap(map);
-
   // TODO: initialize instance of map, but re-draw the map on click
   // (if that's what is necessary for adding points to the map)
   // this map is necessary to show map on load
-
-  var oldInfoWindow = {
-    oldWindow: null
-  };
+  map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
   // TODO: do i need this for an initial map rendering? what does this do?
   // directionsDisplay is a DirectionsRenderer object that controls how the map renders.
   // You can create markers and add them to a map at a later time e.g. after clicking some button using setMap()
   // directionsDisplay.setMap(map);
 
+  var oldInfoWindow = {
+    oldWindow: null
+  };
+
   // move this out of initialize
   function onSubmit(evt) {
     evt.preventDefault();
     // TO DO: this is still being assigned as a global map parameter; this is bad
-    // map = getNewMap(directionsDisplay, mapOptions);
+    map = getNewMap(directionsDisplay, mapOptions);
     calculateAndDisplayRoute(directionsService, directionsDisplay);
     getStartAndEndLocationCoords(oldInfoWindow);
-    setMapOnAll(null)
   }
+
   // this is a good use of initialize
   document.getElementById("search").addEventListener("click", onSubmit);
 }
 
 
-// function getNewMap(directionsDisplay, mapOptions) {
-//   // TO DO: notice how this is NOT using a global map parameter 
-//   // this is good!
-//   var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-//   directionsDisplay.setMap(map);
+function getNewMap(directionsDisplay, mapOptions) {
+  // TO DO: notice how this is NOT using a global map parameter 
+  // this is good!
+  var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+  directionsDisplay.setMap(map);
 
-//   return map;
-// }
+  return map;
+}
 
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
   var start = document.getElementById('location_a').value;
@@ -69,7 +66,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
     if (status === 'OK') {
       directionsDisplay.setDirections(response);
     } else {
-      console.log('Directions request failed due to ' + status);
+      window.alert('Directions request failed due to ' + status);
     }
   });
 }
@@ -77,6 +74,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
 function getStartAndEndLocationCoords(oldInfoWindow) {
   var location = document.getElementsByName('location');
   var startAndEndLocationCoords = [];
+  // go through each location and geocode;?
   // goes through each location entered and get the geocode.
   for(var i=0; i < location.length; i++) {
     var address = location[i].value;
@@ -87,10 +85,11 @@ function getStartAndEndLocationCoords(oldInfoWindow) {
         startAndEndLocationCoords.push(_lat);
         startAndEndLocationCoords.push(_lng);
         if (startAndEndLocationCoords.length == 4) {
+          // console.log('calculating midpoint')
           calculateMidpoint(startAndEndLocationCoords, oldInfoWindow);
         }
       } else {
-        console.log('Geocode was not successful for the following reason: ' + status);
+        alert('Geocode was not successful for the following reason: ' + status);
       }    
     });
   }
@@ -102,11 +101,6 @@ function calculateMidpoint(startAndEndLocationCoords, oldInfoWindow) {
 
   var midpointCoords = {"lat": _lat, "lng": _lng};
 
-
-  var midpointMarker = new google.maps.Marker({
-      map: map
-  });
-
   placeMidpointMarker(midpointCoords);
   map.setCenter(midpointCoords); 
 
@@ -116,10 +110,14 @@ function calculateMidpoint(startAndEndLocationCoords, oldInfoWindow) {
 
 function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
   $.get("/yelp_search.json", midpointCoords, function(yelpResults) {
-    // var listOfYelpBusinessMarkers = [];
+    // console.log(yelpResults);
     for(let i=0; i < yelpResults.length; i++) {
       address = yelpResults[i]['location']['address1'];
       geocoder.geocode( { 'address': address}, function(businessResults, status) {
+        // businessResults no longer null during subsequent search
+        // console.log("BUSINESS RESULTS: ");
+        // console.log(businessResults);
+        // console.log("end busiess results"); // TO DO: this is null when you do a subsequent search -- why?
         var _lat = businessResults[0].geometry.location.lat();
         var _lng = businessResults[0].geometry.location.lng();
         if (status == 'OK') {
@@ -127,10 +125,6 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
             position: {lat: _lat, lng: _lng},
             map: map
           });
-          
-          // yelp_marker.setPosition({lat: _lat, lng: _lng});
-
-          // listOfYelpBusinessMarkers.push(yelp_marker);
 
           yelp_marker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
           
@@ -182,6 +176,8 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
             openInfoWindowAndCallInvitationHandler(newInfoWindow, complete_business_address, name, yelp_marker, oldInfoWindow);
           });
 
+
+          // end info window
         } else {
           alert('Geocode was not successful for the following reason: ' + status);
         }    
@@ -261,20 +257,40 @@ function createMidpointMarker(coords) {
   });
 }
 
-// $body = $("body");
+// TO DO: midpoint marker should NOT be global. you can pass midpointmarker here as a parameter
+// and call setPosition on it.
+// if midpoint marker doesnt exist, you can call something like createMidpointMarker
+function placeMidpointMarker(coords, midpointMarker) {
 
-// $(document).on({
-//     ajaxStart: function() {
-//       $body.addClass("loading");    
-//     },
-//      ajaxStop: function() { 
-//       $body.removeClass("loading"); 
-//     }    
-// });
+  // console.log(midpointMarker)
+  if (midpointMarker) {
+    // clear the map
+    // create a new map with new midpoint
+    midpointMarker.setPosition(coords);
+  } else {
+    // console.log('new google maps')
+    // change midpointMarker color
+    createMidpointMarker(coords);
+    // midpointMarker = new google.maps.Marker({
+    //   position: coords,
+    //   map: map
+    // });
+  }
+}
 
+
+function createMidpointMarker(coords) {
+  var midpointMarker = new google.maps.Marker({
+      position: coords,
+      map: map
+  });
+}
 
 
 
 initialize();
+
+
+
 
 

@@ -117,7 +117,12 @@ def logout():
 @app.route("/search_midpoint", methods=["GET"])
 def search_midpoint():
     """Render for map search."""
+
     data=[{'name':'restaurant'}, {'name':'shopping'}, {'name':'bar'}, {'name':'cafe'}]
+
+    # venue_type = str(request.args.get("venue_type"))
+    # print "VENUE TYPE!!"
+    # print venue_type
 
     return render_template("search_midpoint.html", data=data)
 
@@ -247,13 +252,11 @@ def yelp_business_search():
     lat = request.args.get("lat")
     lng = request.args.get("lng")
 
-    venue_type = request.form.get("venue_type")
-
     access_token = get_yelp_access_token()
 
     url = "https://api.yelp.com/v3/businesses/search"
     headers = {"Authorization": "bearer %s" % access_token}
-    params = {"radius": 100, "limit": 10, "term": venue_type, "sort_by": "rating", "latitude": lat, "longitude": lng}
+    params = {"radius": 250, "limit": 10, "term": "cafe", "sort_by": "rating", "latitude": lat, "longitude": lng}
 
     resp = requests.get(url=url, params=params, headers=headers)
 
