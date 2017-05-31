@@ -120,9 +120,10 @@ def search_midpoint():
 
     data=[{'name':'restaurant'}, {'name':'shopping'}, {'name':'bar'}, {'name':'cafe'}]
 
-    # venue_type = str(request.args.get("venue_type"))
-    # print "VENUE TYPE!!"
-    # print venue_type
+    # i need this in yelp_search.json
+    venue_type = str(request.args.get("venue_type"))
+    print "VENUE TYPE!!"
+    print venue_type
 
     return render_template("search_midpoint.html", data=data)
 

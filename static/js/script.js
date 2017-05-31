@@ -17,6 +17,12 @@ function initialize() {
         center: latlng
   }
 
+  var first_location_input = document.getElementById('location_a');
+  var autocomplete = new google.maps.places.Autocomplete(first_location_input);
+
+  var second_location_input = document.getElementById('location_b');
+  var autocomplete = new google.maps.places.Autocomplete(second_location_input);
+
   // TODO: initialize instance of map, but re-draw the map on click
   // (if that's what is necessary for adding points to the map)
   // this map is necessary to show map on load
@@ -73,6 +79,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
 
 function getStartAndEndLocationCoords(oldInfoWindow) {
   var location = document.getElementsByName('location');
+
   var startAndEndLocationCoords = [];
   // go through each location and geocode;?
   // goes through each location entered and get the geocode.
