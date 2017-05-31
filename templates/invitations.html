@@ -22,4 +22,9 @@
         </p>
 {% endfor %}
 
+Sent Invitations:
+{% for sent in sent_invitations %}
+    {{ sent.receiver.name }} -- status is {{ sent.status }}<br>
+{% endfor %}
+
 {% endblock content %}

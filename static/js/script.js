@@ -2,6 +2,7 @@
 // instead of defining them globally
 var geocoder;
 var map;
+// var markers = [];
 
 function initialize() {
   // TO DO: make sure everything defined in intialize never changes (if it changes, move it out of initialize)
@@ -40,6 +41,7 @@ function initialize() {
     // map = getNewMap(directionsDisplay, mapOptions);
     calculateAndDisplayRoute(directionsService, directionsDisplay);
     getStartAndEndLocationCoords(oldInfoWindow);
+    setMapOnAll(null)
   }
   // this is a good use of initialize
   document.getElementById("search").addEventListener("click", onSubmit);
@@ -101,10 +103,9 @@ function calculateMidpoint(startAndEndLocationCoords, oldInfoWindow) {
   var midpointCoords = {"lat": _lat, "lng": _lng};
 
 
-  // var midpointMarker = new google.maps.Marker({
-  //     position: midpointCoords,
-  //     map: map
-  // });
+  var midpointMarker = new google.maps.Marker({
+      map: map
+  });
 
   placeMidpointMarker(midpointCoords);
   map.setCenter(midpointCoords); 
@@ -114,8 +115,8 @@ function calculateMidpoint(startAndEndLocationCoords, oldInfoWindow) {
 
 
 function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
-  // listOfYelpBusinessMarkers = [];
   $.get("/yelp_search.json", midpointCoords, function(yelpResults) {
+    // var listOfYelpBusinessMarkers = [];
     for(let i=0; i < yelpResults.length; i++) {
       address = yelpResults[i]['location']['address1'];
       geocoder.geocode( { 'address': address}, function(businessResults, status) {
@@ -126,6 +127,8 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
             position: {lat: _lat, lng: _lng},
             map: map
           });
+          
+          // yelp_marker.setPosition({lat: _lat, lng: _lng});
 
           // listOfYelpBusinessMarkers.push(yelp_marker);
 
@@ -197,7 +200,6 @@ function openInfoWindowAndCallInvitationHandler(newInfoWindow, complete_business
     newInfoWindow.open(map, yelp_marker);
     oldInfoWindow.oldWindow = newInfoWindow;
   }
-
 
   $(".inviteFriendButton").click(function(evt){ 
     evt.preventDefault(); 

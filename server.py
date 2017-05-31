@@ -190,7 +190,12 @@ def invitations_form():
 
     invitations = Invitations.query.filter_by(receiver=verified_logged_in_user).all()
 
-    return render_template("invitations.html", invitations=invitations, business_address=business_address, business_name=business_name)
+    # list all invites sent by user and their status
+    sender = session.get("sender")
+    s = User.query.filter_by(email=logged_in_user).first()
+    sent_invitations = Invitations.query.filter_by(sender=s).all()
+
+    return render_template("invitations.html", invitations=invitations, business_address=business_address, business_name=business_name, sent_invitations=sent_invitations)
 
 # after user responds to an invitation, status_type is updated in database, and invitation is grayed out
 @app.route("/invitations", methods=["POST"])
