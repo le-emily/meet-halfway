@@ -44,6 +44,7 @@ function initialize() {
     map = getNewMap(directionsDisplay, mapOptions);
     calculateAndDisplayRoute(directionsService, directionsDisplay);
     getStartAndEndLocationCoords(oldInfoWindow);
+    clearYelpListing();
   }
 
   // this is a good use of initialize
@@ -214,18 +215,21 @@ function showBusinessOnLeftScreen(yelpBusinessDict) {
   //         }
           
   var yelpBusinessInfowindowDetails = 
-            
-              '<h3 id="firstHeading" class="firstHeading">' + name + '</h3>' +
-              '<div id="bodyContent">'+
-                '<p>' + yelpBusinessDict.name + '<br>' +
-                  yelpBusinessDict.complete_business_address + '<br>' +
-                  yelpBusinessDict.business_phone + '<br>' +
-                '</p>' +
-              '</div>' + '<hr>';
+    '<div id="bodyContent">'+
+    '<h3 id="firstHeading" class="firstHeading">' + name + '</h3>' +
+      '<p>' + yelpBusinessDict.name + '<br>' +
+        yelpBusinessDict.complete_business_address + '<br>' +
+        yelpBusinessDict.business_phone + '<br>' +
+      '</p>' +
+    '</div>' + '<hr>';
 
-  $("#yelp_business_details").append("<div>"+yelpBusinessInfowindowDetails+"</div>");
+  $(".yelp_business_details").append(yelpBusinessInfowindowDetails);
 }
 
+
+function clearYelpListing(elementID) {
+  $(".yelp_business_details").empty();
+}
 
 
 function openInfoWindowAndCallInvitationHandler(newInfoWindow, complete_business_address, name, yelp_marker, oldInfoWindow) {
@@ -329,56 +333,7 @@ function createMidpointMarker(coords) {
 }
 
 
-// var listElement = $("#paginated_list_of_invitations");
-// var perPage = 10; 
-// var numItems = listElement.children().size();
-// var numPages = Math.ceil(numItems/perPage);
-
-// $('.pager').data("curr",0);
-
-// var curr = 0;
-// while(numPages > curr){
-//   $('<li><a href="#" class="page_link">'+(curr+1)+'</a></li>').appendTo('.pager');
-//   curr++;
-// }
-
-// $('.pager .page_link:first').addClass('active');
-
-// listElement.children().css('display', 'none');
-// listElement.children().slice(0, perPage).css('display', 'block');
-
-// $('.pager li a').click(function(){
-//   var clickedPage = $(this).html().valueOf() - 1;
-//   goTo(clickedPage,perPage);
-// });
-
-// function previous(){
-//   var goToPage = parseInt($('.pager').data("curr")) - 1;
-//   if($('.active').prev('.page_link').length==true){
-//     goTo(goToPage);
-//   }
-// }
-
-// function next(){
-//   goToPage = parseInt($('.pager').data("curr")) + 1;
-//   if($('.active_page').next('.page_link').length==true){
-//     goTo(goToPage);
-//   }
-// }
-
-// function goTo(page){
-//   var startAt = page * perPage,
-//     endOn = startAt + perPage;
-
-//   listElement.children().css('display','none').slice(startAt, endOn).css('display','block');
-//   $('.pager').attr("curr",page);
-// }
-
-
-
 initialize();
-
-
 
 
 

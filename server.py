@@ -31,7 +31,7 @@ def register_form():
     return render_template("register.html")
 
 
-@app.route("/register", methods=["POST"])
+@app.route("/", methods=["POST"])
 def process_registration():
     """Process registration."""
 
@@ -210,7 +210,7 @@ def invitations_form():
                             business_name=business_name, 
                             sent_invitations=sent_invitations)
 
-# after user responds to an invitation, status_type is updated in database, and invitation is grayed out
+
 @app.route("/invitations", methods=["POST"])
 def respond_to_invitation():
     """Respond to Invitations."""
@@ -233,8 +233,6 @@ def respond_to_invitation():
     response = {"response": invitation_response}
 
     return jsonify(response)
-
-# END IN PROGRESS
 
 
 def get_yelp_access_token(): 
@@ -259,13 +257,15 @@ def get_yelp_access_token():
 def yelp_business_search():
     lat = request.args.get("lat")
     lng = request.args.get("lng")
+
+    # keeping tabs on previous input searches and adding them to options
     venue_type = request.args.get("venue_type")
 
     access_token = get_yelp_access_token()
 
     url = "https://api.yelp.com/v3/businesses/search"
     headers = {"Authorization": "bearer %s" % access_token}
-    params = {"radius": 150, "limit": 10, "term": str(venue_type), "sort_by": "rating", "latitude": lat, "longitude": lng}
+    params = {"radius": 100, "limit": 5, "term": str(venue_type), "sort_by": "rating", "latitude": lat, "longitude": lng}
 
     resp = requests.get(url=url, params=params, headers=headers)
 

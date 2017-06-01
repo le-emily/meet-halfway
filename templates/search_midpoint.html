@@ -4,6 +4,7 @@
 
 {% block content %}
 
+<a href="/invitations">INVITATIONS</a>
 <div class="container">
 
   <div class="row">
@@ -16,16 +17,13 @@
           <input type="text" id="location_a" placeholder="Your location(street, city or zipcode)" value="hackbright" name="location">
           <!-- Their address: -->
           <img src="static/img/red_MarkerB.png" alt="their_mrker">
-          <input type="text" id="location_b" placeholder="Their location(street, city or zipcode)" value="dublin, ca" name="location">
-  <!--           <span id="venue_type">
-              Venue type: -->
+          <input type="text" id="location_b" placeholder="Their location(street, city or zipcode)" value="Bi-Rite Creamery, 18th Street, San Francisco, CA, United States2" name="location">
               <input type="text" id="venue_type_selections" placeholder="type or dropdown" name="venue_type" list="venue">
               <datalist id="venue">
                 {% for o in data %}
                 <option value="{{ o.name }}">{{ o.name }}</option>
                 {% endfor %}
               </datalist>
-            <!-- </span> -->
             <span>
               <button type="submit" value="submit" id="search">Search</button>
             </span>
@@ -40,18 +38,27 @@
     <!-- </div> -->
   </div>
 
-  <div class="row">
-    <div id="map" class="col-sm-12"></div>
+  <div class="row" id="map_yelp_details">
+    <div class="col-sm-12" id="map"></div>
+    <hr>
+    <div class="col-sm-12">
+      <div>Halfway point:</div> 
+      <div>x miles from location 1 (x min)</div>  
+      <div>x miles from location 2 (x min)</div> 
+    </div>
+    <hr>
+    <div class="col-sm-12">
+      Select a venue (on the map or from the results below)
+    </div>
   </div>
 
-  <div class="row">
-    <div id="yelp_business_details" class="col-sm-12"></div>
+  <div class="row" id="yelp_business_row">
+    <div class="yelp_business_details" class="col-sm-12"></div>
   </div>
 
 
 
 
 </div>
-
 
 {% endblock %}
