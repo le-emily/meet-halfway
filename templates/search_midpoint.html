@@ -4,40 +4,44 @@
 
 {% block content %}
 
-<p>Meet Me Halfway</p>
-
 <div class="container">
-  <div class="row">
-    <div class="col-sm-3 pull-left">
-      <form action="/search_midpoint" method="GET">
-        <div class="form-group" id="midpoint-form">
-          <div>
-            <label>Your address:
-              <input type="text" id="location_a" placeholder="Your location(street, city or zipcode)" value="hackbright" name="location">
-            </label>
-          </div>
-          <div>
-            <label>Their address:
-              <input type="text" id="location_b" placeholder="Their location(street, city or zipcode)" value="dublin, ca" name="location">
-            </label>
-          </div>
- <!--          <div>
-            <label>Venue type:
-              <select id="venue_type_selections" name="venue_type">
-                {% for o in data %}
-                <option value="{{ o.name }}">{{ o.name }}</option>
-                {% endfor %}
-              </select>
-            </label>
-          </div> -->
+  <!-- <div class="row"> -->
+  <div class="col-sm-12">
+    <form action="/search_midpoint" method="GET">
+      <div class="form-group" id="midpoint-form">
+        <!-- Your address: -->
+        
+        <img src="static/img/darkgreen_MarkerA.png" alt="your_marker">
+        <input type="text" id="location_a" placeholder="Your location(street, city or zipcode)" value="hackbright" name="location">
+        <!-- Their address: -->
+        <img src="static/img/red_MarkerB.png" alt="their_mrker">
+        <input type="text" id="location_b" placeholder="Their location(street, city or zipcode)" value="dublin, ca" name="location">
+<!--           <span id="venue_type">
+            Venue type: -->
+            <input type="text" id="venue_type_selections" name="venue_type" list="venue"/>
+            <datalist id="venue">
+              {% for o in data %}
+              <option value="{{ o.name }}">{{ o.name }}</option>
+              {% endfor %}
+            </datalist>
+          <!-- </span> -->
           <span>
             <button type="submit" value="submit" id="search">Search</button>
           </span>
         </div>
       </form>
+    <!-- </div> -->
+    <div class="col-sm-4">
+      <div row="row-sm-6">
+        this is the left side
+      </div>
+      <div row="row-sm-6">
         <div id="successFailureMessage"></div>
+      </div>
     </div>
-    <div id="map" style="height: 500px;"></div>
+    <div >
+      <div id="map" class="col-sm-8"></div>
+    </div>
   </div>
 </div>
 

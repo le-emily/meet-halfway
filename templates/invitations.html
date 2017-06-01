@@ -6,25 +6,38 @@
 
 <h3>Invitations</h3>
 
-<!-- <h4>Need Response</h4> -->
-{% for invitation in invitations %}
-        <p class="invitation_need_response">Please respond to {{ invitation.sender.name }}'s invitation (id {{ invitation.invitation_id }}): 
-            <div>Name: {{ business_name }}</div> 
-            <div>Address: {{ business_address }}</div>
-            <form action="/invitations" class="respond_to_invitation" method="POST">
-                <input type="radio" name="selection" value="accept" {% if invitation.status_id == 1 %}checked="checked"{% endif %}> Accept </input><br>
-                <input type="radio" name="selection" value="decline" {% if invitation.status_id == 2 %}checked="checked"{% endif %}> Decline </input><br>
-                <!-- dangerous... -->
-                <!-- create authorization for invitation id -->
-                <input type="hidden" name="invitation_id" value={{ invitation.invitation_id }}> </input><br>
-                <button type="submit" id="invitation_response" name="invitation_response" value="Submit">Submit</button>
-            </form>
-        </p>
-{% endfor %}
+<h4>Received</h4>
 
-Sent Invitations:
-{% for sent in sent_invitations %}
-    {{ sent.receiver.name }} -- status is {{ sent.status }}<br>
+<div id="receivers_invitations">
+{% for invitation in invitations %}
+    <p class="invitation_need_response">Please respond to {{ invitation.sender.name }}'s invitation (id {{ invitation.invitation_id }}): 
+        <div>Name: {{ business_name }}</div> 
+        <div>Address: {{ business_address }}</div>
+        <form action="/invitations" class="respond_to_invitation" method="POST">
+            <input type="radio" name="selection" value="accept" {% if invitation.status_id == 1 %}checked="checked"{% endif %}> Accept </input><br>
+            <input type="radio" name="selection" value="decline" {% if invitation.status_id == 2 %}checked="checked"{% endif %}> Decline </input><br>
+            <!-- dangerous... -->
+            <!-- create authorization for invitation id -->
+            <input type="hidden" name="invitation_id" value={{ invitation.invitation_id }}> </input><br>
+            <button type="submit" id="invitation_response" name="invitation_response" value="Submit">Submit</button>
+        </form>
+    </p>
 {% endfor %}
+</div>
+
+Sent:
+<div class="sent_invitations">
+{% for invite_details in sent_invitations %}
+    {% if invite_details.status is none %}
+        <div class="list_of_invitations">
+            <span class="pending_status">pending </span><span>{{ invite_details.receiver.name }}</span>
+            <div class="invite_details">{{ business_address }} {{ business_name }}</div>
+        </div>
+    {% else %}
+        <div>
+            <span>{{ invite_details.receiver.name }} responded <span>{{ invite_details.status }}</span> to your invitation.</span>
+    {% endif %}
+{% endfor %}
+</div>
 
 {% endblock content %}

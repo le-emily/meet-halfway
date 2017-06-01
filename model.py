@@ -38,8 +38,12 @@ class Invitations(db.Model):
     receiver = db.relationship("User", foreign_keys=[receiver_id])
     status = db.relationship("Status", foreign_keys=[status_id])
 
-    latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
+    # latitude = db.Column(db.Float)
+    # longitude = db.Column(db.Float)
+    
+    business_name = db.Column(db.String(100), nullable=False)
+    business_address = db.Column(db.String(100), nullable=False)
+
     data = db.Column(db.DateTime)
     time = db.Column(db.DateTime)
 
@@ -84,7 +88,7 @@ class Address(db.Model):
 
 
 class UserAddress(db.Model):
-    """Association table for User and Address"""
+    """Association table for User and Address. Necessary if one user has multiple addresses."""
 
     __tablename__ = "user_address_association"
  

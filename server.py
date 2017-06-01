@@ -8,6 +8,7 @@ import os
 import json
 import random
 
+
 app = Flask(__name__)
 # app.config["SECRET_KEY"] = "my super secret key blah blah"
 app.jinja_env.undefined = StrictUndefined
@@ -48,16 +49,14 @@ def process_registration():
         new_user = User(name=name, email=email, password=password)
         db.session.add(new_user)
 
-    # .first() will pull into memory, look into this
     existing_address = Address.query.filter_by(street_address=street_address).first()
 
     if not existing_address:
         new_address = Address(address_type=address_type, street_address=street_address, city=city, zipcode=zipcode)
         db.session.add(new_address)
-
-    user_address = UserAddress(user_id=new_user.user_id, address_id=new_address.address_id)
+        user_address = UserAddress(user_id=new_user.user_id, address_id=new_address.address_id)
+        db.session.add(user_address)
     
-    db.session.add(user_address)
     db.session.commit()
     flash("Added.")
 
@@ -120,26 +119,21 @@ def search_midpoint():
 
     data=[{'name':'restaurant'}, {'name':'shopping'}, {'name':'bar'}, {'name':'cafe'}]
 
-    # i need this in yelp_search.json
-    venue_type = str(request.args.get("venue_type"))
-    print "VENUE TYPE!!"
-    print venue_type
-
     return render_template("search_midpoint.html", data=data)
 
 
-@app.route("/friends", methods=["GET"])
-def friends_list():
-    """Show list of friends."""
+# @app.route("/friends", methods=["GET"])
+# def friends_list():
+#     """Show list of friends."""
 
-    user_emails = []
+#     user_emails = []
 
-    users = User.query.all()
+#     users = User.query.all()
 
-    for user in users:
-        user_emails.append(user)
+#     for user in users:
+#         user_emails.append(user)
 
-    return render_template("friends_list.html", user_emails=user_emails)
+#     return render_template("friends_list.html", user_emails=user_emails)
 
 @app.route("/invitation_receipient_email", methods=["GET"])
 def check_invitation_email(invitation_recipient_email):
@@ -160,8 +154,16 @@ def make_invitations():
     """Make Invitations instances with null status'."""
 
     invitation_recipient_email = request.form.get("email")
-    print "INVITATION_RECIPIENT_EMAIL: "
-    print invitation_recipient_email
+    business_address = request.form.get("businessAddress")
+    business_name = request.form.get("businessName")
+
+    session["business_address"] = business_address
+    session["business_name"] = business_name
+
+    print "BUSINESS ADDRESS"
+    print business_address
+    print "BUSINESS NAME"
+    print business_name
 
     receiver = check_invitation_email(invitation_recipient_email)
 
@@ -169,7 +171,10 @@ def make_invitations():
         sender = session.get("sender")
         if receiver != sender:
             s = User.query.filter_by(email=sender).first()
-            response_to_invitation = Invitations(sender=s, receiver=receiver)
+            response_to_invitation = Invitations(sender=s, 
+                                                receiver=receiver, 
+                                                business_address=business_address, 
+                                                business_name=business_name)
             db.session.add(response_to_invitation)
             db.session.commit()
             response = {"recipient_name" : receiver.name, "status": "Ok"}
@@ -184,13 +189,10 @@ def invitations_form():
     """Show list of invitations received."""
     logged_in_user = session.get("logged_in_user")
 
-    invitation_recipient_email = request.form.get("email")
-    print "THIS IS THE BUSINESS NAME"
-    business_name = request.form.get("name")
-
-    business_address = request.form.get("businessAddress")
-    print "BUSINESS ADDRESS!!"
-    print business_address
+    # remove?
+    business_name = session.get("business_name")
+    business_address = session.get("business_address")
+    # remove?
 
     verified_logged_in_user = User.query.filter_by(email=logged_in_user).first()
 
@@ -201,7 +203,12 @@ def invitations_form():
     s = User.query.filter_by(email=logged_in_user).first()
     sent_invitations = Invitations.query.filter_by(sender=s).all()
 
-    return render_template("invitations.html", invitations=invitations, business_address=business_address, business_name=business_name, sent_invitations=sent_invitations)
+   
+    return render_template("invitations.html", 
+                            invitations=invitations, 
+                            business_address=business_address, 
+                            business_name=business_name, 
+                            sent_invitations=sent_invitations)
 
 # after user responds to an invitation, status_type is updated in database, and invitation is grayed out
 @app.route("/invitations", methods=["POST"])
@@ -252,12 +259,13 @@ def get_yelp_access_token():
 def yelp_business_search():
     lat = request.args.get("lat")
     lng = request.args.get("lng")
+    venue_type = request.args.get("venue_type")
 
     access_token = get_yelp_access_token()
 
     url = "https://api.yelp.com/v3/businesses/search"
     headers = {"Authorization": "bearer %s" % access_token}
-    params = {"radius": 250, "limit": 10, "term": "cafe", "sort_by": "rating", "latitude": lat, "longitude": lng}
+    params = {"radius": 150, "limit": 10, "term": str(venue_type), "sort_by": "rating", "latitude": lat, "longitude": lng}
 
     resp = requests.get(url=url, params=params, headers=headers)
 

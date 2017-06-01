@@ -1,7 +1,8 @@
 /* Always set the map height explicitly to define the size of the div
  * element that contains the map. Map will not show without this.*/
 #map {
-  height: 800px;
+  height: 500px;
+  /*border: 5px solid red;*/
 }
 
 /* Optional: Makes the sample page fill the window. */
@@ -29,6 +30,41 @@ html, body {
   padding: 10px;
 }
 
+/*/searchmidpoint */
+.col-sm-3 {
+    display: table;
+    border: 5px solid red;
+    margin: 0 auto;
+    border-radius: 15px;
+    padding: 10px;
+}
+
+#venue_type {
+  padding-left: 10px
+}
+
+#location_a {
+  margin-right: 10px;
+}
+
+#location_b {
+  margin-right: 10px;
+}
+
+#venue_type_selections {
+  margin-right: 10px;
+}
+
+#title {
+  font-family: 'Baloo Bhaina', cursive;
+  text-align: center;
+  font-size: 55px;
+}
+
+
+#midpoint-form {
+  text-align: center;
+}
 
 /* Start by setting display:none to make this hidden.
    Then we position it in relation to the viewport window
@@ -60,4 +96,9 @@ body.loading {
 body.loading .modal {
     display: block;
     opacity: 0.75;
+}
+
+
+.pending_status {
+  /*color: dark-yellow;*/
 }
