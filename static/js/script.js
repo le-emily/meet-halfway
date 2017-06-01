@@ -186,7 +186,7 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
             openInfoWindowAndCallInvitationHandler(newInfoWindow, complete_business_address, name, yelp_marker, oldInfoWindow);
           });
 
-
+          showBusinessOnLeftScreen(yelpBusinessInfowindowDetails);
           // end info window
         } else {
           alert('Geocode was not successful for the following reason: ' + status);
@@ -195,6 +195,12 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
   }
   });
 }
+
+
+function showBusinessOnLeftScreen(yelpBusinessInfowindowDetails) {
+  $("#yelp_business_details").html(yelpBusinessInfowindowDetails).fadeIn();
+}
+
 
 
 function openInfoWindowAndCallInvitationHandler(newInfoWindow, complete_business_address, name, yelp_marker, oldInfoWindow) {
