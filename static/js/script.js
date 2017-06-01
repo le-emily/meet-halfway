@@ -154,6 +154,14 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
           var lngOfBusiness = yelpResults[i]['coordinates']['longitude'];
 
           var coordsOfOneBusiness = {"lat": latOfBusiness, "lng": lngOfBusiness};
+
+          
+          var yelpBusinessDict = {
+            "complete_business_address": complete_business_address,
+            "business_phone": business_phone,
+            "image_url": yelpResults[i].image_url,
+            "name": name
+          }
           
           var yelpBusinessInfowindowDetails = 
             '<div id="content">'+
@@ -186,7 +194,7 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
             openInfoWindowAndCallInvitationHandler(newInfoWindow, complete_business_address, name, yelp_marker, oldInfoWindow);
           });
 
-          showBusinessOnLeftScreen(yelpBusinessInfowindowDetails);
+          showBusinessOnLeftScreen(yelpBusinessDict);
           // end info window
         } else {
           alert('Geocode was not successful for the following reason: ' + status);
@@ -197,8 +205,25 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
 }
 
 
-function showBusinessOnLeftScreen(yelpBusinessInfowindowDetails) {
-  $("#yelp_business_details").html(yelpBusinessInfowindowDetails).fadeIn();
+function showBusinessOnLeftScreen(yelpBusinessDict) {
+  // var yelpBusinessDict = {
+  //           "business_street_address": business_street_address,
+  //           "complete_business_address": complete_business_address,
+  //           "business_phone": business_phone,
+  //           "image_url": yelpResults[i].image_url
+  //         }
+          
+  var yelpBusinessInfowindowDetails = 
+            
+              '<h3 id="firstHeading" class="firstHeading">' + name + '</h3>' +
+              '<div id="bodyContent">'+
+                '<p>' + yelpBusinessDict.name + '<br>' +
+                  yelpBusinessDict.complete_business_address + '<br>' +
+                  yelpBusinessDict.business_phone + '<br>' +
+                '</p>' +
+              '</div>' + '<hr>';
+
+  $("#yelp_business_details").append("<div>"+yelpBusinessInfowindowDetails+"</div>");
 }
 
 

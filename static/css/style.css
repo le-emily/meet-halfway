@@ -1,8 +1,9 @@
 /* Always set the map height explicitly to define the size of the div
  * element that contains the map. Map will not show without this.*/
 #map {
+  width: 700px; 
   height: 500px;
-  /*border: 5px solid red;*/
+  /*text-align: center;*/
 }
 
 /* Optional: Makes the sample page fill the window. */

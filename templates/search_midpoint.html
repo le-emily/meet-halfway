@@ -5,49 +5,52 @@
 {% block content %}
 
 <div class="container">
-  <!-- <div class="row"> -->
-  <div class="col-sm-12">
-    <form action="/search_midpoint" method="GET">
-      <div class="form-group" id="midpoint-form">
-        <!-- Your address: -->
 
-        <img src="static/img/darkgreen_MarkerA.png" alt="your_marker">
-        <input type="text" id="location_a" placeholder="Your location(street, city or zipcode)" value="hackbright" name="location">
-        <!-- Their address: -->
-        <img src="static/img/red_MarkerB.png" alt="their_mrker">
-        <input type="text" id="location_b" placeholder="Their location(street, city or zipcode)" value="dublin, ca" name="location">
-<!--           <span id="venue_type">
-            Venue type: -->
-            <input type="text" id="venue_type_selections" placeholder="type or dropdown" name="venue_type" list="venue"/>
-            <datalist id="venue">
-              {% for o in data %}
-              <option value="{{ o.name }}">{{ o.name }}</option>
-              {% endfor %}
-            </datalist>
-          <!-- </span> -->
-          <span>
-            <button type="submit" value="submit" id="search">Search</button>
-          </span>
+  <div class="row">
+    <div class="col-sm-12">
+      <form action="/search_midpoint" method="GET">
+        <div class="form-group" id="midpoint-form">
+          <!-- Your address: -->
+
+          <img src="static/img/darkgreen_MarkerA.png" alt="your_marker">
+          <input type="text" id="location_a" placeholder="Your location(street, city or zipcode)" value="hackbright" name="location">
+          <!-- Their address: -->
+          <img src="static/img/red_MarkerB.png" alt="their_mrker">
+          <input type="text" id="location_b" placeholder="Their location(street, city or zipcode)" value="dublin, ca" name="location">
+  <!--           <span id="venue_type">
+              Venue type: -->
+              <input type="text" id="venue_type_selections" placeholder="type or dropdown" name="venue_type" list="venue">
+              <datalist id="venue">
+                {% for o in data %}
+                <option value="{{ o.name }}">{{ o.name }}</option>
+                {% endfor %}
+              </datalist>
+            <!-- </span> -->
+            <span>
+              <button type="submit" value="submit" id="search">Search</button>
+            </span>
         </div>
       </form>
-    <!-- </div> -->
-    <div class="col-sm-4">
-      <!-- <div id="yelp_business_details"></div> -->
-      <div row="row-sm-6">
-        <div id="yelp_business_details"></div>
-      </div>
-
-      <div row="row-sm-6">
-        <div id="successFailureMessage"></div>
-      </div>
-
     </div>
-
-    <div>
-      <div id="map" class="col-sm-8"></div>
-    </div>
-    
   </div>
+
+  <div class="row">
+    <!-- <div class="col-sm-12"> -->
+    <div class="col-sm-12" id="successFailureMessage"></div>
+    <!-- </div> -->
+  </div>
+
+  <div class="row">
+    <div id="map" class="col-sm-12"></div>
+  </div>
+
+  <div class="row">
+    <div id="yelp_business_details" class="col-sm-12"></div>
+  </div>
+
+
+
+
 </div>
 
 
