@@ -1,20 +1,22 @@
 // none of these need to be global -- pass these as parameters to each function
 // instead of defining them globally
 var geocoder;
-// var map;
+var map;
 // var midpointMarker;
 
 function initialize() {
   // TO DO: make sure everything defined in intialize never changes (if it changes, move it out of initialize)
   var directionsService = new google.maps.DirectionsService;
-  var directionsDisplay = new google.maps.DirectionsRenderer;
+  var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers:true});
   // TO DO: do i change?
   geocoder = new google.maps.Geocoder();
-  // TO DO: do i change? --> No
+  // TO DO: do i change? --> No, this is latlng of hackbright
   var latlng = new google.maps.LatLng(37.78, -122.41);
+
   var mapOptions = {
-        zoom: 8,
-        center: latlng
+    zoom: 8,
+    center: latlng,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
   }
 
   var first_location_input = document.getElementById('location_a');
@@ -31,7 +33,12 @@ function initialize() {
   // TODO: do i need this for an initial map rendering? what does this do?
   // directionsDisplay is a DirectionsRenderer object that controls how the map renders.
   // You can create markers and add them to a map at a later time e.g. after clicking some button using setMap()
-  // directionsDisplay.setMap(map);
+  polyline = new google.maps.Polyline({
+    path: [],
+    strokeColor: '#FF0000',
+    strokeWeight: 3
+  });
+  directionsDisplay.setMap(map);
 
   var oldInfoWindow = {
     oldWindow: null
@@ -41,11 +48,10 @@ function initialize() {
   function onSubmit(evt) {
     evt.preventDefault();
     // TO DO: this is still being assigned as a global map parameter; this is bad
-    map = getNewMap(directionsDisplay, mapOptions);
+    // var map = getNewMap(directionsDisplay, mapOptions);
     calculateAndDisplayRoute(directionsService, directionsDisplay);
-    getStartAndEndLocationCoords(oldInfoWindow);
+    // getStartAndEndLocationCoords(oldInfoWindow);
     clearYelpListing();
-    // getDistanceBetweenStartEndLocations();
   }
 
   // this is a good use of initialize
@@ -53,47 +59,125 @@ function initialize() {
 }
 
 
-function getNewMap(directionsDisplay, mapOptions) {
-  var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-  directionsDisplay.setMap(map);
+// function getNewMap(directionsDisplay, mapOptions) {
+//   var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+//   directionsDisplay.setMap(map);
 
-  return map;
-}
+//   return map;
+// }
 
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
   var start = document.getElementById('location_a').value;
   var end = document.getElementById('location_b').value;
+  var travelMode = google.maps.DirectionsTravelMode.DRIVING;
 
-  directionsService.route({
-    origin: start,
-    destination: end,
-    travelMode: 'WALKING'
-  }, function(response, status) {
-    if (status === 'OK') {
+  var request = {
+        origin: start,
+        destination: end,
+        travelMode: travelMode
+  };
+  debugger
+  directionsService.route(request, function(response, status) {
+    if(status == google.maps.DirectionsStatus.OK) {
+      polyline.setPath([]);
+      var bounds = new google.maps.LatLngBounds();
+      startLocation = new Object();
+      endLocation = new Object();
       directionsDisplay.setDirections(response);
+      var route = response.routes[0];
+
+      // For each route, display summary information.
+      var path = response.routes[0].overview_path;
+      var legs = response.routes[0].legs;
+
+      for (i=0;i<legs.length;i++) {
+        if (i == 0) { 
+          startLocation.latlng = legs[i].start_location;
+          startLocation.address = legs[i].start_address;
+          marker = createMarker(legs[i].start_location,"midpoint","","green");
+        }
+        endLocation.latlng = legs[i].end_location;
+        endLocation.address = legs[i].end_address;
+        var steps = legs[i].steps;
+        for (j=0;j<steps.length;j++) {
+          var nextSegment = steps[j].path;
+          for (k=0;k<nextSegment.length;k++) {
+            polyline.getPath().push(nextSegment[k]);
+            bounds.extend(nextSegment[k]);
+          }
+        }
+      }
+
+      polyline.setMap(map);
+
+      computeTotalDistance(response);
     } else {
-      window.alert('Directions request failed due to ' + status);
+      alert("directions response "+status);
     }
   });
+  
 }
 
-// TESTING - THIS IS NOT DISTANCE ON ROUTE, A STRAIGHT LINE
-function getDistanceBetweenStartEndLocations() {
-  // navigator.geolocation.getCurrentPosition(
-    // function() {
-      // var latLngA = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
-        var latLngA = new google.maps.LatLng(37.773972, -122.431297);
-        var latLngB = new google.maps.LatLng(40.778721618334295, -73.96648406982422);
-        var distance = google.maps.geometry.spherical.computeDistanceBetween(latLngA, latLngB);
-        alert(distance);//In metres
 
-    // },
-    // function() {
-    //     console.log("geolocation not supported!!");
-    // }
-  // );
+var totalDist = 0;
+var totalTime = 0;
+
+function computeTotalDistance(result) {
+  totalDist = 0;
+  totalTime = 0;
+  var myroute = result.routes[0];
+  for (i = 0; i < myroute.legs.length; i++) {
+    totalDist += myroute.legs[i].distance.value;
+    totalTime += myroute.legs[i].duration.value;      
+  }
+
+  putMarkerOnRoute(50);
+
+  totalDist = totalDist / 1000.
+  document.getElementById("total").innerHTML = "total distance is: "+ totalDist + " km<br>total time is: " + (totalTime / 60).toFixed(2) + " minutes";
 }
-// TESTING
+
+function putMarkerOnRoute(percentage) {
+  var distance = (percentage/100) * totalDist;
+  var time = ((percentage/100) * totalTime/60).toFixed(2);
+  if (!marker) {
+    marker = createMarker(polyline.GetPointAtDistance(distance));
+  } else {
+    marker.setPosition(polyline.GetPointAtDistance(distance));
+    marker.setTitle("time:"+time);
+  }
+}
+
+function createMarker(latlng) {
+  var contentString = '<div>THIS IS MY MIDPOINT</div>';
+  var marker = new google.maps.Marker({
+      position: latlng,
+      map: map,
+      // title: label,
+      zIndex: Math.round(latlng.lat()*-100000)<<5
+      });
+      // marker.myname = label;
+
+  google.maps.event.addListener(marker, 'click', function() {
+    infowindow.setContent(contentString+"<br>"+marker.getPosition().toUrlValue(6)); 
+    infowindow.open(map,marker);
+  });
+  return marker;
+}
+
+
+  // {
+    // origin: start,
+    // destination: end,
+    // travelMode: 'WALKING'
+  // }, function(response, status) {
+  //   if (status === 'OK') {
+  //     directionsDisplay.setDirections(response);
+  //   } else {
+  //     window.alert('Directions request failed due to ' + status);
+  //   }
+  // });
+// }
 
 function getStartAndEndLocationCoords(oldInfoWindow) {
   var location = document.getElementsByName('location');
@@ -225,7 +309,7 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
 }
 
 
-function showBusinessOnLeftScreen(yelpBusinessDict) { 
+function showBusinessOnLeftScreen(yelpBusinessDict) {
   var yelpBusinessInfowindowDetails = 
     '<div id="bodyContent">'+
     '<h3 id="firstHeading" class="firstHeading">' + name + '</h3>' +
@@ -239,7 +323,7 @@ function showBusinessOnLeftScreen(yelpBusinessDict) {
 }
 
 
-function clearYelpListing(elementID) {
+function clearYelpListing() {
   $(".yelp_business_details").empty();
 }
 
@@ -344,7 +428,7 @@ function createMidpointMarker(coords) {
   });
 }
 
-
+// user will remain on invitations page after responding to invitation, not taken to json request
 $(".respond_to_invitation").submit(function(evt) {
     evt.preventDefault();
     var formData = $(this).closest('form').serializeArray();
@@ -359,5 +443,6 @@ $(".respond_to_invitation").submit(function(evt) {
 })
 
 initialize();
+
 
 
