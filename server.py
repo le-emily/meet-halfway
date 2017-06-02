@@ -58,7 +58,7 @@ def process_registration():
         db.session.add(user_address)
     
     db.session.commit()
-    flash("Added.")
+    flash("Added")
 
     return redirect("/")
 
@@ -108,7 +108,7 @@ def logout():
     """Log out."""
 
     del session["user_id"]
-    flash("Logged Out.")
+    flash("Logged out")
 
     return redirect("/")
 
@@ -265,7 +265,7 @@ def yelp_business_search():
 
     url = "https://api.yelp.com/v3/businesses/search"
     headers = {"Authorization": "bearer %s" % access_token}
-    params = {"radius": 100, "limit": 5, "term": str(venue_type), "sort_by": "rating", "latitude": lat, "longitude": lng}
+    params = {"radius": 100, "limit": 25, "term": str(venue_type), "sort_by": "rating", "latitude": lat, "longitude": lng}
 
     resp = requests.get(url=url, params=params, headers=headers)
 
@@ -277,7 +277,7 @@ def yelp_business_search():
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
     # that we invoke the DebugToolbarExtension
-    app.debug = True
+    app.debug = False
 
     connect_to_db(app)
  

@@ -333,6 +333,19 @@ function createMidpointMarker(coords) {
 }
 
 
+$(".respond_to_invitation").submit(function(evt) {
+    evt.preventDefault();
+    var formData = $(this).closest('form').serializeArray();
+
+    var data = {"invite_id": $(this).data("id"),
+                "selection": formData[0].value}
+
+
+    $.post("/invitations", data, function() {
+        console.log("yay!");
+    })
+})
+
 initialize();
 
 

@@ -32,14 +32,6 @@ html, body {
 }
 
 /*/searchmidpoint */
-.col-sm-3 {
-    display: table;
-    border: 5px solid red;
-    margin: 0 auto;
-    border-radius: 15px;
-    padding: 10px;
-}
-
 #venue_type {
   padding-left: 10px
 }
@@ -64,7 +56,15 @@ html, body {
 
 #map_yelp_details {
   border: 1px white;
-  border-radius: 15px;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 0 10px #000
+}
+
+#yelp_business_row {
+  margin-top: 15px;
+  border: 1px white;
+  border-radius: 10px;
   padding: 10px;
   box-shadow: 0 0 10px #000
 }
@@ -78,7 +78,7 @@ hr {
     height: 1px;
     /* Set the hr color 
     color: #333; /* old IE */
-    background-color: #333; /* Modern Browsers */
+    background-color: gray; /* Modern Browsers */
 }
 
 
@@ -118,4 +118,19 @@ body.loading .modal {
 
 .pending_status {
   /*color: dark-yellow;*/
+}
+
+/*/invitations*/
+#receivers_invitations{
+  border: 2px solid gray;
+  margin: 0 auto;
+  border-radius: 15px;
+  padding: 10px;
+}
+
+#sent_invitations {
+  border: 2px solid gray;
+  margin: 0 auto;
+  border-radius: 15px;
+  padding: 10px;
 }

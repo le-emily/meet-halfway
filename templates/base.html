@@ -26,7 +26,15 @@
           {% if messages %}
             <ul class=flashes>
             {% for message in messages %}
-              <li>{{ message }}</li>
+                {% if message == "Logged in" or message == "Added" or message == "Logged out" %}
+                    <div class="alert alert-success">
+                        {{ message }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        {{ message }}
+                    </div>
+                {% endif %}
             {% endfor %}
             </ul>
           {% endif %}

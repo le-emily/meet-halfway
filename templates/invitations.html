@@ -6,27 +6,27 @@
 
 <h3>Invitations</h3>
 
-<h4>Received</h4>
-
 <div id="receivers_invitations">
+<h4>Received</h4>
 {% for invitation in invitations %}
     <p class="invitation_need_response">Please respond to {{ invitation.sender.name }}'s invitation (id {{ invitation.invitation_id }}): 
         <div>Name: {{ business_name }}</div> 
         <div>Address: {{ business_address }}</div>
         <form action="/invitations"  data-id="{{ invitation.invitation_id }}" class="respond_to_invitation" method="POST">
-            <input type="radio" name="selection" value="accept" {% if invitation.status_id == 1 %}checked="checked"{% endif %}> Accept </input><br>
-            <input type="radio" name="selection" value="decline" {% if invitation.status_id == 2 %}checked="checked"{% endif %}> Decline </input><br>
+            <input type="radio" name="selection" value="accept" {% if invitation.status_id == 1 %}checked="checked"{% endif %}> Accept </input>
+            <input type="radio" name="selection" value="decline" {% if invitation.status_id == 2 %}checked="checked"{% endif %}> Decline </input>
             <!-- dangerous... -->
             <!-- create authorization for invitation id -->
             <input type="hidden" name="invitation_id" value={{ invitation.invitation_id }}> </input><br>
-            <button type="submit" id="invitation_response" name="invitation_response" value="Submit">Submit</button>
+            <button type="submit" id="invitation_response" name="invitation_response" value="Submit">Submit</button><span class="invite_success"></span>
         </form>
     </p>
 {% endfor %}
 </div>
 
-Sent:
-<div class="sent_invitations">
+
+<div id="sent_invitations">
+<h4>Sent</h4>
 {% for invite_details in sent_invitations %}
     {% if invite_details.status is none %}
         <div class="list_of_invitations">
@@ -35,25 +35,50 @@ Sent:
         </div>
     {% else %}
         <div>
-            <span>{{ invite_details.receiver.name }} responded <span>{{ invite_details.status }}</span> to your invitation.</span>
+            <span>{{ invite_details.receiver.name }} responded <span>{{ invite_details.status.status_type }}</span> to your invitation.</span>
+            <div class="invite_details">{{ business_address }} {{ business_name }}</div>
     {% endif %}
 {% endfor %}
 </div>
 
-<script type="text/javascript">
-    
-$(".respond_to_invitation").submit(function(evt) {
-    evt.preventDefault();
-    var formData = $(this).closest('form').serializeArray();
+<script>
 
-    var data = {"invite_id": $(this).data("id"),
-                "selection": formData[0].value}
+//Pagination
+pageSize = 8;
+
+$(function() {
+  var pageCount = Math.ceil($("#receivers_invitations").size() / pageSize);
+
+  for (var i = 0; i < pageCount; i++) {
+    if (i == 0)
+      $("#pagin").append('<li><a class="current" href="#">' + (i + 1) + '</a></li>');
+    else
+      $("#pagin").append('<li><a href="#">' + (i + 1) + '</a></li>');
+  }
 
 
-    $.post("/invitations", data, function() {
-        console.log("yay!");
-    })
+  showPage(1);
+
+  $("#pagin li a").click(function() {
+    $("#pagin li a").removeClass("current");
+    $(this).addClass("current");
+    showPage(parseInt($(this).text()))
+  });
+
 })
 
+showPage = function(page) {
+  $("#receivers_invitations").hide();
+
+  $("#receivers_invitations").each(function(n) {
+    if (n >= pageSize * (page - 1) && n < pageSize * page)
+      $(this).show();
+  });
+}
+
+
+
 </script>
+
+<ul id="pagin">
 {% endblock content %}
