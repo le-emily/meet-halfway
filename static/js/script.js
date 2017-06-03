@@ -45,7 +45,6 @@ function initialize() {
     calculateAndDisplayRoute(directionsService, directionsDisplay);
     getStartAndEndLocationCoords(oldInfoWindow);
     clearYelpListing();
-    // getDistanceBetweenStartEndLocations();
   }
 
   // this is a good use of initialize
@@ -76,24 +75,6 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
     }
   });
 }
-
-// TESTING - THIS IS NOT DISTANCE ON ROUTE, A STRAIGHT LINE
-function getDistanceBetweenStartEndLocations() {
-  // navigator.geolocation.getCurrentPosition(
-    // function() {
-      // var latLngA = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
-        var latLngA = new google.maps.LatLng(37.773972, -122.431297);
-        var latLngB = new google.maps.LatLng(40.778721618334295, -73.96648406982422);
-        var distance = google.maps.geometry.spherical.computeDistanceBetween(latLngA, latLngB);
-        alert(distance);//In metres
-
-    // },
-    // function() {
-    //     console.log("geolocation not supported!!");
-    // }
-  // );
-}
-// TESTING
 
 function getStartAndEndLocationCoords(oldInfoWindow) {
   var location = document.getElementsByName('location');
@@ -225,7 +206,7 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
 }
 
 
-function showBusinessOnLeftScreen(yelpBusinessDict) { 
+function showBusinessOnLeftScreen(yelpBusinessDict) {
   var yelpBusinessInfowindowDetails = 
     '<div id="bodyContent">'+
     '<h3 id="firstHeading" class="firstHeading">' + name + '</h3>' +
@@ -359,5 +340,3 @@ $(".respond_to_invitation").submit(function(evt) {
 })
 
 initialize();
-
-

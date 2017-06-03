@@ -31,7 +31,7 @@ def register_form():
     return render_template("register.html")
 
 
-@app.route("/", methods=["POST"])
+@app.route("/", methods=["GET", "POST"])
 def process_registration():
     """Process registration."""
 
