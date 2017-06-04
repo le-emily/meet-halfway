@@ -51,6 +51,8 @@ function createMarker(latlng, label, html) {
         travelMode: travelMode
     };
     directionsService.route(request, function(response, status) {
+      console.log("response: ");
+      console.log(response);
       if (status == google.maps.DirectionsStatus.OK) {
         polyline.setPath([]);
         var bounds = new google.maps.LatLngBounds();
@@ -58,11 +60,16 @@ function createMarker(latlng, label, html) {
         endLocation = new Object();
         directionsDisplay.setDirections(response);
         var route = response.routes[0];
+        debugger;
+        console.log("route: ");
+        console.log(route);
         // var summaryPanel = document.getElementById("directions_panel");
         // summaryPanel.innerHTML = "";
 
         // For each route, display summary information.
+    // Question: What is overview_path????
     var path = response.routes[0].overview_path;
+    console.log(response.routes[0])
     var legs = response.routes[0].legs;
         for (i=0;i<legs.length;i++) {
           if (i == 0) { 

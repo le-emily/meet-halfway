@@ -251,6 +251,7 @@ function openInfoWindowAndCallInvitationHandler(newInfoWindow, complete_business
               "businessName": name}, 
       // check for valid email, need to be a registered user to be Ok
       function(result){
+        debugger;
         if(result["status"] !== "Ok") {
           console.log("invalid email!!! :(");
           // need to figure out how to make this htmlcontent to show up in a certain area of my page
@@ -281,6 +282,7 @@ function openInfoWindowAndCallInvitationHandler(newInfoWindow, complete_business
   });
 }
 
+$(".alert-success").fadeOut(3000);
 // TO DO: midpoint marker should NOT be global. you can pass midpointmarker here as a parameter
 // and call setPosition on it.
 // if midpoint marker doesnt exist, you can call something like createMidpointMarker
