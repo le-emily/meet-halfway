@@ -265,7 +265,7 @@ def yelp_business_search():
 
     url = "https://api.yelp.com/v3/businesses/search"
     headers = {"Authorization": "bearer %s" % access_token}
-    params = {"radius": 100, "limit": 25, "term": str(venue_type), "sort_by": "rating", "latitude": lat, "longitude": lng}
+    params = {"radius": 300, "limit": 25, "term": str(venue_type), "sort_by": "rating", "latitude": lat, "longitude": lng}
 
     resp = requests.get(url=url, params=params, headers=headers)
 

@@ -121,14 +121,17 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
                 "venue_type": venue_type}
 
   $.get("/yelp_search.json", params, function(yelpResults) {
-    // console.log(yelpResults);
+    console.log(yelpResults);
+    // window.yelpResults = yelpResults;
     for(let i=0; i < yelpResults.length; i++) {
-      address = yelpResults[i]['location']['address1'];
+      if(yelpResults[i]['location']['address1'] !== "" && yelpResults[i]['location']['address1'] !== null) {
+        address = yelpResults[i]['location']['address1'] + " " + yelpResults[i]['location']['city'] + " " + yelpResults[i]['location']['state'];
       geocoder.geocode( { 'address': address}, function(businessResults, status) {
         // businessResults no longer null during subsequent search
         // console.log("BUSINESS RESULTS: ");
         // console.log(businessResults);
         // console.log("end busiess results"); // TO DO: this is null when you do a subsequent search -- why?
+        console.log(businessResults);
         var _lat = businessResults[0].geometry.location.lat();
         var _lng = businessResults[0].geometry.location.lng();
         if (status == 'OK') {
@@ -199,9 +202,10 @@ function markYelpBusinessesOnMap(midpointCoords, oldInfoWindow) {
           // end info window
         } else {
           alert('Geocode was not successful for the following reason: ' + status);
-        }    
-    });
-  }
+        }  
+      });
+      }
+    }
   });
 }
 
@@ -216,12 +220,12 @@ function showBusinessOnLeftScreen(yelpBusinessDict) {
       '</p>' +
     '</div>' + '<hr>';
 
-  $(".yelp_business_details").append(yelpBusinessInfowindowDetails);
+  $("#yelp_business_row").append(yelpBusinessInfowindowDetails);
 }
 
 
 function clearYelpListing(elementID) {
-  $(".yelp_business_details").empty();
+  $("#yelp_business_row").empty();
 }
 
 

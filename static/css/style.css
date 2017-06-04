@@ -73,21 +73,20 @@ html, body {
   text-align: center;
 }
 
-hr {
+/*hr {
     border: none;
     height: 1px;
-    /* Set the hr color 
-    color: #333; /* old IE */
-    background-color: gray; /* Modern Browsers */
-}
+    color: #333;  
 
+}
+*/
 
 
 /* Start by setting display:none to make this hidden.
    Then we position it in relation to the viewport window
    with position:fixed. Width, height, top and left speak
    for themselves. Background we set to 80% white with
-   our animation centered, and no-repeating */
+   our animation centered, and no-repeating 
 .modal {
     display:    none;
     position:   fixed;
