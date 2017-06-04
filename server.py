@@ -166,7 +166,7 @@ def make_invitations():
     print business_name
 
     receiver = check_invitation_email(invitation_recipient_email)
-
+    import pdb; pdb.set_trace();
     if receiver:
         sender = session.get("sender")
         if receiver != sender:
