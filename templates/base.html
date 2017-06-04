@@ -9,15 +9,32 @@
 </head>
 <body>
 
+    <!-- Navbar -->
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/">Meet Halfway</a>
+        </div>
+        <ul class="nav navbar-nav navbar-left">
+          <li><a href="/">Home</a></li>
+          <li><a href="/search_midpoint">meetup</a></li>
+          <li><a href="/invitations">invites</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          {% if "user_id" in session %}
+            <p class="navbar-text">Hello, {{ session["sender"] }}!</p>
+            <p class="navbar-text"><a href="/logout">logout?</a></p>
+          {% else %}
+            <!-- <li><a href="/login">Login</a></li> -->
+          {% endif %}
+        </ul>
+        
+      </div>
+    </nav>
+    <!-- end navbar -->
 
+    <!-- flash messages -->
     <div class="messages">
-        {% if "user_id" in session %}
-            <span>Hello, {{ session["sender"] }}!</span>
-            <a href="/logout">Logout?</a>
-        {% else %}
-            <a href="/login">Login</a>
-        {% endif %}
-
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             <ul class=flashes>
@@ -36,8 +53,10 @@
           {% endif %}
         {% endwith %}
     </div>
+    <!-- end flash messages -->
 
     <h1 id="title">Meet Halfway</h1>
+
 
     <div class="content">
         {% block content %}

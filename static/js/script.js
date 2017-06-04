@@ -337,8 +337,22 @@ $(".respond_to_invitation").submit(function(evt) {
     var formData = $(this).closest('form').serializeArray();
 
     var data = {"invite_id": $(this).data("id"),
-                "selection": formData[0].value}
+                "selection": formData[0].value};
 
+    if(data["selection"] == "accept") {
+      radiobtn = $("#accept_radio_button").prop( "checked" );
+      var sheet = document.createElement('style')
+      sheet.innerHTML = "#accept_radio_button {color: green;}";
+      document.body.appendChild(sheet);
+      debugger;
+    } else if(data["selection"] == "decline") {
+      radiobtn = $("#decline_radio_button").prop( "checked" );
+      var sheet = document.createElement('style')
+      sheet.innerHTML = "#decline_radio_button {color: red;}";
+      document.body.appendChild(sheet);
+    } else {
+      console.log("nothing selected yet!");
+    }
 
     $.post("/invitations", data, function() {
         console.log("yay!");
