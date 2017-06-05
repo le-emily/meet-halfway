@@ -63,7 +63,7 @@ def process_registration():
     return redirect("/")
 
 
-@app.route("/login", methods=["POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login_process():
     """Process login."""
 

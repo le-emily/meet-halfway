@@ -335,6 +335,7 @@ function markYelpBusinessesOnMap(percentage) {
                   '<span>' + '<button type="submit" class="inviteFriendButton" value="submit">invite</button>' +
                   '</span>' +
                 '</form>' +
+                '<span id="successFailureMessage">Invite status appears here.</span>' +
               '</div>'+
             '</div>';
 
@@ -380,8 +381,7 @@ function markYelpBusinessesOnMap(percentage) {
 
                   } else {
                     var invitation_success_message = '<div>' +
-                      result["recipient_name"] +  " has been invited to " + name + "at " +
-                        complete_business_address + "."
+                      result["recipient_name"] +  " has been invited to " + name + "."
                       '</div>';
                     try {
                     $("#successFailureMessage").html(invitation_success_message)
@@ -425,6 +425,8 @@ function showBusinessBelowMapOnBottomDiv(yelpBusinessDict) {
 function clearYelpListing() {
   $("#yelp_business_row").empty();
 }
+
+$(".alert-success").fadeOut(3000);
 
 // DOMContentLoaded event is fired when the initial HTML document has been completely 
 // loaded and parsed, without waiting for stylesheets, images, and subframes to finish 
