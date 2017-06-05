@@ -2,32 +2,41 @@
 
 {% block title %} Welcome {% endblock %}
 
+{% block page_title %}
+Welcome!
+{% endblock %}
+
 {% block content %}
 
-<!-- login form -->
-<form action="/login" method="POST">
-    <div class="form-group">
-        <label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="email">
-        </label>
+<div class="row welcome-page">
+    <div class="col-sm-6">
+        put some logo image here
     </div>
+    <div class="col-sm-6 login-form">
+        <!-- login form -->
+        <form action="/login" method="POST" class="login">
+            <div class="form-group">
+                <label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="email">
+                </label>
+            </div>
 
-    <div class="form-group">
-        <label>
-            <input type="password" class="form-control" id="password" name="password" placeholder="password">
-        </label>
+            <div class="form-group">
+                <label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="password">
+                </label>
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-default login-button">Login</button>
+            </div>
+        </form>
+        <!-- end login form -->
+        <!-- 
+        <p>Login <a href="/login">here</a></p>
+        SIGN UP AND START MEETING UP IN SECONDS. -->
+        <p class="ask_if_registered">Not registered? Click <a href="/register">here</a>!</p>
     </div>
-
-    <div>
-        <button type="submit" class="btn btn-default">Login</button>
-    </div>
-</form>
-<!-- end login form -->
-<!-- 
-<p>Login <a href="/login">here</a></p>
-SIGN UP AND START MEETING UP IN SECONDS. -->
-<p>Not registered? Click <a href="/register">here</a>!</p>
-
-
+</div>
 
 {% endblock %}

@@ -16,13 +16,13 @@
           <a class="navbar-brand" href="/">Meet Halfway</a>
         </div>
         <ul class="nav navbar-nav navbar-left">
-          <li><a href="/">Home</a></li>
+          <li><a href="/">home</a></li>
           <li><a href="/search_midpoint">meetup</a></li>
           <li><a href="/invitations">invites</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           {% if "user_id" in session %}
-            <p class="navbar-text">Hello, {{ session["sender"] }}!</p>
+            <p class="navbar-text">hello, {{ session["sender"] }}!</p>
             <p class="navbar-text"><a href="/logout">logout?</a></p>
           {% else %}
             <!-- <li><a href="/login">Login</a></li> -->
@@ -55,7 +55,11 @@
     </div>
     <!-- end flash messages -->
 
-    <h1 id="title">Meet Halfway</h1>
+
+    <h1 class="title">
+        {% block page_title %}
+        {% endblock %}
+    </h1>
 
 
     <div class="content">

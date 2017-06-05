@@ -2,6 +2,10 @@
 
 {% block title %} Search Midpoint {% endblock %}
 
+{% block page_title %}
+Meet Halfway
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
@@ -10,7 +14,7 @@
       <form action="/search_midpoint" method="GET">
         <div class="form-group" id="midpoint-form">
           <img src="static/img/darkgreen_MarkerA.png" alt="your_marker">
-          <input type="text" id="location_a" placeholder="Your location(street, city or zipcode)" value="hackbright" name="location">x
+          <input type="text" id="location_a" placeholder="Your location(street, city or zipcode)" value="hackbright" name="location">
           <img src="static/img/red_MarkerB.png" alt="their_mrker">
           <input type="text" id="location_b" placeholder="Their location(street, city or zipcode)" value="Bi-Rite Creamery, 18th Street, San Francisco, CA, United States2" name="location">
               <input type="text" id="venue_type_selections" placeholder="type or dropdown" name="venue_type" list="venue">

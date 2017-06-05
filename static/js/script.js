@@ -251,7 +251,6 @@ function openInfoWindowAndCallInvitationHandler(newInfoWindow, complete_business
               "businessName": name}, 
       // check for valid email, need to be a registered user to be Ok
       function(result){
-        debugger;
         if(result["status"] !== "Ok") {
           console.log("invalid email!!! :(");
           // need to figure out how to make this htmlcontent to show up in a certain area of my page
@@ -302,57 +301,13 @@ function createMidpointMarker(coords) {
   });
 }
 
-// TO DO: midpoint marker should NOT be global. you can pass midpointmarker here as a parameter
-// and call setPosition on it.
-// if midpoint marker doesnt exist, you can call something like createMidpointMarker
-function placeMidpointMarker(coords, midpointMarker) {
-
-  // console.log(midpointMarker)
-  if (midpointMarker) {
-    // clear the map
-    // create a new map with new midpoint
-    midpointMarker.setPosition(coords);
-  } else {
-    // console.log('new google maps')
-    // change midpointMarker color
-    createMidpointMarker(coords);
-    // midpointMarker = new google.maps.Marker({
-    //   position: coords,
-    //   map: map
-    // });
-  }
-}
-
-
-function createMidpointMarker(coords) {
-  var midpointMarker = new google.maps.Marker({
-      position: coords,
-      map: map
-  });
-}
-
 
 $(".respond_to_invitation").submit(function(evt) {
     evt.preventDefault();
     var formData = $(this).closest('form').serializeArray();
 
-    var data = {"invite_id": $(this).data("id"),
+    var data = {"invitation_id": $(this).data("id"),
                 "selection": formData[0].value};
-
-    if(data["selection"] == "accept") {
-      radiobtn = $("#accept_radio_button").prop( "checked" );
-      var sheet = document.createElement('style')
-      sheet.innerHTML = "#accept_radio_button {color: green;}";
-      document.body.appendChild(sheet);
-      debugger;
-    } else if(data["selection"] == "decline") {
-      radiobtn = $("#decline_radio_button").prop( "checked" );
-      var sheet = document.createElement('style')
-      sheet.innerHTML = "#decline_radio_button {color: red;}";
-      document.body.appendChild(sheet);
-    } else {
-      console.log("nothing selected yet!");
-    }
 
     $.post("/invitations", data, function() {
         console.log("yay!");
