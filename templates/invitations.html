@@ -58,13 +58,13 @@ document.addEventListener("DOMContentLoaded", function() {
         <hr>
     {% else %}
       <div>
-          <span>{{ invite_details.receiver.name }} has
+          <span>{{ invite_details.receiver.name }}
             {% if invite_details.status.status_type == "accept" %}
               <span class="accept_invitation">{{ invite_details.status.status_type }}ed</span>
             {% else %}
               <span class="decline_invitation">{{ invite_details.status.status_type }}d</span>
             {% endif %}
-          your invitation.
+          your invitation to:
           </span>
           <div class="invite_details">{{ invite_details.business_address }} {{ invite_details.business_name }}</div>
           <hr>

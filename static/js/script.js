@@ -142,9 +142,6 @@ function computeTotalDistance(result) {
   totalDist = 0;
   totalTime = 0;
   var myroute = result.routes[0];
-  console.log("myroute: ");
-  console.log(myroute);
-  debugger;
   // loop through route's legs and add distance and duration to totalDist/totalTime
   for (i = 0; i < myroute.legs.length; i++) {
     // Go through legs and get distance and duration from start to end locations
@@ -429,6 +426,9 @@ function clearYelpListing() {
   $("#yelp_business_row").empty();
 }
 
+// DOMContentLoaded event is fired when the initial HTML document has been completely 
+// loaded and parsed, without waiting for stylesheets, images, and subframes to finish 
+// loading.
 document.addEventListener("DOMContentLoaded", function(event) {
   initialize();
 });
