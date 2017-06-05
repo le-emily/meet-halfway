@@ -1,11 +1,4 @@
-// none of these need to be global -- pass these as parameters to each function
-// instead of defining them globally
 var geocoder;
-// var map;
-// var midpointMarker;
-
-// Route midpoint code:
-
 var directionDisplay;
 var directionsService = new google.maps.DirectionsService();
 var map;
@@ -14,7 +7,7 @@ var polyline = null;
 var infowindow = new google.maps.InfoWindow();
 
 function createMarker(latlng, label, html) {
-// alert("createMarker("+latlng+","+label+","+html+","+color+")");
+  // Create markers for start and end points, showing lat/lng coords and address.
   var contentString = '<b>'+label+'</b><br>'+html;
   var img = '';
   if(label == "Start"){
@@ -40,6 +33,7 @@ function createMarker(latlng, label, html) {
 }
 
 function initialize() {
+  // Create google map, call calcRoute, and create polyline
   geocoder = new google.maps.Geocoder();
   directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers:true});
   var sf = new google.maps.LatLng(37.791011,-122.402113);
@@ -52,11 +46,11 @@ function initialize() {
   map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
   polyline = new google.maps.Polyline({
   path: [],
-  strokeColor: '#FF0000',
+  strokeColor: '#29c6ff',
   strokeWeight: 3
   });
 
-  //Close infowindow when click map
+  //Close infowindow when click anywhere on map
   map.addListener('click', function() {
       if(infowindow != null) {
         infowindow.close();
@@ -70,6 +64,7 @@ function calcRoute() {
   setMapOnAll(null);
   markers = [];
   clearYelpListing();
+
   var start = document.getElementById("start").value;
   var end = document.getElementById("end").value;
   var travelMode = google.maps.DirectionsTravelMode.DRIVING
@@ -79,7 +74,13 @@ function calcRoute() {
       destination: end,
       travelMode: travelMode
   };
+
+  // Send start and end values (directions request) into directionsService which 
+  // returns an efficient route path.
   directionsService.route(request, function(response, status) {
+    // Response - object of geocoded_waypoints, request, routes and status
+    console.log("response: ");
+    console.log(response);
     if (status == google.maps.DirectionsStatus.OK) {
       polyline.setPath([]);
       var bounds = new google.maps.LatLngBounds();
@@ -87,75 +88,88 @@ function calcRoute() {
       endLocation = new Object();
       directionsDisplay.setDirections(response);
       var route = response.routes[0];
-      // var summaryPanel = document.getElementById("directions_panel");
-      // summaryPanel.innerHTML = "";
 
-      // For each route, display summary information.
-  var path = response.routes[0].overview_path;
-  var legs = response.routes[0].legs;
-    for (i=0;i<legs.length;i++) {
-      if (i == 0) {
-        startLocation.latlng = legs[i].start_location;
-        startLocation.address = legs[i].start_address;
-        markers.push(createMarker(startLocation.latlng, "Start", startLocation.address));
-        // marker = google.maps.Marker({map:map,position: startLocation.latlng});
-        marker = createMarker(legs[i].start_location,"midpoint","","green");
-        markers.push(marker);
-      }
-      endLocation.latlng = legs[i].end_location;
-      endLocation.address = legs[i].end_address;
-      markers.push(createMarker(endLocation.latlng, "End", endLocation.address));
-      var steps = legs[i].steps;
-      for (j=0;j<steps.length;j++) {
-        var nextSegment = steps[j].path;
-        for (k=0;k<nextSegment.length;k++) {
-          polyline.getPath().push(nextSegment[k]);
-          bounds.extend(nextSegment[k]);
+      var path = response.routes[0].overview_path;
+      var legs = response.routes[0].legs;
+      for (i=0;i<legs.length;i++) {
+        // For each leg, check for start, end and midpoint, and create marker.
+        // Each leg is an object of address, distance, duration, steps, traffic speed,
+        // and waypoints
+        if (i == 0) {
+          startLocation.latlng = legs[i].start_location;
+          startLocation.address = legs[i].start_address;
+          markers.push(createMarker(startLocation.latlng, "Start", startLocation.address));
+          marker = createMarker(legs[i].start_location,"Midpoint","");
+          markers.push(marker);
+        }
+        endLocation.latlng = legs[i].end_location;
+        endLocation.address = legs[i].end_address;
+        markers.push(createMarker(endLocation.latlng, "End", endLocation.address));
+        var steps = legs[i].steps;
+        for (j=0;j<steps.length;j++) {
+          // go through each step, which are small instructions of how to get to 
+          // midpoint
+          var nextSegment = steps[j].path;
+          // nextSegment contains an object of 2 lat/lng coords--SE and NE
+          // lat/lng coords.
+          for (k=0;k<nextSegment.length;k++) {
+            // go through each set of lat/lng coords and set the polyline path.
+            polyline.getPath().push(nextSegment[k]);
+            // Add the SE/NE lat/lng object to bounds
+            bounds.extend(nextSegment[k]);
+          }
         }
       }
-    }
-
-    polyline.setMap(map);
-
-    computeTotalDistance(response);
-    } else {
-      alert("directions response "+status);
-    }
-  });
+      polyline.setMap(map);
+      computeTotalDistance(response);
+      } else {
+        alert("directions response " + status);
+      }
+    });
 }
 
 // Sets the map on all markers in the array.
-  function setMapOnAll(map) {
-    for (var i = 0; i < markers.length; i++) {
-      markers[i].setMap(map);
-    }
+function setMapOnAll(map) {
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(map);
   }
+}
 
 var totalDist = 0;
 var totalTime = 0;
-function computeTotalDistance(result) {
-totalDist = 0;
-totalTime = 0;
-var myroute = result.routes[0];
-for (i = 0; i < myroute.legs.length; i++) {
-  totalDist += myroute.legs[i].distance.value;
-  totalTime += myroute.legs[i].duration.value;
-}
-putMarkerOnRoute(50);
-markYelpBusinessesOnMap(50);
 
-totalDist = totalDist / 1000.
-document.getElementById("total").innerHTML = "total distance is: "+ totalDist + " km<br>total time is: " + (totalTime / 60).toFixed(2) + " minutes";
-//      document.getElementById("totalTime").value = (totalTime/60.).toFixed(2);
+function computeTotalDistance(result) {
+  totalDist = 0;
+  totalTime = 0;
+  var myroute = result.routes[0];
+  console.log("myroute: ");
+  console.log(myroute);
+  debugger;
+  // loop through route's legs and add distance and duration to totalDist/totalTime
+  for (i = 0; i < myroute.legs.length; i++) {
+    // Go through legs and get distance and duration from start to end locations
+    totalDist += myroute.legs[i].distance.value;
+    totalTime += myroute.legs[i].duration.value;
+  }
+
+  putMarkerOnRoute(50);
+  markYelpBusinessesOnMap(50);
+
+  totalDist = totalDist / 1000.
+
+  document.getElementById("total").innerHTML = "Total distance is: "+ totalDist + 
+    " km<br>Total time is: " + (totalTime / 60).toFixed(2) + " minutes";
 }
 
 function putMarkerOnRoute(percentage) {
+  // Multiply totalDist by 50% to get the middle.
   var distance = (percentage/100) * totalDist;
   var time = ((percentage/100) * totalTime/60).toFixed(2);
-  // alert("Time:"+time+" totalTime:"+totalTime+" totalDist:"+totalDist+" dist:"+distance);
   if (!marker) {
-          marker = createMarker(polyline.GetPointAtDistance(distance),"time: "+time,"marker");
-          markers.push(marker);
+    // GetPointAtDistance-returns a GLatLng at the specified distance along the path. 
+    // The distance is specified in metres.
+    marker = createMarker(polyline.GetPointAtDistance(distance),"time: "+time,"marker");
+    markers.push(marker);
   } else {
     marker.setPosition(polyline.GetPointAtDistance(distance));
     marker.setTitle("time:"+time);
@@ -166,117 +180,93 @@ function putMarkerOnRoute(percentage) {
 
 // Route midpoint code ^^
 
+// autocomplete not working
+var first_location_input = document.getElementById('start');
+var autocomplete = new google.maps.places.Autocomplete(first_location_input);
+
+var second_location_input = document.getElementById('end');
+var autocomplete = new google.maps.places.Autocomplete(second_location_input);
+
+// no longer needed
+var oldInfoWindow = {
+  oldWindow: null
+};
+
+// move this out of initialize
+// function onSubmit(evt) {
+//   evt.preventDefault();
+//   // TO DO: this is still being assigned as a global map parameter; this is bad
+//   map = getNewMap(directionsDisplay, mapOptions);
+//   calculateAndDisplayRoute(directionsService, directionsDisplay);
+//   getStartAndEndLocationCoords(oldInfoWindow);
+//   clearYelpListing();
+// }
 
 
+// function getNewMap(directionsDisplay, mapOptions) {
+//   var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+//   directionsDisplay.setMap(map);
 
+//   return map;
+// }
 
+// function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+//   var start = document.getElementById('location_a').value;
+//   var end = document.getElementById('location_b').value;
 
-// function initialize() {
-//   // TO DO: make sure everything defined in intialize never changes (if it changes, move it out of initialize)
-//   var directionsService = new google.maps.DirectionsService;
-//   var directionsDisplay = new google.maps.DirectionsRenderer;
-//   // TO DO: do i change?
-//   geocoder = new google.maps.Geocoder();
-//   // TO DO: do i change? --> No
-//   var latlng = new google.maps.LatLng(37.78, -122.41);
-//   var mapOptions = {
-//         zoom: 8,
-//         center: latlng
+//   directionsService.route({
+//     origin: start,
+//     destination: end,
+//     travelMode: 'WALKING'
+//   }, function(response, status) {
+//     if (status === 'OK') {
+//       directionsDisplay.setDirections(response);
+//     } else {
+//       window.alert('Directions request failed due to ' + status);
+//     }
+//   });
+// }
+
+// function getStartAndEndLocationCoords(oldInfoWindow) {
+//   var location = document.getElementsByName('location');
+
+//   var startAndEndLocationCoords = [];
+//   // go through each location and geocode;?
+//   // goes through each location entered and get the geocode.
+//   for(var i=0; i < location.length; i++) {
+//     var address = location[i].value;
+//     geocoder.geocode( { 'address': address}, function(results, status) {
+//     var _lat = results[0].geometry.location.lat()
+//     var _lng = results[0].geometry.location.lng()
+//       if (status == 'OK') {
+//         startAndEndLocationCoords.push(_lat);
+//         startAndEndLocationCoords.push(_lng);
+//         if (startAndEndLocationCoords.length == 4) {
+//           // console.log('calculating midpoint')
+//           calculateMidpoint(startAndEndLocationCoords, oldInfoWindow);
+//         }
+//       } else {
+//         alert('Geocode was not successful for the following reason: ' + status);
+//       }
+//     });
 //   }
+// }
 
-  var first_location_input = document.getElementById('start');
-  var autocomplete = new google.maps.places.Autocomplete(first_location_input);
+// Remove?
+// function calculateMidpoint(startAndEndLocationCoords, oldInfoWindow) {
+//   var _lat = (startAndEndLocationCoords[0] + startAndEndLocationCoords[2])/2.0;
+//   var _lng = (startAndEndLocationCoords[1] + startAndEndLocationCoords[3])/2.0;
 
-  var second_location_input = document.getElementById('end');
-  var autocomplete = new google.maps.places.Autocomplete(second_location_input);
+//   var midpointCoords = {"lat": _lat, "lng": _lng};
 
-  // TODO: initialize instance of map, but re-draw the map on click
-  // (if that's what is necessary for adding points to the map)
-  // this map is necessary to show map on load
-  // map = new google.maps.Map(document.getElementById('map'), mapOptions);
+//   placeMidpointMarker(midpointCoords);
+//   map.setCenter(midpointCoords);
 
-  // TODO: do i need this for an initial map rendering? what does this do?
-  // directionsDisplay is a DirectionsRenderer object that controls how the map renders.
-  // You can create markers and add them to a map at a later time e.g. after clicking some button using setMap()
-  // directionsDisplay.setMap(map);
-
-  var oldInfoWindow = {
-    oldWindow: null
-  };
-
-  // move this out of initialize
-  function onSubmit(evt) {
-    evt.preventDefault();
-    // TO DO: this is still being assigned as a global map parameter; this is bad
-    map = getNewMap(directionsDisplay, mapOptions);
-    calculateAndDisplayRoute(directionsService, directionsDisplay);
-    getStartAndEndLocationCoords(oldInfoWindow);
-    clearYelpListing();
-  }
+//   markYelpBusinessesOnMap(midpointCoords, oldInfoWindow);
+// }
 
 
-function getNewMap(directionsDisplay, mapOptions) {
-  var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-  directionsDisplay.setMap(map);
-
-  return map;
-}
-
-function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-  var start = document.getElementById('location_a').value;
-  var end = document.getElementById('location_b').value;
-
-  directionsService.route({
-    origin: start,
-    destination: end,
-    travelMode: 'WALKING'
-  }, function(response, status) {
-    if (status === 'OK') {
-      directionsDisplay.setDirections(response);
-    } else {
-      window.alert('Directions request failed due to ' + status);
-    }
-  });
-}
-
-function getStartAndEndLocationCoords(oldInfoWindow) {
-  var location = document.getElementsByName('location');
-
-  var startAndEndLocationCoords = [];
-  // go through each location and geocode;?
-  // goes through each location entered and get the geocode.
-  for(var i=0; i < location.length; i++) {
-    var address = location[i].value;
-    geocoder.geocode( { 'address': address}, function(results, status) {
-    var _lat = results[0].geometry.location.lat()
-    var _lng = results[0].geometry.location.lng()
-      if (status == 'OK') {
-        startAndEndLocationCoords.push(_lat);
-        startAndEndLocationCoords.push(_lng);
-        if (startAndEndLocationCoords.length == 4) {
-          // console.log('calculating midpoint')
-          calculateMidpoint(startAndEndLocationCoords, oldInfoWindow);
-        }
-      } else {
-        alert('Geocode was not successful for the following reason: ' + status);
-      }
-    });
-  }
-}
-
-function calculateMidpoint(startAndEndLocationCoords, oldInfoWindow) {
-  var _lat = (startAndEndLocationCoords[0] + startAndEndLocationCoords[2])/2.0;
-  var _lng = (startAndEndLocationCoords[1] + startAndEndLocationCoords[3])/2.0;
-
-  var midpointCoords = {"lat": _lat, "lng": _lng};
-
-  placeMidpointMarker(midpointCoords);
-  map.setCenter(midpointCoords);
-
-  markYelpBusinessesOnMap(midpointCoords, oldInfoWindow);
-}
-
-
+// Called in computeTotalDistance
 function markYelpBusinessesOnMap(percentage) {
   var midpointCoords = polyline.GetPointAtDistance(((percentage/100) * totalDist));
   var venue_type = document.getElementById("venue_type_selections").value;
@@ -285,19 +275,13 @@ function markYelpBusinessesOnMap(percentage) {
                 "venue_type": venue_type,
                 "radius": (Math.floor(totalDist*.1))}
 
+  // AJAX get request to yelp_search for yelp api results. Get key business data 
+  // from response for infoWindow content.
   $.get("/yelp_search.json", params, function(yelpResults) {
-    console.log(yelpResults);
-    // window.yelpResults = yelpResults;
     for(let i=0; i < yelpResults.length; i++) {
       if(yelpResults[i]['location']['address1'] !== "" && yelpResults[i]['location']['address1'] !== null) {
         address = yelpResults[i]['location']['address1'] + " " + yelpResults[i]['location']['city'] + " " + yelpResults[i]['location']['state'];
         geocoder.geocode( { 'address': address}, function(businessResults, status) {
-        // businessResults no longer null during subsequent search
-        // console.log("BUSINESS RESULTS: ");
-        // console.log(businessResults);
-        // console.log("end busiess results"); // TO DO: this is null when you do a subsequent search -- why?
-        console.log(businessResults);
-        console.log(status);
         var _lat = businessResults[0].geometry.location.lat();
         var _lng = businessResults[0].geometry.location.lng();
         if (status == 'OK') {
@@ -363,12 +347,12 @@ function markYelpBusinessesOnMap(percentage) {
 
 
           yelp_marker.addListener('click', function() {
+            // Close the previous info window if a new yelp business marker is clicked.
             newInfoWindow.open(map, yelp_marker);
             infowindow.close();
             infowindow = newInfoWindow;
-
+            // InviteFriend function run everytime a window is open.
             inviteFriend();
-            // openInfoWindowAndCallInvitationHandler(newInfoWindow, complete_business_address, name, yelp_marker, oldInfoWindow);
           });
 
 
@@ -378,6 +362,9 @@ function markYelpBusinessesOnMap(percentage) {
 
               var emailOfPersonInvited = document.getElementById("inviteEmail").value;
 
+              // AJAX post requst to add_invitation to invitation with email, 
+              // businessAddress, and name for receiver, business_address, and 
+              // business_name for invitation instance respectively.
               $.post(
                 url="/add_invitation",
                 data= {"email": emailOfPersonInvited,
@@ -387,7 +374,6 @@ function markYelpBusinessesOnMap(percentage) {
                 function(result){
                   if(result["status"] !== "Ok") {
                     console.log("invalid email!!! :(");
-                    // need to figure out how to make this htmlcontent to show up in a certain area of my page
                     var invitation_failed_message = '<div>' +
                       data["email"] + " is an invalid email!" + " Please try again."
                       '</div>';
@@ -414,11 +400,7 @@ function markYelpBusinessesOnMap(percentage) {
               );
             });
           }
-
-
-
-          showBusinessOnLeftScreen(yelpBusinessDict);
-          // end info window
+          showBusinessBelowMapOnBottomDiv(yelpBusinessDict);
         } else {
           alert('Geocode was not successful for the following reason: ' + status);
         }
@@ -429,7 +411,7 @@ function markYelpBusinessesOnMap(percentage) {
 }
 
 
-function showBusinessOnLeftScreen(yelpBusinessDict) {
+function showBusinessBelowMapOnBottomDiv(yelpBusinessDict) {
   var yelpBusinessInfowindowDetails =
     '<div id="bodyContent">'+
     '<h3 id="firstHeading" class="firstHeading">' + name + '</h3>' +
@@ -443,59 +425,9 @@ function showBusinessOnLeftScreen(yelpBusinessDict) {
 }
 
 
-function clearYelpListing(elementID) {
+function clearYelpListing() {
   $("#yelp_business_row").empty();
 }
-
-$(".alert-success").fadeOut(3000);
-// TO DO: midpoint marker should NOT be global. you can pass midpointmarker here as a parameter
-// and call setPosition on it.
-// if midpoint marker doesnt exist, you can call something like createMidpointMarker
-function placeMidpointMarker(midpointCoords, midpointMarker) {
-  if (midpointMarker) {
-    midpointMarker.setPosition(midpointCoords);
-  } else {
-    createMidpointMarker(midpointCoords);
-  }
-}
-
-
-// function createMidpointMarker(coords) {
-//   var midpointMarker = new google.maps.Marker({
-//       position: coords,
-//       map: map
-//   });
-// }
-
-// TO DO: midpoint marker should NOT be global. you can pass midpointmarker here as a parameter
-// and call setPosition on it.
-// if midpoint marker doesnt exist, you can call something like createMidpointMarker
-// function placeMidpointMarker(coords, midpointMarker) {
-//
-//   // console.log(midpointMarker)
-//   if (midpointMarker) {
-//     // clear the map
-//     // create a new map with new midpoint
-//     midpointMarker.setPosition(coords);
-//   } else {
-//     // console.log('new google maps')
-//     // change midpointMarker color
-//     createMidpointMarker(coords);
-//     // midpointMarker = new google.maps.Marker({
-//     //   position: coords,
-//     //   map: map
-//     // });
-//   }
-// }
-
-
-// function createMidpointMarker(coords) {
-//   var midpointMarker = new google.maps.Marker({
-//       position: coords,
-//       map: map
-//   });
-// }
-
 
 document.addEventListener("DOMContentLoaded", function(event) {
   initialize();

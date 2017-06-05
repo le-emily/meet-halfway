@@ -83,19 +83,6 @@ html, body {
   text-align: right;
 }
 
-/*LOGIN*/
-/*.login {
-  text-align: center;
-}
-
-.login-button {
-  -moz-box-sizing:content-box;
-  -webkit-box-sizing:content-box;
-  -ms-box-sizing: content-box;
-  box-sizing:content-box;
-}
-*/
-
 .login-form {
   text-align: right;
 }
@@ -133,3 +120,12 @@ html, body {
     opacity: 0;
     visibility: hidden;
 }
+
+.navbar-fixed-bottom {
+  color: gray;
+  position: relative;
+  /*margin-top: -150px;  negative value of footer height */
+  height: 150px;
+  clear:both;
+  padding-top:20px;
+} 
