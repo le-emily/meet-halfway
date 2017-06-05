@@ -3,13 +3,14 @@
 <head>
     <title> {% block title %} Title {% endblock %}</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <script src="epoly.js" type="../static/js/epoly.js"> </script>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
     <link href="https://fonts.googleapis.com/css?family=Baloo+Bhaina" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    {% block mapscript %}{% endblock %}
 </head>
 <body>
 
-    <!-- Navbar -->
+  <!-- Navbar -->
     <nav class="navbar navbar-default">
       <div class="container-fluid">
         <div class="navbar-header">
@@ -28,7 +29,7 @@
             <!-- <li><a href="/login">Login</a></li> -->
           {% endif %}
         </ul>
-        
+
       </div>
     </nav>
     <!-- end navbar -->
@@ -37,7 +38,7 @@
     <div class="messages">
         {% with messages = get_flashed_messages() %}
           {% if messages %}
-            <ul class=flashes>
+            <div class=flashes>
             {% for message in messages %}
                 {% if message == "Logged in" or message == "Added" or message == "Logged out" %}
                     <div class="alert alert-success">
@@ -49,7 +50,7 @@
                     </div>
                 {% endif %}
             {% endfor %}
-            </ul>
+          </div>
           {% endif %}
         {% endwith %}
     </div>
@@ -67,11 +68,5 @@
             Add content here!
         {% endblock %}
     </div>
-
-<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDXbmqoGjh-BtVtOjfl8bKkOVY6sSyilUU&libraries=geometry,places"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-<script src="../static/js/script.js"></script>
-
 </body>
 </html>
-

@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, flash, redirect, session, jso
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, User, Status, Invitations, Address, UserAddress
 import requests
-import sys 
+import sys
 import os
 import json
 import random
@@ -20,7 +20,7 @@ app.secret_key = "t)6r)3s5^w)i9kahs(=^u$0-djb*6!@gs93qlfnjxh_^!gi@&_"
 
 @app.route("/", methods=["GET"])
 def index():
-    
+
     return render_template("welcome.html")
 
 
@@ -56,24 +56,17 @@ def process_registration():
         db.session.add(new_address)
         user_address = UserAddress(user_id=new_user.user_id, address_id=new_address.address_id)
         db.session.add(user_address)
-    
+
     db.session.commit()
     flash("Added")
 
     return redirect("/")
 
 
-@app.route("/login", methods=["GET"])
-def login_form():
-    """Show form for user login"""
-    
-    return render_template("login.html")
-
-
 @app.route("/login", methods=["POST"])
 def login_process():
     """Process login."""
-    
+
     # Get form variables
     email = request.form["email"]
     password = request.form["password"]
@@ -81,27 +74,23 @@ def login_process():
     # using this user to send current logged in user as sender
     user = User.query.filter_by(email=email).first()
 
-    sender = user.email
-    # create a session to hold onto current user for invitations
-    session["sender"] = sender
-    
-    logged_in_user = user.email 
-
-    session["logged_in_user"] = logged_in_user
-
     if not user:
         flash("No such user")
-        return redirect("/login")
-
-    if user.password != password:
+        return redirect("/")
+    elif user.password != password:
         flash("Incorrect password")
-        return redirect("/login")
+        return redirect("/")
+    else:
+        # create a session to hold onto current user for invitations
+        # sender and logged_in_user are the same thing
+        sender = user.email
+        session["sender"] = sender
+        logged_in_user = user.email
+        session["logged_in_user"] = logged_in_user
+        session["user_id"] = user.user_id
+        flash("Logged in")
 
-    session["user_id"] = user.user_id
-
-    flash("Logged in")
     return redirect("/search_midpoint")
-
 
 @app.route("/logout")
 def logout():
@@ -112,7 +101,7 @@ def logout():
 
     return redirect("/")
 
-     
+
 @app.route("/search_midpoint", methods=["GET"])
 def search_midpoint():
     """Render for map search."""
@@ -166,13 +155,14 @@ def make_invitations():
     print business_name
 
     receiver = check_invitation_email(invitation_recipient_email)
+
     if receiver:
         sender = session.get("sender")
         if receiver != sender:
             s = User.query.filter_by(email=sender).first()
-            response_to_invitation = Invitations(sender=s, 
-                                                receiver=receiver, 
-                                                business_address=business_address, 
+            response_to_invitation = Invitations(sender=s,
+                                                receiver=receiver,
+                                                business_address=business_address,
                                                 business_name=business_name)
             db.session.add(response_to_invitation)
             db.session.commit()
@@ -188,11 +178,6 @@ def invitations_form():
     """Show list of invitations received."""
     logged_in_user = session.get("logged_in_user")
 
-    # remove?
-    business_name = session.get("business_name")
-    business_address = session.get("business_address")
-    # remove?
-
     verified_logged_in_user = User.query.filter_by(email=logged_in_user).first()
 
     invitations = Invitations.query.filter_by(receiver=verified_logged_in_user).all()
@@ -202,11 +187,9 @@ def invitations_form():
     s = User.query.filter_by(email=logged_in_user).first()
     sent_invitations = Invitations.query.filter_by(sender=s).all()
 
-   
-    return render_template("invitations.html", 
-                            invitations=invitations, 
-                            business_address=business_address, 
-                            business_name=business_name, 
+
+    return render_template("invitations.html",
+                            invitations=invitations,
                             sent_invitations=sent_invitations)
 
 
@@ -223,7 +206,7 @@ def respond_to_invitation():
         elif invitation_response == "decline":
             find_invitation.status_id = 2
         else:
-            "hi"
+            pass
 
     db.session.commit()
 
@@ -234,7 +217,7 @@ def respond_to_invitation():
     return jsonify(response)
 
 
-def get_yelp_access_token(): 
+def get_yelp_access_token():
     """Get yelp businesses around midpoint coordinates."""
 
     # UNSAFE! need to put app_id and app_secret in config file
@@ -249,6 +232,8 @@ def get_yelp_access_token():
 
     access_token = token.json()["access_token"]
 
+    print(access_token)
+
     return access_token
 
 
@@ -256,6 +241,15 @@ def get_yelp_access_token():
 def yelp_business_search():
     lat = request.args.get("lat")
     lng = request.args.get("lng")
+    radius = request.args.get("radius")
+
+    if int(radius) > 40000:
+        radius = '40000'
+    elif int(radius) < 100:
+        radius = '100'
+    else:
+        pass
+
 
     # keeping tabs on previous input searches and adding them to options
     venue_type = request.args.get("venue_type")
@@ -264,7 +258,7 @@ def yelp_business_search():
 
     url = "https://api.yelp.com/v3/businesses/search"
     headers = {"Authorization": "bearer %s" % access_token}
-    params = {"radius": 800, "limit": 10, "term": str(venue_type), "latitude": lat, "longitude": lng}
+    params = {"radius": radius, "limit": 10, "term": str(venue_type), "sort_by": "rating", "latitude": lat, "longitude": lng}
 
     resp = requests.get(url=url, params=params, headers=headers)
 
@@ -279,7 +273,7 @@ if __name__ == "__main__":
     app.debug = False
 
     connect_to_db(app)
- 
+
     # Use the DebugToolbar
     DebugToolbarExtension(app)
 

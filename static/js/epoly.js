@@ -84,7 +84,7 @@ google.maps.LatLng.prototype.lngRadians = function() {
 
 // === A method for testing if a point is inside a polygon
 // === Returns true if poly contains point
-// === Algorithm shamelessly stolen from http://alienryderflex.com/polygon/ 
+// === Algorithm shamelessly stolen from http://alienryderflex.com/polygon/
 google.maps.Polygon.prototype.Contains = function(point) {
   var j=0;
   var oddNodes = false;
@@ -182,7 +182,7 @@ google.maps.Polygon.prototype.GetPointsAtDistance = function(metres) {
       var p2= this.getPath().getAt(i);
       var m = (next-olddist)/(dist-olddist);
       points.push(new google.maps.LatLng( p1.lat() + (p2.lat()-p1.lat())*m, p1.lng() + (p2.lng()-p1.lng())*m));
-      next += metres;    
+      next += metres;
     }
   }
   return points;
