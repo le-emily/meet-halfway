@@ -5,7 +5,9 @@ When we spend time with our friends and family, we donâ€™t really care what weâ€
 Technologies
 
    Backend: Python, Flask, PostgreSQL, SQLAlchemy
+
    Frontend: JavaScript, jQuery, AJAX, Jinja2, Bootstrap, HTML5, CSS3
+   
    APIs: Google Maps, Yelp
 
 Setup
