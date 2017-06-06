@@ -71,8 +71,13 @@ def login_process():
     email = request.form["email"]
     password = request.form["password"]
 
-    # using this user to send current logged in user as sender
     user = User.query.filter_by(email=email).first()
+    sender = user.email
+    logged_in_user = user.email
+
+    # If user already logged in, redirect -- not working :(
+    # if session["logged_in_user"]:
+    #     return redirect("/search_midpoint")
 
     if not user:
         flash("No such user")
@@ -83,9 +88,7 @@ def login_process():
     else:
         # create a session to hold onto current user for invitations
         # sender and logged_in_user are the same thing
-        sender = user.email
         session["sender"] = sender
-        logged_in_user = user.email
         session["logged_in_user"] = logged_in_user
         session["user_id"] = user.user_id
         flash("Logged in")
@@ -97,6 +100,9 @@ def logout():
     """Log out."""
 
     del session["user_id"]
+    del session["sender"]
+    del session["logged_in_user"]
+
     flash("Logged out")
 
     return redirect("/")
@@ -270,7 +276,7 @@ def yelp_business_search():
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
     # that we invoke the DebugToolbarExtension
-    app.debug = False
+    app.debug = True
 
     connect_to_db(app)
 

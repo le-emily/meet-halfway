@@ -25,6 +25,11 @@ Meet Halfway
       <option value="{{ o.name }}">{{ o.name }}</option>
       {% endfor %}
     </datalist>
+    <p>
+      <label for="amount">Minimum radius:</label>
+      <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+    </p>
+    <div id="slider-range-max"></div>
     <input type="submit" class="btn btn-default" onclick="calcRoute();"></button><br />
   </div>
 </div>

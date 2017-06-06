@@ -15,7 +15,6 @@ html, body {
   padding: 0 50px;
 }
 
-/*/searchmidpoint */
 #venue_type {
   padding-left: 10px
 }
@@ -47,6 +46,10 @@ html, body {
 
 #midpoint-form {
   text-align: center;
+}
+
+#slider-range-max {
+  width: 15%;
 }
 
 /*INVITATIONS*/

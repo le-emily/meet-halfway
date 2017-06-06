@@ -60,6 +60,19 @@ function initialize() {
   calcRoute();
 }
 
+$( function() {
+  $( "#slider-range-max" ).slider({
+    range: "max",
+    min: 1,
+    max: 50,
+    value: 1,
+    slide: function( event, ui ) {
+      $( "#amount" ).val( ui.value );
+    }
+  });
+  $( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) );
+} );
+
 function calcRoute() {
   setMapOnAll(null);
   markers = [];
@@ -67,6 +80,9 @@ function calcRoute() {
 
   var start = document.getElementById("start").value;
   var end = document.getElementById("end").value;
+
+  var radius = ($( "#amount" ).val())/100;
+
   var travelMode = google.maps.DirectionsTravelMode.DRIVING
 
   var request = {
@@ -79,8 +95,6 @@ function calcRoute() {
   // returns an efficient route path.
   directionsService.route(request, function(response, status) {
     // Response - object of geocoded_waypoints, request, routes and status
-    console.log("response: ");
-    console.log(response);
     if (status == google.maps.DirectionsStatus.OK) {
       polyline.setPath([]);
       var bounds = new google.maps.LatLngBounds();
@@ -98,13 +112,11 @@ function calcRoute() {
         if (i == 0) {
           startLocation.latlng = legs[i].start_location;
           startLocation.address = legs[i].start_address;
-          markers.push(createMarker(startLocation.latlng, "Start", startLocation.address));
-          marker = createMarker(legs[i].start_location,"Midpoint","");
-          markers.push(marker);
+          createMarker(startLocation.latlng, "Start", startLocation.address);
         }
         endLocation.latlng = legs[i].end_location;
         endLocation.address = legs[i].end_address;
-        markers.push(createMarker(endLocation.latlng, "End", endLocation.address));
+        createMarker(endLocation.latlng, "End", endLocation.address);
         var steps = legs[i].steps;
         for (j=0;j<steps.length;j++) {
           // go through each step, which are small instructions of how to get to 
@@ -122,10 +134,13 @@ function calcRoute() {
       }
       polyline.setMap(map);
       computeTotalDistance(response);
-      } else {
-        alert("directions response " + status);
-      }
-    });
+
+      putMarkerOnRoute(50,);
+      markYelpBusinessesOnMap(50, radius);
+    } else {
+      alert("directions response " + status);
+    }
+  });
 }
 
 // Sets the map on all markers in the array.
@@ -135,8 +150,7 @@ function setMapOnAll(map) {
   }
 }
 
-var totalDist = 0;
-var totalTime = 0;
+
 
 function computeTotalDistance(result) {
   totalDist = 0;
@@ -149,28 +163,21 @@ function computeTotalDistance(result) {
     totalTime += myroute.legs[i].duration.value;
   }
 
-  putMarkerOnRoute(50);
-  markYelpBusinessesOnMap(50);
-
-  totalDist = totalDist / 1000.
-
-  document.getElementById("total").innerHTML = "Total distance is: "+ totalDist + 
+  document.getElementById("total").innerHTML = "Total distance is: "+ (totalDist / 1000.) + 
     " km<br>Total time is: " + (totalTime / 60).toFixed(2) + " minutes";
 }
 
 function putMarkerOnRoute(percentage) {
-  // Multiply totalDist by 50% to get the middle.
   var distance = (percentage/100) * totalDist;
   var time = ((percentage/100) * totalTime/60).toFixed(2);
-  if (!marker) {
+  // if (!marker) {
     // GetPointAtDistance-returns a GLatLng at the specified distance along the path. 
     // The distance is specified in metres.
-    marker = createMarker(polyline.GetPointAtDistance(distance),"time: "+time,"marker");
-    markers.push(marker);
-  } else {
-    marker.setPosition(polyline.GetPointAtDistance(distance));
-    marker.setTitle("time:"+time);
-  }
+ createMarker(polyline.GetPointAtDistance(distance),"time: "+time,"marker");
+  // } else {
+  //   marker.setPosition(polyline.GetPointAtDistance(distance));
+  //   marker.setTitle("time:"+time);
+  // }
 }
 
 
@@ -264,13 +271,13 @@ var oldInfoWindow = {
 
 
 // Called in computeTotalDistance
-function markYelpBusinessesOnMap(percentage) {
+function markYelpBusinessesOnMap(percentage, radius) {
   var midpointCoords = polyline.GetPointAtDistance(((percentage/100) * totalDist));
   var venue_type = document.getElementById("venue_type_selections").value;
   var params = {"lat": midpointCoords.lat(),
                 "lng": midpointCoords.lng(),
                 "venue_type": venue_type,
-                "radius": (Math.floor(totalDist*.1))}
+                "radius": (Math.floor(totalDist*radius))}
 
   // AJAX get request to yelp_search for yelp api results. Get key business data 
   // from response for infoWindow content.
