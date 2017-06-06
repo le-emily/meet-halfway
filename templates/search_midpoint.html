@@ -17,20 +17,21 @@ Meet Halfway
   <div id="tools">
     <img src="static/img/darkgreen_MarkerA.png" alt="your_marker">
     <input type="text" name="start" id="start" value="Hackbright"/>
-    <img src="static/img/red_MarkerB.png" alt="their_mrker">
-    <input type="text" name="end" id="end" value="App Academy"/>
+    <img src="static/img/red_MarkerB.png" alt="their_marker">
+    <input type="text" name="end" id="end" value="Golden Gate Park"/>
     <input type="text" id="venue_type_selections" placeholder="type or dropdown" name="venue_type" list="venue">
     <datalist id="venue">
       {% for o in data %}
       <option value="{{ o.name }}">{{ o.name }}</option>
       {% endfor %}
     </datalist>
-    <p>
-      <label for="amount">Minimum radius:</label>
-      <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
-    </p>
-    <div id="slider-range-max"></div>
-    <input type="submit" class="btn btn-default" onclick="calcRoute();"></button><br />
+    <!-- <div> -->
+<!--       <label for="amount">Minimum radius:</label>
+      <input type="text" id="amount" readonly style="color:#f6931f; font-weight:bold;">
+      <span id="slider-range-max"></span> -->
+    <!-- </div> -->
+   
+    <input type="submit" class="btn btn-default input-submit-btn" onclick="calcRoute();"></button><br />
   </div>
 </div>
 

@@ -258,12 +258,18 @@ def yelp_business_search():
 
     # keeping tabs on previous input searches and adding them to options
     venue_type = request.args.get("venue_type")
+    print "venue_type"
+    print venue_type
+    print type(venue_type)
+    print str(venue_type)
+    if not str(venue_type):
+        venue_type = "restaurant"
 
     access_token = get_yelp_access_token()
 
     url = "https://api.yelp.com/v3/businesses/search"
     headers = {"Authorization": "bearer %s" % access_token}
-    params = {"radius": radius, "limit": 10, "term": str(venue_type) + "restaurant", "sort_by": "rating", "latitude": lat, "longitude": lng}
+    params = {"radius": radius, "limit": 10, "term": str(venue_type), "sort_by": "rating", "latitude": lat, "longitude": lng}
 
     resp = requests.get(url=url, params=params, headers=headers)
 

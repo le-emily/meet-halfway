@@ -60,18 +60,18 @@ function initialize() {
   calcRoute();
 }
 
-$( function() {
-  $( "#slider-range-max" ).slider({
-    range: "max",
-    min: 1,
-    max: 50,
-    value: 1,
-    slide: function( event, ui ) {
-      $( "#amount" ).val( ui.value );
-    }
-  });
-  $( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) );
-} );
+// $( function() {
+//   $( "#slider-range-max" ).slider({
+//     range: "max",
+//     min: 1,
+//     max: 50,
+//     value: 1,
+//     slide: function( event, ui ) {
+//       $( "#amount" ).val( ui.value );
+//     }
+//   });
+//   $( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) );
+// } );
 
 function calcRoute() {
   setMapOnAll(null);
@@ -136,7 +136,7 @@ function calcRoute() {
       computeTotalDistance(response);
 
       putMarkerOnRoute(50,);
-      markYelpBusinessesOnMap(50, radius);
+      markYelpBusinessesOnMap(50);
     } else {
       alert("directions response " + status);
     }
@@ -271,13 +271,13 @@ var oldInfoWindow = {
 
 
 // Called in computeTotalDistance
-function markYelpBusinessesOnMap(percentage, radius) {
+function markYelpBusinessesOnMap(percentage) {
   var midpointCoords = polyline.GetPointAtDistance(((percentage/100) * totalDist));
   var venue_type = document.getElementById("venue_type_selections").value;
   var params = {"lat": midpointCoords.lat(),
                 "lng": midpointCoords.lng(),
                 "venue_type": venue_type,
-                "radius": (Math.floor(totalDist*radius))}
+                "radius": (Math.floor(totalDist*.1))}
 
   // AJAX get request to yelp_search for yelp api results. Get key business data 
   // from response for infoWindow content.

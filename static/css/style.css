@@ -46,12 +46,27 @@ html, body {
 
 #midpoint-form {
   text-align: center;
+  margin: 10px 10px;
 }
 
 #slider-range-max {
-  width: 15%;
+  width: 50%;
+  left: 25%
+  right: 25%;
 }
 
+#amount {
+  width: 10%;
+}
+
+.ui-slider-track {
+    margin-left: 120px;
+}
+
+/*.input-submit-btn {
+  margin: 10px;
+}
+*/
 /*INVITATIONS*/
 .receivers_invitations,
 .sent_invitations{
