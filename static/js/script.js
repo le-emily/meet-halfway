@@ -50,6 +50,13 @@ function initialize() {
   strokeWeight: 3
   });
 
+    // autocomplete not working
+  var first_location_input = document.getElementById('start');
+  var autocomplete = new google.maps.places.Autocomplete(first_location_input);
+
+  var second_location_input = document.getElementById('end');
+  var autocomplete = new google.maps.places.Autocomplete(second_location_input);
+
   //Close infowindow when click anywhere on map
   map.addListener('click', function() {
       if(infowindow != null) {
@@ -135,7 +142,7 @@ function calcRoute() {
       polyline.setMap(map);
       computeTotalDistance(response);
 
-      putMarkerOnRoute(50,);
+      putMidpointMarkerOnRoute(50,);
       markYelpBusinessesOnMap(50);
     } else {
       alert("directions response " + status);
@@ -167,7 +174,7 @@ function computeTotalDistance(result) {
     " km<br>Total time is: " + (totalTime / 60).toFixed(2) + " minutes";
 }
 
-function putMarkerOnRoute(percentage) {
+function putMidpointMarkerOnRoute(percentage) {
   var distance = (percentage/100) * totalDist;
   var time = ((percentage/100) * totalTime/60).toFixed(2);
   // if (!marker) {
@@ -184,12 +191,7 @@ function putMarkerOnRoute(percentage) {
 
 // Route midpoint code ^^
 
-// autocomplete not working
-var first_location_input = document.getElementById('start');
-var autocomplete = new google.maps.places.Autocomplete(first_location_input);
 
-var second_location_input = document.getElementById('end');
-var autocomplete = new google.maps.places.Autocomplete(second_location_input);
 
 // no longer needed
 var oldInfoWindow = {

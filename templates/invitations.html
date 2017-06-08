@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
     {% if invite_details.status is none %}
         <div class="list_of_invitations">
             <span class="pending_status">pending </span><span>{{ invite_details.receiver.name }}</span>
-            <div class="invite_details">{{ invite_details.business_address }} {{ invite_details.business_name }}</div>
+            <div class="invite_details"> {{ invite_details.business_name }}<br>{{ invite_details.business_address }}</div>
         </div>
         <hr>
     {% else %}
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function() {
         {% else %}
           <span class="decline_invitation">{{ invite_details.status.status_type }}d</span>
         {% endif %}
-        <div class="invite_details">{{ invite_details.business_address }} {{ invite_details.business_name }}</div>
+        <div class="invite_details"><div>{{ invite_details.business_name }}</div><div>{{ invite_details.business_address }}</div></div>
         <hr>
       </div>
     {% endif %}

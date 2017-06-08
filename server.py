@@ -7,9 +7,12 @@ import sys
 import os
 import json
 import random
+from flask.ext.bcrypt import Bcrypt
+from functools import wraps
 
 
 app = Flask(__name__)
+bcrypt = Bcrypt(app)
 # app.config["SECRET_KEY"] = "my super secret key blah blah"
 app.jinja_env.undefined = StrictUndefined
 app.jinja_env.auto_reload = True
@@ -30,7 +33,7 @@ def register_form():
 
     return render_template("register.html")
 
-
+# need to change route
 @app.route("/", methods=["GET", "POST"])
 def process_registration():
     """Process registration."""
@@ -43,10 +46,13 @@ def process_registration():
     city = request.form.get("city")
     address_type = request.form.get("address_type")
 
+    # Encode password
+    hashed = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt(9))
+
     existing_user = User.query.filter_by(email=email).first()
 
     if not existing_user:
-        new_user = User(name=name, email=email, password=password)
+        new_user = User(name=name, email=email, password=hashed)
         db.session.add(new_user)
 
     existing_address = Address.query.filter_by(street_address=street_address).first()
@@ -63,6 +69,17 @@ def process_registration():
     return redirect("/")
 
 
+# Login Required Decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not 'current_user' in session:
+            return redirect('/')
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+# need to change route
 @app.route("/login", methods=["GET", "POST"])
 def login_process():
     """Process login."""
@@ -71,29 +88,27 @@ def login_process():
     email = request.form["email"]
     password = request.form["password"]
 
-    user = User.query.filter_by(email=email).first()
-    sender = user.email
-    logged_in_user = user.email
-
-    # If user already logged in, redirect -- not working :(
-    # if session["logged_in_user"]:
-    #     return redirect("/search_midpoint")
-
-    if not user:
-        flash("No such user")
-        return redirect("/")
-    elif user.password != password:
-        flash("Incorrect password")
-        return redirect("/")
-    else:
+    try:
+        user = User.query.filter_by(email=email).first()
+    # if not user:
+    #     flash("No such user")
+    #     return redirect("/")
+        if bcrypt.checkpw(password.encode('utf8'), user.password.encode('utf8')):
+            session["sender"] = sender
+            session["current_user"] = email
+            session["user_id"] = user.user_id
+            flash("Logged in")
+            return redirect("/search_midpoint")
+        else:
         # create a session to hold onto current user for invitations
         # sender and logged_in_user are the same thing
-        session["sender"] = sender
-        session["logged_in_user"] = logged_in_user
-        session["user_id"] = user.user_id
-        flash("Logged in")
-
-    return redirect("/search_midpoint")
+        # sender = user.email
+        # logged_in_user = user.email
+            flash("Incorrect password")
+            return redirect("/")
+    except:
+        flash("No user with that email")
+        return redirect("/")
 
 @app.route("/logout")
 def logout():
@@ -101,7 +116,7 @@ def logout():
 
     del session["user_id"]
     del session["sender"]
-    del session["logged_in_user"]
+    del session["current_user"]
 
     flash("Logged out")
 
@@ -109,6 +124,7 @@ def logout():
 
 
 @app.route("/search_midpoint", methods=["GET"])
+@login_required
 def search_midpoint():
     """Render for map search."""
 
@@ -180,17 +196,18 @@ def make_invitations():
 
 
 @app.route("/invitations", methods=["GET"])
+@login_required
 def invitations_form():
     """Show list of invitations received."""
-    logged_in_user = session.get("logged_in_user")
+    current_user = session.get("current_user")
 
-    verified_logged_in_user = User.query.filter_by(email=logged_in_user).first()
+    verified_logged_in_user = User.query.filter_by(email=current_user).first()
 
     invitations = Invitations.query.filter_by(receiver=verified_logged_in_user).all()
 
     # list all invites sent by user and their status
     sender = session.get("sender")
-    s = User.query.filter_by(email=logged_in_user).first()
+    s = User.query.filter_by(email=current_user).first()
     sent_invitations = Invitations.query.filter_by(sender=s).all()
 
 
