@@ -67,18 +67,18 @@ function initialize() {
   calcRoute();
 }
 
-// $( function() {
-//   $( "#slider-range-max" ).slider({
-//     range: "max",
-//     min: 1,
-//     max: 50,
-//     value: 1,
-//     slide: function( event, ui ) {
-//       $( "#amount" ).val( ui.value );
-//     }
-//   });
-//   $( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) );
-// } );
+$( function() {
+  $( "#slider-range-max" ).slider({
+    range: "max",
+    min: 1,
+    max: 50,
+    value: 1,
+    slide: function( event, ui ) {
+      $( "#amount" ).val( ui.value );
+    }
+  });
+  $( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) );
+} );
 
 function calcRoute() {
   setMapOnAll(null);
@@ -177,99 +177,10 @@ function computeTotalDistance(result) {
 function putMidpointMarkerOnRoute(percentage) {
   var distance = (percentage/100) * totalDist;
   var time = ((percentage/100) * totalTime/60).toFixed(2);
-  // if (!marker) {
-    // GetPointAtDistance-returns a GLatLng at the specified distance along the path. 
-    // The distance is specified in metres.
- createMarker(polyline.GetPointAtDistance(distance),"time: "+time,"marker");
-  // } else {
-  //   marker.setPosition(polyline.GetPointAtDistance(distance));
-  //   marker.setTitle("time:"+time);
-  // }
+  // GetPointAtDistance-returns a GLatLng at the specified distance along the path. 
+  // The distance is specified in metres.
+  createMarker(polyline.GetPointAtDistance(distance),"time: "+time,"marker");
 }
-
-
-
-// Route midpoint code ^^
-
-
-
-// no longer needed
-var oldInfoWindow = {
-  oldWindow: null
-};
-
-// move this out of initialize
-// function onSubmit(evt) {
-//   evt.preventDefault();
-//   // TO DO: this is still being assigned as a global map parameter; this is bad
-//   map = getNewMap(directionsDisplay, mapOptions);
-//   calculateAndDisplayRoute(directionsService, directionsDisplay);
-//   getStartAndEndLocationCoords(oldInfoWindow);
-//   clearYelpListing();
-// }
-
-
-// function getNewMap(directionsDisplay, mapOptions) {
-//   var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-//   directionsDisplay.setMap(map);
-
-//   return map;
-// }
-
-// function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-//   var start = document.getElementById('location_a').value;
-//   var end = document.getElementById('location_b').value;
-
-//   directionsService.route({
-//     origin: start,
-//     destination: end,
-//     travelMode: 'WALKING'
-//   }, function(response, status) {
-//     if (status === 'OK') {
-//       directionsDisplay.setDirections(response);
-//     } else {
-//       window.alert('Directions request failed due to ' + status);
-//     }
-//   });
-// }
-
-// function getStartAndEndLocationCoords(oldInfoWindow) {
-//   var location = document.getElementsByName('location');
-
-//   var startAndEndLocationCoords = [];
-//   // go through each location and geocode;?
-//   // goes through each location entered and get the geocode.
-//   for(var i=0; i < location.length; i++) {
-//     var address = location[i].value;
-//     geocoder.geocode( { 'address': address}, function(results, status) {
-//     var _lat = results[0].geometry.location.lat()
-//     var _lng = results[0].geometry.location.lng()
-//       if (status == 'OK') {
-//         startAndEndLocationCoords.push(_lat);
-//         startAndEndLocationCoords.push(_lng);
-//         if (startAndEndLocationCoords.length == 4) {
-//           // console.log('calculating midpoint')
-//           calculateMidpoint(startAndEndLocationCoords, oldInfoWindow);
-//         }
-//       } else {
-//         alert('Geocode was not successful for the following reason: ' + status);
-//       }
-//     });
-//   }
-// }
-
-// Remove?
-// function calculateMidpoint(startAndEndLocationCoords, oldInfoWindow) {
-//   var _lat = (startAndEndLocationCoords[0] + startAndEndLocationCoords[2])/2.0;
-//   var _lng = (startAndEndLocationCoords[1] + startAndEndLocationCoords[3])/2.0;
-
-//   var midpointCoords = {"lat": _lat, "lng": _lng};
-
-//   placeMidpointMarker(midpointCoords);
-//   map.setCenter(midpointCoords);
-
-//   markYelpBusinessesOnMap(midpointCoords, oldInfoWindow);
-// }
 
 
 // Called in computeTotalDistance
