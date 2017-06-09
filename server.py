@@ -9,6 +9,8 @@ import json
 import random
 from flask.ext.bcrypt import Bcrypt
 from functools import wraps
+google_maps_api_key = os.environ['GOOGLE_KEY']
+
 
 
 app = Flask(__name__)
@@ -130,7 +132,8 @@ def search_midpoint():
 
     data=[{'name':'restaurant'}, {'name':'shopping'}, {'name':'bar'}, {'name':'cafe'}]
 
-    return render_template("search_midpoint.html", data=data)
+    return render_template("search_midpoint.html", data=data, 
+        google_maps_api_key=google_maps_api_key)
 
 
 # @app.route("/friends", methods=["GET"])
