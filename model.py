@@ -108,19 +108,19 @@ class UserAddress(db.Model):
 ##############################################################################
 # Helper functions
 
-# def fill_sample_data():
-#     """ Fill database with sample data to start with """
+def fill_sample_data():
+    """ Fill database with sample data to start with """
 
-#     # Users
-#     user1 = User(name="User1", email="user1@gmail.com", password=bcrypt.hashpw("password", bcrypt.gensalt(9)), 
-#         address="1234 Hackbright Way")
+    # Users
+    user1 = User(name="User1", email="user1@gmail.com", password=bcrypt.hashpw("password", bcrypt.gensalt(9)), 
+        address="1234 Hackbright Way")
 
-#     user2 = User(name="User2", email="user2@gmail.com", password=bcrypt.hashpw("password", bcrypt.gensalt(9)), 
-#         address="1234 Hackbright Way")
+    user2 = User(name="User2", email="user2@gmail.com", password=bcrypt.hashpw("password", bcrypt.gensalt(9)), 
+        address="1234 Hackbright Way")
 
-#     db.session.add(user1)
-#     db.session.add(user2)
-#     db.session.commit()
+    db.session.add(user1)
+    db.session.add(user2)
+    db.session.commit()
 
 
 def connect_to_db(app):

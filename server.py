@@ -7,15 +7,15 @@ import sys
 import os
 import json
 import random
-from flask.ext.bcrypt import Bcrypt
+# import bcrypt
+# from flask.ext.bcrypt import generate_password_hash, check_password_hash
 from functools import wraps
-google_maps_api_key = os.environ['GOOGLE_KEY']
+# google_maps_api_key = os.environ['GOOGLE_KEY']
 
 
 
 app = Flask(__name__)
-bcrypt = Bcrypt(app)
-# app.config["SECRET_KEY"] = "my super secret key blah blah"
+# bcrypt = Bcrypt(app)
 app.jinja_env.undefined = StrictUndefined
 app.jinja_env.auto_reload = True
 
@@ -49,13 +49,17 @@ def process_registration():
     address_type = request.form.get("address_type")
 
     # Encode password
-    hashed = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt(9))
+    # hashed = bcrypt.generate_password_hash(password)
 
     existing_user = User.query.filter_by(email=email).first()
 
+    # Check new user and log in 
     if not existing_user:
-        new_user = User(name=name, email=email, password=hashed)
+        new_user = User(name=name, email=email, password=password)
+        session['current_user'] = email
         db.session.add(new_user)
+        db.session.commit()
+        flash("You are now registered and logged in!")
 
     existing_address = Address.query.filter_by(street_address=street_address).first()
 
@@ -64,8 +68,8 @@ def process_registration():
         db.session.add(new_address)
         user_address = UserAddress(user_id=new_user.user_id, address_id=new_address.address_id)
         db.session.add(user_address)
-
-    db.session.commit()
+        db.session.commit()
+    
     flash("Added")
 
     return redirect("/")
@@ -87,25 +91,19 @@ def login_process():
     """Process login."""
 
     # Get form variables
-    email = request.form["email"]
-    password = request.form["password"]
+    user_email = request.form["email"]
+    user_password = request.form["password"]
 
     try:
-        user = User.query.filter_by(email=email).first()
-    # if not user:
-    #     flash("No such user")
-    #     return redirect("/")
-        if bcrypt.checkpw(password.encode('utf8'), user.password.encode('utf8')):
-            session["sender"] = sender
-            session["current_user"] = email
-            session["user_id"] = user.user_id
+        user = User.query.filter_by(email=user_email).first()
+        print "USER", user
+        print "user.password", user.password 
+        print "user_password", user_password
+        if user.password == user_password:
+            session["current_user"] = user_email
             flash("Logged in")
             return redirect("/search_midpoint")
         else:
-        # create a session to hold onto current user for invitations
-        # sender and logged_in_user are the same thing
-        # sender = user.email
-        # logged_in_user = user.email
             flash("Incorrect password")
             return redirect("/")
     except:
@@ -116,9 +114,9 @@ def login_process():
 def logout():
     """Log out."""
 
-    del session["user_id"]
-    del session["sender"]
     del session["current_user"]
+    del session["business_name"]
+    del session["business_address"]
 
     flash("Logged out")
 
@@ -132,8 +130,7 @@ def search_midpoint():
 
     data=[{'name':'restaurant'}, {'name':'shopping'}, {'name':'bar'}, {'name':'cafe'}]
 
-    return render_template("search_midpoint.html", data=data, 
-        google_maps_api_key=google_maps_api_key)
+    return render_template("search_midpoint.html", data=data)
 
 
 # @app.route("/friends", methods=["GET"])
@@ -174,15 +171,10 @@ def make_invitations():
     session["business_address"] = business_address
     session["business_name"] = business_name
 
-    print "BUSINESS ADDRESS"
-    print business_address
-    print "BUSINESS NAME"
-    print business_name
-
     receiver = check_invitation_email(invitation_recipient_email)
 
     if receiver:
-        sender = session.get("sender")
+        sender = session.get("current_user")
         if receiver != sender:
             s = User.query.filter_by(email=sender).first()
             response_to_invitation = Invitations(sender=s,
@@ -204,12 +196,12 @@ def invitations_form():
     """Show list of invitations received."""
     current_user = session.get("current_user")
 
-    verified_logged_in_user = User.query.filter_by(email=current_user).first()
+    receiver = User.query.filter_by(email=current_user).first()
 
-    invitations = Invitations.query.filter_by(receiver=verified_logged_in_user).all()
+    invitations = Invitations.query.filter_by(receiver=receiver).all()
 
     # list all invites sent by user and their status
-    sender = session.get("sender")
+    sender = session.get("current_user")
     s = User.query.filter_by(email=current_user).first()
     sent_invitations = Invitations.query.filter_by(sender=s).all()
 
@@ -276,12 +268,9 @@ def yelp_business_search():
     else:
         pass
 
-    # keeping tabs on previous input searches and adding them to options
     venue_type = request.args.get("venue_type")
-    print "venue_type"
-    print venue_type
-    print type(venue_type)
-    print str(venue_type)
+
+    # Default venue to restaurants if not indicated
     if not str(venue_type):
         venue_type = "restaurant"
 
