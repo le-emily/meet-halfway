@@ -10,7 +10,9 @@ import random
 # import bcrypt
 # from flask.ext.bcrypt import generate_password_hash, check_password_hash
 from functools import wraps
-# google_maps_api_key = os.environ['GOOGLE_KEY']
+google_maps_api_key = os.environ['GOOGLE_KEY']
+yelp_app_id = os.environ['YELP_APP_ID']
+yelp_app_secret = os.environ['YELP_APP_SECRET']
 
 
 
@@ -25,7 +27,7 @@ app.secret_key = "t)6r)3s5^w)i9kahs(=^u$0-djb*6!@gs93qlfnjxh_^!gi@&_"
 
 @app.route("/", methods=["GET"])
 def index():
-
+    """Render welcome page."""
     return render_template("welcome.html")
 
 
@@ -226,6 +228,8 @@ def respond_to_invitation():
         else:
             pass
 
+    # delete_invitation = request.form.get("")
+
     db.session.commit()
 
     print find_invitation
@@ -236,15 +240,11 @@ def respond_to_invitation():
 
 
 def get_yelp_access_token():
-    """Get yelp businesses around midpoint coordinates."""
-
-    # UNSAFE! need to put app_id and app_secret in config file
-    app_id = "CCbMJ0qYlYAB3GJ8DA-pFg"
-    app_secret = "pgbsg6iN7p8Sg767MFJjmmW0cia3Cad9X8IGJjZLCNIMUFbKzgb45MCvGdAapxlM"
+    """Get yelp access token."""
 
     data = {"grant_type": "client_credentials",
-            "client_id": app_id,
-            "client_secret": app_secret}
+            "client_id": yelp_app_id,
+            "client_secret": yelp_app_secret}
 
     token = requests.post("https://api.yelp.com/oauth2/token", data=data)
 
@@ -257,6 +257,7 @@ def get_yelp_access_token():
 
 @app.route("/yelp_search.json", methods=["GET"])
 def yelp_business_search():
+    """Get yelp businesses around midpoint coordinates."""
     lat = request.args.get("lat")
     lng = request.args.get("lng")
     radius = request.args.get("radius")

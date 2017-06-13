@@ -38,7 +38,11 @@ document.addEventListener("DOMContentLoaded", function() {
             <input type="radio" name="selection" value="accept" {% if invitation.status_id == 1 %}checked="checked"{% endif %}> Accept </input>
             <input type="radio" name="selection" value="decline" {% if invitation.status_id == 2 %}checked="checked"{% endif %}> Decline </input>
             <input type="hidden" name="invitation_id" value={{ invitation.invitation_id }}> </input><br>
-            <button class="btn btn-default invitation_response" type="submit" id="invitation_response" name="invitation_response" value="Submit">Submit</button><span id="invite_success_{{invitation.invitation_id}}"></span>
+            <button class="btn btn-default invitation_response" type="submit" id="invitation_response" name="invitation_response" value="Submit">Submit</button><span id="invite_success_{{invitation.invitation_id}}">
+        </form>
+        <form action="/invitations" method=post class="delete_invitation">
+        <input type=hidden value="{{ invitation.invitation_id }}" name="movie_to_delete"></input>
+        <button class="btn btn-default delete_invitation" type="submit" id="delete_invitation" name="delete_invitation" value="Submit">Delete</button></input>
         </form>
     </div>
     <hr>

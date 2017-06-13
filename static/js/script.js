@@ -50,7 +50,7 @@ function initialize() {
   strokeWeight: 3
   });
 
-    // autocomplete not working
+  // autocomplete not working
   var first_location_input = document.getElementById('start');
   var autocomplete = new google.maps.places.Autocomplete(first_location_input);
 
@@ -67,18 +67,19 @@ function initialize() {
   calcRoute();
 }
 
-$( function() {
-  $( "#slider-range-max" ).slider({
-    range: "max",
-    min: 1,
-    max: 50,
-    value: 1,
-    slide: function( event, ui ) {
-      $( "#amount" ).val( ui.value );
-    }
-  });
-  $( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) );
-} );
+// $( function() {
+//   $( "#slider-range-max" ).slider({
+//     range: "max",
+//     min: 1,
+//     max: 50,
+//     value: 1,
+//     slide: function( event, ui ) {
+//       $( "#amount" ).val( ui.value );
+//     }
+//   });
+//   $( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) );
+//   console.log($( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) ));
+// } );
 
 function calcRoute() {
   setMapOnAll(null);
@@ -88,7 +89,8 @@ function calcRoute() {
   var start = document.getElementById("start").value;
   var end = document.getElementById("end").value;
 
-  var radius = ($( "#amount" ).val())/100;
+  // var radius = $( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) );
+  // console.log(radius);
 
   var travelMode = google.maps.DirectionsTravelMode.DRIVING
 
