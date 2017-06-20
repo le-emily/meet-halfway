@@ -50,7 +50,6 @@ function initialize() {
   strokeWeight: 3
   });
 
-  // autocomplete not working
   var first_location_input = document.getElementById('start');
   var autocomplete = new google.maps.places.Autocomplete(first_location_input);
 
@@ -63,23 +62,10 @@ function initialize() {
         infowindow.close();
       }
   });
+
   directionsDisplay.setMap(map);
   calcRoute();
 }
-
-// $( function() {
-//   $( "#slider-range-max" ).slider({
-//     range: "max",
-//     min: 1,
-//     max: 50,
-//     value: 1,
-//     slide: function( event, ui ) {
-//       $( "#amount" ).val( ui.value );
-//     }
-//   });
-//   $( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) );
-//   console.log($( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) ));
-// } );
 
 function calcRoute() {
   setMapOnAll(null);
@@ -89,10 +75,7 @@ function calcRoute() {
   var start = document.getElementById("start").value;
   var end = document.getElementById("end").value;
 
-  // var radius = $( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) );
-  // console.log(radius);
-
-  var travelMode = google.maps.DirectionsTravelMode.DRIVING
+  var travelMode = document.getElementById("mode").value;
 
   var request = {
       origin: start,
@@ -197,6 +180,23 @@ function markYelpBusinessesOnMap(percentage) {
   // AJAX get request to yelp_search for yelp api results. Get key business data 
   // from response for infoWindow content.
   $.get("/yelp_search.json", params, function(yelpResults) {
+    var search_params = {"business_id": yelpResults[i].id}
+          // yelp_review_ajax_call(search_params);
+    var reviews = {};
+    $.get("/yelp_reviews.json", 
+      search_params, 
+      function(yelpReviewsResults) {
+        debugger;
+        console.log('YELPREVIEWRESULTS:');
+        console.log(yelpReviewResults);
+        for(var i=0; i < yelpReviewResults.length; i++) {            
+          for(var j=0; j<=5; j++) {
+            // Error! Uncaught ReferenceError: yelpReviewsResult is not defined
+            reviews[yelpReviewsResult[j].user.name] = yelpReviewsResult[j].text;
+          }
+        }
+    });
+    
     for(let i=0; i < yelpResults.length; i++) {
       if(yelpResults[i]['location']['address1'] !== "" && yelpResults[i]['location']['address1'] !== null) {
         address = yelpResults[i]['location']['address1'] + " " + yelpResults[i]['location']['city'] + " " + yelpResults[i]['location']['state'];
@@ -230,14 +230,17 @@ function markYelpBusinessesOnMap(percentage) {
 
           var coordsOfOneBusiness = {"lat": latOfBusiness, "lng": lngOfBusiness};
 
+          var image_url = yelpResults[i]['image_url']
 
           var yelpBusinessDict = {
             "complete_business_address": complete_business_address,
             "business_phone": business_phone,
             "image_url": yelpResults[i].image_url,
-            "name": name
+            "name": name,
+            "rating": rating,
+            "image_url": image_url
           }
-
+          
           var yelpBusinessInfowindowDetails =
             '<div id="content">'+
               '<h3 id="firstHeading" class="firstHeading">' + name + '</h3>' +
@@ -319,28 +322,101 @@ function markYelpBusinessesOnMap(percentage) {
               );
             });
           }
-          showBusinessBelowMapOnBottomDiv(yelpBusinessDict);
+
+          // ajax get rquest used to be here!!!
+          showBusinessBelowMapOnBottomDiv(yelpBusinessDict, reviews);
         } else {
           alert('Geocode was not successful for the following reason: ' + status);
         }
+
       });
       }
     }
   });
-}
+}         
 
 
-function showBusinessBelowMapOnBottomDiv(yelpBusinessDict) {
+// function yelp_review_ajax_call(search_params) {
+//   var reviews = {};
+//   $.get("/yelp_reviews.json", 
+//     search_params, 
+//     function(yelpReviewsResults) {
+//       console.log('YELPREVIEWRESULTS:');
+//       console.log(yelpReviewResults);
+//       for(var i=0; i < yelpReviewResults.length; i++) {            
+//         for(var j=0; j<=5; j++) {
+//           // Error! Uncaught ReferenceError: yelpReviewsResult is not defined
+//           reviews[yelpReviewsResult[j].user.name] = yelpReviewsResult[j].text;
+//         }
+//       }
+//   });
+//   return reviews
+// }
+
+
+function showBusinessBelowMapOnBottomDiv(yelpBusinessDict, reviews) {
+  // Set ratings to yelp stars image
+  if(yelpBusinessDict.rating == 0) {
+    rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_0.png" alt="star ratings">';
+  } else if(yelpBusinessDict.rating == 1) {
+    rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_1.png" alt="star ratings">';
+  } else if(yelpBusinessDict.rating == 1.5) {
+    rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_1_half.png" alt="star ratings">';
+  } else if(yelpBusinessDict.rating == 2) {
+    rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_2.png" alt="star ratings">';
+  } else if(yelpBusinessDict.rating == 2.5) {
+    rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_2_half.png" alt="star ratings">';
+  } else if(yelpBusinessDict.rating == 3) {
+    rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_3.png" alt="star ratings">';
+  } else if(yelpBusinessDict.rating == 3.5) {
+    rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_3_half.png" alt="star ratings">';
+  } else if(yelpBusinessDict.rating == 4) {
+    rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_4.png" alt="star ratings">';
+  } else if(yelpBusinessDict.rating == 4.5) {
+    rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_4_half.png" alt="star ratings">';
+  } else{
+    rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_5.png" alt="star ratings">';
+  };
+
   var yelpBusinessInfowindowDetails =
-    '<div id="bodyContent">'+
-    '<h3 id="firstHeading" class="firstHeading">' + name + '</h3>' +
-      '<p>' + yelpBusinessDict.name + '<br>' +
-        yelpBusinessDict.complete_business_address + '<br>' +
-        yelpBusinessDict.business_phone + '<br>' +
-      '</p>' +
-    '</div>' + '<hr>';
+    '<div class="row">'+
+    // '<div class="wrap">' + 
 
+      '<div class="col-sm-1 business-image">' +
+        '<img src='+ yelpBusinessDict.image_url + ' class="business_image" alt="Business Image" height="60" width="60">' +
+      '</div>' +
+
+      '<div class="col-sm-6">' +
+        yelpBusinessDict.name + '<br>' +
+        yelpBusinessDict.complete_business_address + '<br>' +
+        '<a class="readmorebtn">Read more</a>' + 
+        '<p class="more">' + 
+          yelpBusinessDict.business_phone + '<br>' + rating + 
+        '</p>' +
+      '</div>' +
+    '</div>' + 
+    '<hr>';
+  
   $("#yelp_business_row").append(yelpBusinessInfowindowDetails);
+
+  var moreText = "Read more",
+      lessText = "Read less",
+      moreButton = $("a.readmorebtn");
+
+  moreButton.click(function () {
+    var $this = $(this);
+    $this.text($this.text() == moreText ? lessText : moreText).next("p.more").slideToggle("fast");
+  });
+
+  // limit reviews per business to 5
+  // for(var i=0; i<reviews.length; i++) {
+  //   if(i == reviews.length - 1) {
+  //     $("#yelp_business_row").append(reviews[i] + '<hr>');
+  //   }
+  //   $("#yelp_business_row").append(reviews[i]);
+  // }
+
+
 }
 
 
@@ -348,7 +424,8 @@ function clearYelpListing() {
   $("#yelp_business_row").empty();
 }
 
-$(".alert-success").fadeOut(3000);
+$(".alert-success").fadeIn()
+                  .fadeOut(3000);
 
 // DOMContentLoaded event is fired when the initial HTML document has been completely 
 // loaded and parsed, without waiting for stylesheets, images, and subframes to finish 

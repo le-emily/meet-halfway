@@ -1,3 +1,4 @@
+
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
@@ -132,7 +133,7 @@ def search_midpoint():
 
     data=[{'name':'restaurant'}, {'name':'shopping'}, {'name':'bar'}, {'name':'cafe'}]
 
-    return render_template("search_midpoint.html", data=data)
+    return render_template("search_midpoint.html", data=data, google_maps_api_key=google_maps_api_key)
 
 
 # @app.route("/friends", methods=["GET"])
@@ -228,7 +229,10 @@ def respond_to_invitation():
         else:
             pass
 
-    # delete_invitation = request.form.get("")
+    if find_invitation:
+        if delete_invitation:
+            db.session.delete(find_invitation)
+
 
     db.session.commit()
 
@@ -253,6 +257,15 @@ def get_yelp_access_token():
     print(access_token)
 
     return access_token
+
+
+@app.route('/<invitation_id>/delete', methods=['POST'])
+def delete_invitation(invitation_id):
+    """Delete view that takes an id to delete invitation from database."""
+    invitation = Record.query.get_or_404(id)
+    db.session.delete(r)
+    db.session.commit()
+    return redirect(url_for('index'))
 
 
 @app.route("/yelp_search.json", methods=["GET"])
@@ -287,6 +300,21 @@ def yelp_business_search():
 
     return jsonify(result)
 
+@app.route("/yelp_reviews.json", methods=["GET"])
+def yelp_reviews():
+    """Get business reviews."""
+    business_id = request.args.get("business_id")
+
+    access_token = get_yelp_access_token()
+
+    headers = {"Authorization": "bearer %s" % access_token}
+    url = 'https://api.yelp.com/v3/businesses/' + business_id +'/reviews'
+
+    resp = requests.get(url=url, headers=headers)
+
+    result = resp.json()["reviews"]
+
+    return jsonify(result)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point

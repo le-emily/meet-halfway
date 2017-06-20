@@ -40,7 +40,7 @@ html, body {
   margin-top: 15px;
   border: 1px white;
   border-radius: 10px;
-  padding: 10px;
+  padding: 15px;
   box-shadow: 0 0 10px #000
 }
 
@@ -63,10 +63,10 @@ html, body {
     margin-left: 120px;
 }
 
-/*.input-submit-btn {
-  margin: 10px;
+.business-image {
+  padding-top: 5px;
 }
-*/
+
 /*INVITATIONS*/
 .receivers_invitations,
 .sent_invitations{

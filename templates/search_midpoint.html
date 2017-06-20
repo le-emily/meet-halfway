@@ -14,7 +14,7 @@ Meet Halfway
 
 {% block content %}
 <div class="form-group" id="midpoint-form">
-  <div id="tools">
+  <!-- <div id="tools"> -->
     <img src="static/img/darkgreen_MarkerA.png" alt="your_marker">
     <input type="text" name="start" id="start" value="Hackbright"/>
     <img src="static/img/red_MarkerB.png" alt="their_marker">
@@ -25,14 +25,19 @@ Meet Halfway
       <option value="{{ o.name }}">{{ o.name }}</option>
       {% endfor %}
     </datalist>
-    <!-- <div> -->
-<!--       <label for="amount">Minimum radius:</label>
-      <input type="text" name="radius" id="amount" readonly style="color:#f6931f; font-weight:bold;">
-      <div id="slider-range-max"></div> -->
-    <!-- </div> -->
+
+    <span id="floating-panel">
+    <b>Mode of Travel: </b>
+    <select id="mode">
+      <option value="DRIVING">Driving</option>
+      <option value="WALKING">Walking</option>
+      <option value="BICYCLING">Bicycling</option>
+      <option value="TRANSIT">Transit</option>
+    </select>
+    </span>
    
     <input type="submit" class="btn btn-default input-submit-btn" onclick="calcRoute();"></button>
-  </div>
+  <!-- </div> -->
 </div>
 
   <div class="row">
@@ -49,7 +54,13 @@ Meet Halfway
   </div>
 
   <div class="row" id="yelp_business_row">
-    <hr>
+   <!--  <div class="show-hide-text">
+    <a id="show-more" class="show-less" href="#show-less">Show less</a>
+    <a id="show-less" class="show-more" href="#show-more">Show more</a>
+    <p>
+      Lorem Ipsum is simply dummy text of  the printing and typesetting industry...
+    </p> -->
   </div>
+  
 </div>
 {% endblock %}
