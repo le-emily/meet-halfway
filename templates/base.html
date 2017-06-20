@@ -24,8 +24,8 @@
           <li><a href="/invitations">invites</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-          {% if "user_id" in session %}
-            <p class="navbar-text">hello, {{ session["sender"] }}!</p>
+          {% if "current_user" in session %}
+            <p class="navbar-text">hello, {{ session["current_user"] }}!</p>
             <p class="navbar-text"><a href="/logout">logout?</a></p>
           {% else %}
             <p class="navbar-text"><a href="/">Login</a></p>

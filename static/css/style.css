@@ -67,6 +67,18 @@ html, body {
   padding-top: 5px;
 }
 
+p.more {
+    display:none;
+}
+
+a.readmorebtn {
+    cursor:pointer;
+}
+
+a.readmorebtn:hover {
+    border-bottom:1px black solid;
+}
+
 /*INVITATIONS*/
 .receivers_invitations,
 .sent_invitations{
@@ -89,10 +101,6 @@ html, body {
 .pending_status {
   color: orange;
   font-weight: bold;
-}
-
-.pending_status {
-  /*color: dark-yellow;*/
 }
 
 /*BASE*/

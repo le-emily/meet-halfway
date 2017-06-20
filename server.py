@@ -75,7 +75,7 @@ def process_registration():
     
     flash("Added")
 
-    return redirect("/")
+    return redirect("/search_midpoint")
 
 
 # Login Required Decorator
@@ -88,7 +88,6 @@ def login_required(f):
     return decorated_function
 
 
-# need to change route
 @app.route("/login", methods=["GET", "POST"])
 def login_process():
     """Process login."""
@@ -118,8 +117,6 @@ def logout():
     """Log out."""
 
     del session["current_user"]
-    del session["business_name"]
-    del session["business_address"]
 
     flash("Logged out")
 
@@ -135,19 +132,6 @@ def search_midpoint():
 
     return render_template("search_midpoint.html", data=data, google_maps_api_key=google_maps_api_key)
 
-
-# @app.route("/friends", methods=["GET"])
-# def friends_list():
-#     """Show list of friends."""
-
-#     user_emails = []
-
-#     users = User.query.all()
-
-#     for user in users:
-#         user_emails.append(user)
-
-#     return render_template("friends_list.html", user_emails=user_emails)
 
 @app.route("/invitation_receipient_email", methods=["GET"])
 def check_invitation_email(invitation_recipient_email):
@@ -259,13 +243,13 @@ def get_yelp_access_token():
     return access_token
 
 
-@app.route('/<invitation_id>/delete', methods=['POST'])
-def delete_invitation(invitation_id):
-    """Delete view that takes an id to delete invitation from database."""
-    invitation = Record.query.get_or_404(id)
-    db.session.delete(r)
-    db.session.commit()
-    return redirect(url_for('index'))
+# @app.route('/<invitation_id>/delete', methods=['POST'])
+# def delete_invitation(invitation_id):
+#     """Delete view that takes an id to delete invitation from database."""
+#     invitation = Record.query.get_or_404(id)
+#     db.session.delete(r)
+#     db.session.commit()
+#     return redirect(url_for('index'))
 
 
 @app.route("/yelp_search.json", methods=["GET"])
