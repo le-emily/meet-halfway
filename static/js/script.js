@@ -186,13 +186,14 @@ function markYelpBusinessesOnMap(percentage) {
     $.get("/yelp_reviews.json", 
       search_params, 
       function(yelpReviewsResults) {
-        debugger;
         console.log('YELPREVIEWRESULTS:');
-        console.log(yelpReviewResults);
-        for(var i=0; i < yelpReviewResults.length; i++) {            
-          for(var j=0; j<=5; j++) {
-            // Error! Uncaught ReferenceError: yelpReviewsResult is not defined
-            reviews[yelpReviewsResult[j].user.name] = yelpReviewsResult[j].text;
+        console.log(yelpReviewsResults);
+        for(var i=0; i < yelpReviewsResults.length; i++) {       
+          if(yelpReviewsResults[i].user.name !== null && yelpReviewsResults[i].user.name !== "") {  
+            debugger;   
+            var name = yelpReviewsResult[i].user.name;
+            var text = yelpReviewsResult[i].text;
+            reviews.name = text;
           }
         }
     });
@@ -389,34 +390,81 @@ function showBusinessBelowMapOnBottomDiv(yelpBusinessDict, reviews) {
       '<div class="col-sm-6">' +
         yelpBusinessDict.name + '<br>' +
         yelpBusinessDict.complete_business_address + '<br>' +
-        '<a class="readmorebtn">Read more</a>' + 
+
         '<p class="more">' + 
           yelpBusinessDict.business_phone + '<br>' + rating + 
         '</p>' +
+      '</div>' + 
+      '<div class="col-sm-3">' +
+        '<button type="button" class=".btn readmorebtn">more info</button>' +
+        '<form id="inviteForm">' +
+          'E-mail: ' + '<br>' +
+          '<input type="text" id="inviteEmail" name="inviteEmail" value="kevin@gmail.com">' +
+          '<span>' + '<button type="submit" class="inviteFriendButton" value="submit">invite</button>' +
+          '</span>' +
+          '<span id="successFailureMessage"></span>' +
+        '</form>' +
       '</div>' +
     '</div>' + 
     '<hr>';
   
   $("#yelp_business_row").append(yelpBusinessInfowindowDetails);
 
-  var moreText = "Read more",
-      lessText = "Read less",
-      moreButton = $("a.readmorebtn");
+  var moreText = "more info",
+      lessText = "less info",
+      moreButton = $(".readmorebtn");
 
   moreButton.click(function () {
     var $this = $(this);
     $this.text($this.text() == moreText ? lessText : moreText).next("p.more").slideToggle("fast");
   });
 
-  // limit reviews per business to 5
-  // for(var i=0; i<reviews.length; i++) {
-  //   if(i == reviews.length - 1) {
-  //     $("#yelp_business_row").append(reviews[i] + '<hr>');
-  //   }
-  //   $("#yelp_business_row").append(reviews[i]);
+  ///////////////////////////////////////////////
+  // function inviteFriend() {
+    $(".inviteFriendButton").click(function(evt){
+      evt.preventDefault();
+
+      var emailOfPersonInvited = document.getElementById("inviteEmail").value;
+
+      // AJAX post requst to add_invitation to invitation with email, 
+      // businessAddress, and name for receiver, business_address, and 
+      // business_name for invitation instance respectively.
+
+      $.post(
+        url="/add_invitation",
+        data= {"email": emailOfPersonInvited,
+                "businessAddress": yelpBusinessDict.complete_business_address,
+                "businessName": yelpBusinessDict.name},
+        // check for valid email, need to be a registered user to be Ok
+        function(result){
+          if(result["status"] !== "Ok") {
+            console.log("invalid email!!! :(");
+            var invitation_failed_message = '<div>' +
+              data["email"] + " is an invalid email!" + " Please try again."
+              '</div>';
+            $("#successFailureMessage").html(invitation_failed_message)
+                                        .fadeIn()
+                                        .fadeOut(3000)
+
+          } else {
+            var invitation_success_message = '<div>' +
+              result["recipient_name"] +  " has been invited to " + yelpBusinessDict.name + "."
+              '</div>';
+            try {
+            $("#successFailureMessage").html(invitation_success_message)
+                                        .fadeIn()
+                                        .fadeOut(3000)
+            }
+            catch(err) {
+              console.log(err.message);
+            }
+          }
+          setTimeout(function() { $("#successFailureMessage").val('');}, 6000);
+        }
+      );
+    });
   // }
-
-
+///////////////////////////////////////////////////////////////////
 }
 
 

@@ -192,7 +192,6 @@ def invitations_form():
     s = User.query.filter_by(email=current_user).first()
     sent_invitations = Invitations.query.filter_by(sender=s).all()
 
-
     return render_template("invitations.html",
                             invitations=invitations,
                             sent_invitations=sent_invitations)
@@ -213,9 +212,9 @@ def respond_to_invitation():
         else:
             pass
 
-    if find_invitation:
-        if delete_invitation:
-            db.session.delete(find_invitation)
+    # if find_invitation:
+    #     if delete_invitation:
+    #         db.session.delete(find_invitation)
 
 
     db.session.commit()
@@ -242,16 +241,32 @@ def get_yelp_access_token():
 
     return access_token
 
+@app.route("/delete-invitation/<invitation_id>")
+@login_required
+def delete_invitation_details(invitation_id):
+    """Render delete-invitation template."""
+    # invitation_id is passed into function from app.route 
+    invitation = Invitations.query.filter_by(invitation_id=invitation_id).first()
+    print "INVITATION", invitation
 
-# @app.route('/<invitation_id>/delete', methods=['POST'])
-# def delete_invitation(invitation_id):
-#     """Delete view that takes an id to delete invitation from database."""
-#     invitation = Record.query.get_or_404(id)
-#     db.session.delete(r)
-#     db.session.commit()
-#     return redirect(url_for('index'))
+    return render_template('delete_invitation.html', invitation=invitation)
 
 
+@app.route("/delete-invitation/<invitation_id>", methods=['POST'])
+@login_required
+def delete_invitation(invitation_id):
+    """Delete invitation row from database once user clicks delete."""
+    import pdb;pdb.set_trace()
+    invitation = Invitations.query.get(invitation_id)
+
+    print "INVITATION", invitation
+
+    db.session.delete(invitation)
+    db.session.commit()
+    flash("Invitation successfully deleted!")
+
+    return redirect("/invitations")
+    
 @app.route("/yelp_search.json", methods=["GET"])
 def yelp_business_search():
     """Get yelp businesses around midpoint coordinates."""

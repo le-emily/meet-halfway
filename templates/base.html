@@ -16,7 +16,9 @@
     <nav class="navbar navbar-default">
       <div class="container-fluid">
         <div class="navbar-header">
-          <a class="navbar-brand" href="/">Meet Halfway</a>
+          <a class="navbar-brand" href="/">
+            <span><img src="../static/img/pin_logo.png" alt="pin-logo" style="width:25px;height:25px"></span>Meet Halfway
+          </a>
         </div>
         <ul class="nav navbar-nav navbar-left">
           <li><a href="/">home</a></li>
@@ -47,8 +49,12 @@
                         {{ message }}
                     </div>
                 {% else %}
-                    <div class="alert alert-warning">
+                   <!--  <div class="alert alert-warning">
                         {{ message }}
+                    </div> -->
+                    <div class="alert alert-warning alert-dismissible" style='margin:10px;' role="alert">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      <strong>Sorry!</strong> There is no user with that username or password.
                     </div>
                 {% endif %}
             {% endfor %}
