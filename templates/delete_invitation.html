@@ -9,7 +9,8 @@
   <div>{{ invitation.business_name }}</div><div>{{ invitation.business_address }}</div>
   <p><strong>***Deleting this invitation will delete it forever.***</strong></p>
 <!-- <input type="submit" value="Delete" /> -->
-  <button class="btn btn-warning delete_invitation" type="submit" class="delete_invitation" name="delete" value="Delete">Delete</button>
+    <input type="hidden" name="invitation_id" value={{ invitation.invitation_id }}> </input>
+  <button class="btn btn-warning delete_invitation" type="submit">Delete</button>
 </form>
 
 {% endblock %}

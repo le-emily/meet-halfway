@@ -241,13 +241,13 @@ def get_yelp_access_token():
 
     return access_token
 
-@app.route("/delete-invitation/<invitation_id>")
+@app.route("/delete-invitation/<invitation_id>", methods=["GET"])
 @login_required
 def delete_invitation_details(invitation_id):
     """Render delete-invitation template."""
     # invitation_id is passed into function from app.route 
     invitation = Invitations.query.filter_by(invitation_id=invitation_id).first()
-    print "INVITATION", invitation
+    print "INVITATION", invitation, invitation_id
 
     return render_template('delete_invitation.html', invitation=invitation)
 
@@ -256,10 +256,7 @@ def delete_invitation_details(invitation_id):
 @login_required
 def delete_invitation(invitation_id):
     """Delete invitation row from database once user clicks delete."""
-    import pdb;pdb.set_trace()
-    invitation = Invitations.query.get(invitation_id)
-
-    print "INVITATION", invitation
+    invitation = Invitations.query.filter_by(invitation_id=request.form.get('invitation_id')).first()
 
     db.session.delete(invitation)
     db.session.commit()

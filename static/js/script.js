@@ -180,24 +180,6 @@ function markYelpBusinessesOnMap(percentage) {
   // AJAX get request to yelp_search for yelp api results. Get key business data 
   // from response for infoWindow content.
   $.get("/yelp_search.json", params, function(yelpResults) {
-    var search_params = {"business_id": yelpResults[i].id}
-          // yelp_review_ajax_call(search_params);
-    var reviews = {};
-    $.get("/yelp_reviews.json", 
-      search_params, 
-      function(yelpReviewsResults) {
-        console.log('YELPREVIEWRESULTS:');
-        console.log(yelpReviewsResults);
-        for(var i=0; i < yelpReviewsResults.length; i++) {       
-          if(yelpReviewsResults[i].user.name !== null && yelpReviewsResults[i].user.name !== "") {  
-            debugger;   
-            var name = yelpReviewsResult[i].user.name;
-            var text = yelpReviewsResult[i].text;
-            reviews.name = text;
-          }
-        }
-    });
-    
     for(let i=0; i < yelpResults.length; i++) {
       if(yelpResults[i]['location']['address1'] !== "" && yelpResults[i]['location']['address1'] !== null) {
         address = yelpResults[i]['location']['address1'] + " " + yelpResults[i]['location']['city'] + " " + yelpResults[i]['location']['state'];
@@ -324,7 +306,28 @@ function markYelpBusinessesOnMap(percentage) {
             });
           }
 
-          // ajax get rquest used to be here!!!
+          var search_params = {"business_id": yelpResults[i].id}
+          // var reviews = {};
+          // $.get("/yelp_reviews.json", 
+          //   search_params, 
+          //   function(yelpReviewsResults) {
+          //     console.log('YELPREVIEWRESULTS:');
+          //     console.log(yelpReviewsResults);
+          //     for(var i=0; i < yelpReviewsResults.length; i++) { 
+          //       console.log(yelpReviewsResults[i]);      
+          //       debugger;   
+          //       if(yelpReviewsResults[i].user.name !== null && yelpReviewsResults[i].user.name !== "") {  
+          //         debugger;   
+          //         var name = yelpReviewsResult[i].user.name;
+          //         var text = yelpReviewsResult[i].text;
+          //         reviews.name = text;
+          //       }
+          //     }
+          //   // }
+          // });
+          
+          
+          yelp_review_ajax_call(search_params);
           showBusinessBelowMapOnBottomDiv(yelpBusinessDict, reviews);
         } else {
           alert('Geocode was not successful for the following reason: ' + status);
@@ -337,22 +340,24 @@ function markYelpBusinessesOnMap(percentage) {
 }         
 
 
-// function yelp_review_ajax_call(search_params) {
-//   var reviews = {};
-//   $.get("/yelp_reviews.json", 
-//     search_params, 
-//     function(yelpReviewsResults) {
-//       console.log('YELPREVIEWRESULTS:');
-//       console.log(yelpReviewResults);
-//       for(var i=0; i < yelpReviewResults.length; i++) {            
-//         for(var j=0; j<=5; j++) {
-//           // Error! Uncaught ReferenceError: yelpReviewsResult is not defined
-//           reviews[yelpReviewsResult[j].user.name] = yelpReviewsResult[j].text;
-//         }
-//       }
-//   });
-//   return reviews
-// }
+function yelp_review_ajax_call(search_params) {
+  var reviews = {};
+  $.get("/yelp_reviews.json", 
+    search_params, 
+    function(yelpReviewsResults) {
+      console.log('YELPREVIEWRESULTS:');
+      console.log(yelpReviewsResults);
+      for(var i=0; i < yelpReviewsResults.length; i++) {       
+        if(yelpReviewsResults[i].user.name !== null && yelpReviewsResults[i].user.name !== "") {  
+          debugger;   
+          var name = yelpReviewsResult[i].user.name;
+          var text = yelpReviewsResult[i].text;
+          reviews.name = text;
+        }
+      }
+  });
+  return reviews
+}
 
 
 function showBusinessBelowMapOnBottomDiv(yelpBusinessDict, reviews) {

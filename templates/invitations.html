@@ -23,28 +23,6 @@ document.addEventListener("DOMContentLoaded", function() {
 })
 </script>
 
-<script>
-// document.getElementByClassName("delete_invitation").onclick = function() {
-//   alert("click to delete!");
-// }
-
-$(".delete_invitation").click(function(evt){
-  evt.preventDefault();
-  alert("click to delete!");
-
-  $.post(
-        url="/delete-invitation/<invitation_id>",
-        data= {"receiver": invite_details.receiver.name,
-                "sender": invite_details.sender.name,
-                "invite_id": invite_details.invitation_id},
-                function(result){
-                }
-              }
-  );
-
-});
-
-</script>
 {% endblock %}
 
 {% block content %}
