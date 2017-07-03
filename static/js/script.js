@@ -5,6 +5,7 @@ var map;
 var markers = [];
 var polyline = null;
 var infowindow = new google.maps.InfoWindow();
+var business_id = []
 
 function createMarker(latlng, label, html) {
   // Create markers for start and end points, showing lat/lng coords and address.
@@ -221,7 +222,8 @@ function markYelpBusinessesOnMap(percentage) {
             "image_url": yelpResults[i].image_url,
             "name": name,
             "rating": rating,
-            "image_url": image_url
+            "image_url": image_url,
+            "business_id": yelpResults[i].id
           }
           
           var yelpBusinessInfowindowDetails =
@@ -307,28 +309,21 @@ function markYelpBusinessesOnMap(percentage) {
           }
 
           var search_params = {"business_id": yelpResults[i].id}
-          // var reviews = {};
-          // $.get("/yelp_reviews.json", 
-          //   search_params, 
-          //   function(yelpReviewsResults) {
-          //     console.log('YELPREVIEWRESULTS:');
-          //     console.log(yelpReviewsResults);
-          //     for(var i=0; i < yelpReviewsResults.length; i++) { 
-          //       console.log(yelpReviewsResults[i]);      
-          //       debugger;   
-          //       if(yelpReviewsResults[i].user.name !== null && yelpReviewsResults[i].user.name !== "") {  
-          //         debugger;   
-          //         var name = yelpReviewsResult[i].user.name;
-          //         var text = yelpReviewsResult[i].text;
-          //         reviews.name = text;
-          //       }
-          //     }
-          //   // }
-          // });
-          
-          
-          yelp_review_ajax_call(search_params);
+          var reviews = {};
+
+          // function get_yelp_reviews() {
+            $.get("/yelp_reviews.json", 
+              search_params, 
+              function(yelpReviewsResults) {
+                for(var i=0; i < yelpReviewsResults.length; i++) {       
+                  if(yelpReviewsResults[i].user.name !== null && yelpReviewsResults[i].user.name !== "") {    
+                    reviews[yelpReviewsResults[i].user.name] = yelpReviewsResults[i].text;
+                  }
+                }
+            });
+          // }        
           showBusinessBelowMapOnBottomDiv(yelpBusinessDict, reviews);
+
         } else {
           alert('Geocode was not successful for the following reason: ' + status);
         }
@@ -340,24 +335,21 @@ function markYelpBusinessesOnMap(percentage) {
 }         
 
 
-function yelp_review_ajax_call(search_params) {
-  var reviews = {};
-  $.get("/yelp_reviews.json", 
-    search_params, 
-    function(yelpReviewsResults) {
-      console.log('YELPREVIEWRESULTS:');
-      console.log(yelpReviewsResults);
-      for(var i=0; i < yelpReviewsResults.length; i++) {       
-        if(yelpReviewsResults[i].user.name !== null && yelpReviewsResults[i].user.name !== "") {  
-          debugger;   
-          var name = yelpReviewsResult[i].user.name;
-          var text = yelpReviewsResult[i].text;
-          reviews.name = text;
-        }
-      }
-  });
-  return reviews
-}
+// function yelp_review_ajax_call(search_params) {
+//   var reviews = {};
+//   $.get("/yelp_reviews.json", 
+//     search_params, 
+//     function(yelpReviewsResults) {
+//       for(var i=0; i < yelpReviewsResults.length; i++) {       
+//         if(yelpReviewsResults[i].user.name !== null && yelpReviewsResults[i].user.name !== "") {    
+//           var name = yelpReviewsResults[i].user.name;
+//           var text = yelpReviewsResults[i].text;
+//           reviews.name = text;
+//         }
+//       }
+//   });
+//   return reviews
+// }
 
 
 function showBusinessBelowMapOnBottomDiv(yelpBusinessDict, reviews) {
@@ -384,10 +376,15 @@ function showBusinessBelowMapOnBottomDiv(yelpBusinessDict, reviews) {
     rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_5.png" alt="star ratings">';
   };
 
+  for(var key in reviews) {
+    // $(".read-more-target").append('<p>' + key + ': ' + p[key] + '</p>');
+    if(p.hasOwnProperty(key)) {
+      console.log(key);
+    }    
+  }
+  console.log("this is reviews in div function! ---" + reviews);
   var yelpBusinessInfowindowDetails =
     '<div class="row">'+
-    // '<div class="wrap">' + 
-
       '<div class="col-sm-1 business-image">' +
         '<img src='+ yelpBusinessDict.image_url + ' class="business_image" alt="Business Image" height="60" width="60">' +
       '</div>' +
@@ -395,79 +392,76 @@ function showBusinessBelowMapOnBottomDiv(yelpBusinessDict, reviews) {
       '<div class="col-sm-6">' +
         yelpBusinessDict.name + '<br>' +
         yelpBusinessDict.complete_business_address + '<br>' +
+        
+          '<div>' +
+            '<input type="checkbox" class="read-more-state" id="post-{{yelpBusinessDict.name}}" />' +
 
-        '<p class="more">' + 
-          yelpBusinessDict.business_phone + '<br>' + rating + 
-        '</p>' +
-      '</div>' + 
-      '<div class="col-sm-3">' +
-        '<button type="button" class=".btn readmorebtn">more info</button>' +
-        '<form id="inviteForm">' +
-          'E-mail: ' + '<br>' +
-          '<input type="text" id="inviteEmail" name="inviteEmail" value="kevin@gmail.com">' +
-          '<span>' + '<button type="submit" class="inviteFriendButton" value="submit">invite</button>' +
-          '</span>' +
-          '<span id="successFailureMessage"></span>' +
-        '</form>' +
+            '<p class="read-more-wrap">' +
+              '<span class="read-more-target">' + 
+                yelpBusinessDict.business_phone + '<br>' +
+                rating + 
+              '</span>' +
+            '</p>' +
+            
+            '<label for="post-{{yelpBusinessDict.name}}" class="read-more-trigger"></label>' +
+          '</div>' +
+        // '<form id="inviteForm">' +
+          // 'E-mail: ' + '<br>' +
+          // '<input type="text" id="inviteEmail" name="inviteEmail" value="kevin@gmail.com">' +
+          // '<span>' + '<button type="submit" class="inviteFriendButton" value="submit">invite</button>' +
+          // '</span>' +
+          // '<span id="successFailureMessage"></span>' +
+        // '</form>' + 
       '</div>' +
     '</div>' + 
     '<hr>';
   
   $("#yelp_business_row").append(yelpBusinessInfowindowDetails);
 
-  var moreText = "more info",
-      lessText = "less info",
-      moreButton = $(".readmorebtn");
-
-  moreButton.click(function () {
-    var $this = $(this);
-    $this.text($this.text() == moreText ? lessText : moreText).next("p.more").slideToggle("fast");
-  });
-
   ///////////////////////////////////////////////
   // function inviteFriend() {
-    $(".inviteFriendButton").click(function(evt){
-      evt.preventDefault();
+    // $(".inviteFriendButton").click(function(evt){
+    //   evt.preventDefault();
 
-      var emailOfPersonInvited = document.getElementById("inviteEmail").value;
+    //   var emailOfPersonInvited = document.getElementById("inviteEmail").value;
 
-      // AJAX post requst to add_invitation to invitation with email, 
-      // businessAddress, and name for receiver, business_address, and 
-      // business_name for invitation instance respectively.
+    //   // AJAX post requst to add_invitation to invitation with email, 
+    //   // businessAddress, and name for receiver, business_address, and 
+    //   // business_name for invitation instance respectively.
 
-      $.post(
-        url="/add_invitation",
-        data= {"email": emailOfPersonInvited,
-                "businessAddress": yelpBusinessDict.complete_business_address,
-                "businessName": yelpBusinessDict.name},
-        // check for valid email, need to be a registered user to be Ok
-        function(result){
-          if(result["status"] !== "Ok") {
-            console.log("invalid email!!! :(");
-            var invitation_failed_message = '<div>' +
-              data["email"] + " is an invalid email!" + " Please try again."
-              '</div>';
-            $("#successFailureMessage").html(invitation_failed_message)
-                                        .fadeIn()
-                                        .fadeOut(3000)
+    //   $.post(
+    //     url="/add_invitation",
+    //     data= {"email": emailOfPersonInvited,
+    //             "businessAddress": yelpBusinessDict.complete_business_address,
+    //             "businessName": yelpBusinessDict.name},
+    //     // check for valid email, need to be a registered user to be Ok
+    //     function(result){
+    //       if(result["status"] !== "Ok") {
+    //         console.log("invalid email!!! :(");
+    //         var invitation_failed_message = '<div>' +
+    //           data["email"] + " is an invalid email!" + " Please try again."
+    //           '</div>';
+    //         $("#successFailureMessage").html(invitation_failed_message)
+    //                                     .fadeIn()
+    //                                     .fadeOut(3000)
 
-          } else {
-            var invitation_success_message = '<div>' +
-              result["recipient_name"] +  " has been invited to " + yelpBusinessDict.name + "."
-              '</div>';
-            try {
-            $("#successFailureMessage").html(invitation_success_message)
-                                        .fadeIn()
-                                        .fadeOut(3000)
-            }
-            catch(err) {
-              console.log(err.message);
-            }
-          }
-          setTimeout(function() { $("#successFailureMessage").val('');}, 6000);
-        }
-      );
-    });
+    //       } else {
+    //         var invitation_success_message = '<div>' +
+    //           result["recipient_name"] +  " has been invited to " + yelpBusinessDict.name + "."
+    //           '</div>';
+    //         try {
+    //         $("#successFailureMessage").html(invitation_success_message)
+    //                                     .fadeIn()
+    //                                     .fadeOut(3000)
+    //         }
+    //         catch(err) {
+    //           console.log(err.message);
+    //         }
+    //       }
+    //       setTimeout(function() { $("#successFailureMessage").val('');}, 6000);
+    //     }
+    //   );
+    // });
   // }
 ///////////////////////////////////////////////////////////////////
 }
@@ -477,8 +471,12 @@ function clearYelpListing() {
   $("#yelp_business_row").empty();
 }
 
-$(".alert-success").fadeIn()
-                  .fadeOut(3000);
+// $(".delete_invitation").click(function() {
+//   $(".alert-success").fadeIn()
+//                   .fadeOut(3000);
+// });
+
+
 
 // DOMContentLoaded event is fired when the initial HTML document has been completely 
 // loaded and parsed, without waiting for stylesheets, images, and subframes to finish 

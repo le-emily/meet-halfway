@@ -27,6 +27,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
 {% block content %}
 
+<div class="alert alert-success" style="display:none;">
+  <strong>Success!</strong> Indicates a successful or positive action.
+</div>
+
 <div class="receivers_invitations">
 <h4>Received</h4>
 {% for invitation in invitations %}
@@ -55,9 +59,7 @@ document.addEventListener("DOMContentLoaded", function() {
             <div class="invite_details"> {{ invite_details.business_name }}<br>{{ invite_details.business_address }}</div>
         </div>
         <form action="/delete-invitation/{{ invite_details.invitation_id }}">
-      <!-- <input type="submit" value="Delete" /> -->
-          <input type="hidden" name="invitation_id" value={{ invite_details.invitation_id }}> </input>
-          <button class="btn btn-warning delete_invitation" type="submit" class="delete_invitation" name="delete" value="Delete">Delete</button>
+          <button class="btn btn-warning delete" type="submit" class="delete_invitation" name="delete" value="Delete">Delete</button>
         </form>
         <hr>
     {% else %}
@@ -70,9 +72,7 @@ document.addEventListener("DOMContentLoaded", function() {
         {% endif %}
         <div class="invite_details"><div>{{ invite_details.business_name }}</div><div>{{ invite_details.business_address }}</div></div>
         <form action="/delete-invitation/{{ invite_details.invitation_id }}">
-      <!-- <input type="submit" value="Delete" /> -->
-          <input type="hidden" name="invitation_id" value={{ invite_details.invitation_id }}> </input>
-          <button class="btn btn-warning delete_invitation" type="submit" class="delete_invitation" name="delete" value="Delete">Delete</button>
+          <button class="btn btn-warning delete" type="submit" class="delete_invitation" name="delete" value="Delete">Delete</button>
         </form>
         <hr>
       </div>

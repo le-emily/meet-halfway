@@ -2,15 +2,15 @@
 {% block content %}
 
 <form action="/delete-invitation/<invitation_id>" method="POST">
-  <h3>Invite Details</h3>
-  <div>Invite ID: {{ invitation.invitation_id }}</div>
-  <div>Sender: {{ invitation.sender.name }}</div>
-  <div>Receiver: {{ invitation.receiver.name }}</div>
-  <div>{{ invitation.business_name }}</div><div>{{ invitation.business_address }}</div>
-  <p><strong>***Deleting this invitation will delete it forever.***</strong></p>
-<!-- <input type="submit" value="Delete" /> -->
+    <h3>Invite Details</h3>
+    <div>Invite ID: {{ invitation.invitation_id }}</div>
+    <div>Sender: {{ invitation.sender.name }}</div>
+    <div>Receiver: {{ invitation.receiver.name }}</div>
+    <div>{{ invitation.business_name }}</div><div>{{ invitation.business_address }}</div>
+    <p><strong>***Deleting this invitation will delete it forever.***</strong></p>
+    <!-- Need the input type to send invitation_id data to route's controller -->
     <input type="hidden" name="invitation_id" value={{ invitation.invitation_id }}> </input>
-  <button class="btn btn-warning delete_invitation" type="submit">Delete</button>
+    <button class="btn btn-warning delete_invitation" type="submit">Delete</button>
 </form>
 
 {% endblock %}
