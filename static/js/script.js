@@ -128,7 +128,7 @@ function calcRoute() {
       polyline.setMap(map);
       computeTotalDistance(response);
 
-      putMidpointMarkerOnRoute(50,);
+      putMidpointMarkerOnRoute(50);
       markYelpBusinessesOnMap(50);
     } else {
       alert("directions response " + status);
@@ -309,20 +309,26 @@ function markYelpBusinessesOnMap(percentage) {
           }
 
           var search_params = {"business_id": yelpResults[i].id}
-          var reviews = {};
 
           // function get_yelp_reviews() {
-            $.get("/yelp_reviews.json", 
-              search_params, 
-              function(yelpReviewsResults) {
-                for(var i=0; i < yelpReviewsResults.length; i++) {       
-                  if(yelpReviewsResults[i].user.name !== null && yelpReviewsResults[i].user.name !== "") {    
-                    reviews[yelpReviewsResults[i].user.name] = yelpReviewsResults[i].text;
-                  }
-                }
-            });
-          // }        
-          showBusinessBelowMapOnBottomDiv(yelpBusinessDict, reviews);
+            // $.get("/yelp_reviews.json", 
+            //   search_params, 
+            //   function(yelpReviewsResults) {
+            //     if(status == 'OK') {
+            //       for(var i=0; i < yelpReviewsResults.length; i++) {       
+            //         if(yelpReviewsResults[i].user.name !== null && yelpReviewsResults[i].user.name !== "") {    
+            //           reviews[yelpReviewsResults[i].user.name] = yelpReviewsResults[i].text;
+            //           console.log("reviews INSIDE ajax request");
+            //           console.log('third', reviews);
+            //         }
+            //       }
+            //     }
+            // });
+          // }  
+          // console.log("reviews OUTSIDE ajax get request");
+          // console.log('first', reviews);      
+          // reviews not getting populated before showBusinessBelowMapOnBottomDiv function is run
+          showBusinessBelowMapOnBottomDiv(yelpBusinessDict, search_params);
 
         } else {
           alert('Geocode was not successful for the following reason: ' + status);
@@ -352,7 +358,20 @@ function markYelpBusinessesOnMap(percentage) {
 // }
 
 
-function showBusinessBelowMapOnBottomDiv(yelpBusinessDict, reviews) {
+function showBusinessBelowMapOnBottomDiv(yelpBusinessDict, search_params) {
+
+  $.get("/yelp_reviews.json", 
+    search_params, 
+    function(yelpReviewsResults) {
+      for(var i=0; i < 2; i++) {    
+        if(yelpReviewsResults[i].user.name !== null && yelpReviewsResults[i].user.name !== "") {    
+          visitor = yelpReviewsResults[i].user.name;
+          review = yelpReviewsResults[i].text;
+          // reviews[visitor] = review;
+          $(".read-more-target").append('<p>' + visitor + ' -- ' + review +'</p>');
+        }
+      }
+  });
   // Set ratings to yelp stars image
   if(yelpBusinessDict.rating == 0) {
     rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_0.png" alt="star ratings">';
@@ -376,34 +395,25 @@ function showBusinessBelowMapOnBottomDiv(yelpBusinessDict, reviews) {
     rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_5.png" alt="star ratings">';
   };
 
-  for(var key in reviews) {
-    // $(".read-more-target").append('<p>' + key + ': ' + p[key] + '</p>');
-    if(p.hasOwnProperty(key)) {
-      console.log(key);
-    }    
-  }
-  console.log("this is reviews in div function! ---" + reviews);
   var yelpBusinessInfowindowDetails =
     '<div class="row">'+
       '<div class="col-sm-1 business-image">' +
         '<img src='+ yelpBusinessDict.image_url + ' class="business_image" alt="Business Image" height="60" width="60">' +
       '</div>' +
 
-      '<div class="col-sm-6">' +
+      '<div class="col-sm-6 business-info">' +
         yelpBusinessDict.name + '<br>' +
-        yelpBusinessDict.complete_business_address + '<br>' +
-        
+        yelpBusinessDict.complete_business_address + '<br>' + 
           '<div>' +
-            '<input type="checkbox" class="read-more-state" id="post-{{yelpBusinessDict.name}}" />' +
-
+            '<input type="checkbox" class="read-more-state" id="post-{{yelpBusinessDict.business_id}}" />' +
             '<p class="read-more-wrap">' +
               '<span class="read-more-target">' + 
                 yelpBusinessDict.business_phone + '<br>' +
-                rating + 
+                rating + '<br>' +
               '</span>' +
             '</p>' +
             
-            '<label for="post-{{yelpBusinessDict.name}}" class="read-more-trigger"></label>' +
+            '<label for="post-{{yelpBusinessDict.business_id}}" class="read-more-trigger"></label>' +
           '</div>' +
         // '<form id="inviteForm">' +
           // 'E-mail: ' + '<br>' +
