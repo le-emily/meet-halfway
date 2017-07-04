@@ -18,6 +18,13 @@ html, body {
   padding: 0 50px;
 }
 
+/*p {
+  white-space: pre-line;
+}*/
+.firstHeading {
+  color: #b5002b;
+}
+
 #venue_type {
   padding-left: 10px
 }

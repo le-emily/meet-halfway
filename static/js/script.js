@@ -156,8 +156,9 @@ function computeTotalDistance(result) {
     totalTime += myroute.legs[i].duration.value;
   }
 
-  document.getElementById("total").innerHTML = "Total distance is: "+ (totalDist / 1000.) + 
-    " km<br>Total time is: " + (totalTime / 60).toFixed(2) + " minutes";
+  document.getElementById("total").innerHTML = "Total distance is: "+ (totalDist / 1000.);
+
+   // "km<br>Total time is: " + (totalTime / 60).toFixed(2) + " minutes";
 }
 
 function putMidpointMarkerOnRoute(percentage) {
@@ -309,6 +310,7 @@ function markYelpBusinessesOnMap(percentage) {
           }
 
           var search_params = {"business_id": yelpResults[i].id}
+          console.log('SEARCH PARAMS ', search_params);
 
           // function get_yelp_reviews() {
             // $.get("/yelp_reviews.json", 
@@ -359,19 +361,6 @@ function markYelpBusinessesOnMap(percentage) {
 
 
 function showBusinessBelowMapOnBottomDiv(yelpBusinessDict, search_params) {
-
-  $.get("/yelp_reviews.json", 
-    search_params, 
-    function(yelpReviewsResults) {
-      for(var i=0; i < 2; i++) {    
-        if(yelpReviewsResults[i].user.name !== null && yelpReviewsResults[i].user.name !== "") {    
-          visitor = yelpReviewsResults[i].user.name;
-          review = yelpReviewsResults[i].text;
-          // reviews[visitor] = review;
-          $(".read-more-target").append('<p>' + visitor + ' -- ' + review +'</p>');
-        }
-      }
-  });
   // Set ratings to yelp stars image
   if(yelpBusinessDict.rating == 0) {
     rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_0.png" alt="star ratings">';
@@ -395,6 +384,19 @@ function showBusinessBelowMapOnBottomDiv(yelpBusinessDict, search_params) {
     rating = '<img src="../static/img/yelp_stars/web_and_ios/small/small_5.png" alt="star ratings">';
   };
 
+  console.log('SEARCH PARAMS IN FUNCITON', search_params);
+
+  $.get("/yelp_reviews.json", 
+    search_params, 
+    function(yelpReviewsResults) {
+      for(var i=0; i < yelpReviewsResults.length; i++) {     
+        visitor = yelpReviewsResults[i].user.name;
+        review = yelpReviewsResults[i].text;
+        timestamp = yelpReviewsResults[i].time_created;
+        $("#collapseOne").append('<p>' + '<b>' + visitor + '</b>' + ' -- ' + timestamp + '<br>' + review + '</p>');
+      }
+  });
+
   var yelpBusinessInfowindowDetails =
     '<div class="row">'+
       '<div class="col-sm-1 business-image">' +
@@ -402,26 +404,33 @@ function showBusinessBelowMapOnBottomDiv(yelpBusinessDict, search_params) {
       '</div>' +
 
       '<div class="col-sm-6 business-info">' +
-        yelpBusinessDict.name + '<br>' +
-        yelpBusinessDict.complete_business_address + '<br>' + 
-          '<div>' +
-            '<input type="checkbox" class="read-more-state" id="post-{{yelpBusinessDict.business_id}}" />' +
-            '<p class="read-more-wrap">' +
-              '<span class="read-more-target">' + 
-                yelpBusinessDict.business_phone + '<br>' +
-                rating + '<br>' +
-              '</span>' +
-            '</p>' +
-            
-            '<label for="post-{{yelpBusinessDict.business_id}}" class="read-more-trigger"></label>' +
-          '</div>' +
-        // '<form id="inviteForm">' +
-          // 'E-mail: ' + '<br>' +
-          // '<input type="text" id="inviteEmail" name="inviteEmail" value="kevin@gmail.com">' +
-          // '<span>' + '<button type="submit" class="inviteFriendButton" value="submit">invite</button>' +
-          // '</span>' +
-          // '<span id="successFailureMessage"></span>' +
-        // '</form>' + 
+        '<p>' + 
+          yelpBusinessDict.name + '<br>' +
+          yelpBusinessDict.complete_business_address + '<br>' +
+          '<button type="button" class="btn btn-default btn-sm" data-toggle="collapse" data-target="#demo">collapse</button>' + 
+          '<div id="collapseOne" class="panel-collapse collapse in">' + 
+            // '<div>' +
+              // '<input type="checkbox" class="read-more-state" id="post-{{yelpBusinessDict.business_id}}" />' +
+              // '<p class="read-more-wrap">' +
+                // '<span class="read-more-target">' + 
+                  // 'Tel: ' + yelpBusinessDict.business_phone + '<br>' +
+                  // rating + 
+          '</div>' + 
+                // '</span>' +
+              // '</p>' +
+              
+              // '<label for="post-{{yelpBusinessDict.business_id}}" class="read-more-trigger"></label>' +
+            // '</div>' +
+
+
+          // '<form id="inviteForm">' +
+            // 'E-mail: ' + '<br>' +
+            // '<input type="text" id="inviteEmail" name="inviteEmail" value="kevin@gmail.com">' +
+            // '<span>' + '<button type="submit" class="inviteFriendButton" value="submit">invite</button>' +
+            // '</span>' +
+            // '<span id="successFailureMessage"></span>' +
+          // '</form>' + 
+        '</p>' +
       '</div>' +
     '</div>' + 
     '<hr>';
