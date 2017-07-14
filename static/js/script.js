@@ -224,7 +224,8 @@ function markYelpBusinessesOnMap(percentage) {
             "name": name,
             "rating": rating,
             "image_url": image_url,
-            "business_id": yelpResults[i].id
+            "business_id": yelpResults[i].id,
+            "url": url
           }
           
           var yelpBusinessInfowindowDetails =
@@ -360,16 +361,18 @@ function showBusinessBelowMapOnBottomDiv(yelpBusinessDict, search_params) {
   //     console.log('YELP REVIEW RESULTS, ENTIRE THING', yelpReviewsResults);
   //     console.log('yelpReviewsResults', yelpReviewsResults.business_id);
   //     console.log('SEARCH PARAMS', search_params.business_id);
+
   //     for(var key in reviews) {
   //       $('.business-info').append('<p>' + '<b>' + key + '</b>' + ' -- ' + timestamp + '<br>' + reviews[key] + '</p>');
   //     }
   //     reviews = {};
+
   // });
 
   var yelpBusinessInfowindowDetails =
     '<div class="row">'+
       '<div class="col-sm-1 business-image">' +
-        '<img src='+ yelpBusinessDict.image_url + ' class="business_image" alt="Business Image" height="60" width="60">' +
+        '<img src='+ yelpBusinessDict.image_url + ' class="business_image" style="border-radius: 10px;" alt="Business Image" height="65" width="65">' +
       '</div>' +
 
       '<div class="col-sm-6 business-info">' +
@@ -378,8 +381,11 @@ function showBusinessBelowMapOnBottomDiv(yelpBusinessDict, search_params) {
           yelpBusinessDict.name + '<br>' +
           yelpBusinessDict.complete_business_address + '<br>' +
 
-                'Tel: ' + yelpBusinessDict.business_phone + '<br>' +
+                'Tel: ' + yelpBusinessDict.business_phone + ' - ' + '<a href="' + yelpBusinessDict.url + '">View Website</a>' 
+                + '<br>' +
                   rating +
+
+                // '<button type="button" class="btn reviews-button">Basic</button>' + 
         '</p>' +
 
       '</div>' +
